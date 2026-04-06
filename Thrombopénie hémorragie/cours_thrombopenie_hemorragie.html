@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thrombopénie & Hémorragie - Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+  .pdf-5 { background: #3a1a2a; color: #ff6b9d; }
+  .pdf-6 { background: #1a3a3a; color: #22d3ee; }
+  .pdf-7 { background: #2a2a1a; color: #facc15; }
+  .pdf-8 { background: #1a2a2a; color: #34d399; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Thrombopénie & Hémorragie</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 104</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Thrombopénie_et_Purpuras", label: "Thrombopénie et Purpuras : Démarche Diagnostique", badge: "pdf-1", totalSlides: 12 },
+  { id: 2, name: "Thrombocytopenia_Clinical_Handbook", label: "Le Guide Diagnostique : Urgences et Étiologies", badge: "pdf-2", totalSlides: 14 },
+  { id: 3, name: "Purpura_Diagnostic_Approach", label: "Démarche Diagnostique face au Purpura", badge: "pdf-3", totalSlides: 13 },
+  { id: 4, name: "Thrombocytopenia_and_Purpura_Clinical_Protocol", label: "Algorithme Clinique et Prise en Charge", badge: "pdf-4", totalSlides: 12 },
+  { id: 5, name: "Hemorrhagic_Syndromes_and_Thrombopathies", label: "Le Syndrome Hémorragique et Les Thrombopathies", badge: "pdf-5", totalSlides: 10 },
+  { id: 6, name: "Constitutional_Hemorrhagic_Syndromes", label: "Syndromes Hémorragiques Constitutionnels", badge: "pdf-6", totalSlides: 16 },
+  { id: 7, name: "Le_Code_Vasculaire", label: "L'Équilibre Rompu : Syndromes Hémorragiques et Thrombotiques", badge: "pdf-7", totalSlides: 12 },
+  { id: 8, name: "Thromboembolic_Investigation_Guide", label: "L'Enquête Thrombotique", badge: "pdf-8", totalSlides: 15 },
+];
+
+const flashcardMap = {
+  "1-2": [
+    {q:"Quelle est la valeur seuil définissant une thrombopénie ?", a:"< 150 G/L"},
+    {q:"Quelle est la plage de valeurs normales pour un taux de plaquettes ?", a:"Entre 150 et 400 G/L"},
+    {q:"Quel appareil est utilisé pour déterminer le nombre de plaquettes lors d'un hémogramme ?", a:"Un automate de numération"},
+    {q:"Comment décrirait-on la morphologie d'une plaquette par rapport à un globule rouge ?", a:"De très petite taille et dépourvue de noyau"},
+    {q:"Quel est le rôle physiologique principal des plaquettes ?", a:"L'hémostase primaire"},
+    {q:"Quel élément est formé par l'agrégation des plaquettes lors d'une brèche vasculaire ?", a:"Le clou plaquettaire (ou thrombus plaquettaire)"},
+    {q:"Qu'est-ce qui assure la consolidation du clou plaquettaire après sa formation ?", a:"La coagulation (via les facteurs de coagulation)"}
+  ],
+  "1-3": [
+    {q:"À quel seuil de plaquettes le risque d'hémorragie spontanée devient-il une urgence vitale ?", a:"< 20 G/L"},
+    {q:"Sous quelle condition un taux de plaquettes entre 20 et 50 G/L présente-t-il un risque hémorragique possible ?", a:"Surtout en présence de facteurs hémorragiques aggravants"},
+    {q:"Quel est le risque principal pour un patient ayant un taux de plaquettes > 50 G/L ?", a:"Le risque lors d'opérations chirurgicales"},
+    {q:"Vrai ou Faux : Les signes hémorragiques sont toujours proportionnels à la profondeur de la thrombopénie.", a:"Faux (ils ne sont pas toujours corrélés)"}
+  ],
+  "1-4": [
+    {q:"Quelles sont les trois étapes de la conduite à tenir devant une thrombopénie ?", a:"Éliminer une fausse thrombopénie, évaluer la gravité et faire l'enquête étiologique"}
+  ],
+  "1-5": [
+    {q:"Quelle est la cause la plus fréquente d'une fausse thrombopénie biologique ?", a:"La présence d'amas ou d'agrégats plaquettaires in vitro"},
+    {q:"Quel anticoagulant présent dans les tubes de prélèvement peut déclencher une agrégation plaquettaire artificielle ?", a:"L'EDTA"},
+    {q:"Pourquoi l'automate sous-estime-t-il le taux de plaquettes en présence d'agrégats ?", a:"Il ne compte que les plaquettes libres"},
+    {q:"Quel examen permet de confirmer visuellement la présence d'amas plaquettaires ?", a:"Le frottis sanguin"}
+  ],
+  "1-6": [
+    {q:"Quel type de tube de prélèvement permet de corriger une fausse thrombopénie liée à l'EDTA ?", a:"Le tube citraté"},
+    {q:"Comment appelle-t-on le phénomène où les plaquettes se fixent autour des leucocytes ?", a:"Le satellitisme plaquettaire"},
+    {q:"Vrai ou Faux : Un patient peut présenter simultanément des agrégats plaquettaires et une vraie thrombopénie.", a:"Vrai"},
+    {q:"Pourquoi ne faut-il pas retarder la prise en charge d'un patient hémorragique pour explorer une suspicion de fausse thrombopénie ?", a:"Parce que le syndrome hémorragique rend la fausse thrombopénie très improbable et prime sur l'artefact"}
+  ],
+  "1-7": [
+    {q:"Quel type de signes hémorragiques est spécifiquement associé aux anomalies plaquettaires ?", a:"Les signes cutanéo-muqueux"},
+    {q:"Comment définit-on cliniquement le purpura ?", a:"L'extravasation de globules rouges hors des vaisseaux sanguins dans le derme"},
+    {q:"Quelle est la caractéristique physique majeure d'une lésion purpurique ?", a:"Elle ne s'efface pas à la vitro-pression"}
+  ],
+  "1-8": [
+    {q:"Terme : Pétéchies", a:"Définition : Éléments purpuriques punctiformes de la taille d'une tête d'épingle"},
+    {q:"Quelle est l'origine physiologique de la couleur des ecchymoses ?", a:"La dégradation de l'hémoglobine dans le derme"},
+    {q:"Terme : Vibices", a:"Définition : Lésions purpuriques se présentant sous forme de traînées linéaires"}
+  ],
+  "1-9": [
+    {q:"Comment appelle-t-on un saignement des gencives ?", a:"Une gingivorragie"},
+    {q:"Comment appelle-t-on un saignement nasal ?", a:"Une épistaxis"},
+    {q:"Quel signe muqueux buccal constitue une urgence absolue en cas de thrombopénie ?", a:"Les bulles hémorragiques buccales"},
+    {q:"Quelles sont les deux circonstances principales de découverte d'une thrombopénie ?", a:"Découverte biologique fortuite (NFS) ou découverte clinique (syndrome hémorragique)"},
+    {q:"Citez trois organes pouvant être le siège d'hémorragies graves lors d'une thrombopénie sévère.", a:"Le cerveau (hémorragie cérébrale), le tube digestif ou l'œil (fond d'œil)"}
+  ],
+  "1-10": [
+    {q:"Pourquoi certaines thromboses provoquent-elles paradoxalement une thrombopénie ?", a:"À cause de la consommation excessive des plaquettes pour former les thrombus"},
+    {q:"Que signifie l'acronyme MAT ?", a:"Micro-Angiopathie Thrombotique"},
+    {q:"Quel traitement anticoagulant peut provoquer une thrombopénie immuno-allergique ?", a:"L'héparine (TIH : Thrombopénie Induite par l'Héparine)"},
+    {q:"Quel est le mécanisme de la Thrombopénie Induite par l'Héparine (TIH) ?", a:"Production d'anticorps activant les plaquettes, entraînant leur consommation"},
+    {q:"Quelles sont les deux questions fondamentales à se poser devant toute thrombopénie ?", a:"1) Est-ce une urgence ? 2) Quelles sont les étiologies ?"},
+    {q:"Quel est le taux de mortalité estimé en cas d'hémorragie sur thrombopénie sévère ?", a:"Environ 5 %"},
+    {q:"Quel signe clinique de gravité peut accompagner une hémorragie extériorisée abondante ?", a:"Une déglobulisation (baisse de l'hémoglobine)"},
+    {q:"Citez trois signes de gravité clinique à rechercher impérativement face à une thrombopénie.", a:"Bulles hémorragiques buccales, hématomes spontanés et hémorragies extériorisées"}
+  ],
+  "1-11": [
+    {q:"Où adhèrent les plaquettes immédiatement après une lésion vasculaire ?", a:"Au sous-endothélium"},
+    {q:"Vrai ou Faux : Les pétéchies sont douloureuses.", a:"Faux (elles sont indolores)"},
+    {q:"Quelle est la localisation anatomique précise de l'accumulation des globules rouges dans le purpura ?", a:"Le derme"},
+    {q:"Un bilan pré-opératoire révèle une thrombopénie sans saignements. S'agit-il d'une découverte _____.", a:"fortuite (ou biologique)"},
+    {q:"Le purpura _____ correspond à une éruption cutanée ne s'effaçant pas à la pression.", a:"cutané"},
+    {q:"Les ecchymoses sont plus familièrement appelées des _____.", a:"bleus"},
+    {q:"L'épistaxis abondant est considéré comme un signe de _____.", a:"gravité"},
+    {q:"Les automates de numération comptent les plaquettes de manière _____.", a:"individuelle"},
+    {q:"Concept : Hémostase primaire", a:"Processus impliquant l'adhésion, l'activation et l'agrégation plaquettaire pour stopper un saignement initial."}
+  ],
+  "1-12": [
+    {q:"À quel type de purpura appartient le purpura rhumatoïde dans la classification générale ?", a:"Purpura vasculaire"},
+    {q:"Quels sont les deux grands types de purpura plaquettaire ?", a:"Purpura thrombopénique et purpura thrombopathique"},
+    {q:"Citez les trois catégories de purpura vasculaire.", a:"Infectieux, immunologique et rhumatoïde"},
+    {q:"Quel examen doit être réalisé en urgence dès qu'un syndrome hémorragique est suspecté ?", a:"Une NFS avec frottis sanguin"},
+    {q:"Comment décrirait-on l'aspect des vibices ?", a:"Des ecchymoses en traînées linéaires"},
+    {q:"Quel phénomène artefactuel est décrit comme étant réversible dans le temps chez un même patient ?", a:"L'agrégation plaquettaire à l'EDTA (fausse thrombopénie)"},
+    {q:"Dans quel contexte rencontre-t-on le plus souvent des vibices ?", a:"Zones de flexion ou de frottement (bien que plus rares)"},
+    {q:"Un purpura lié à un défaut de fonction des plaquettes (nombre normal) est un purpura _____.", a:"thrombopathique"},
+    {q:"Les plaquettes sont des éléments _____ du sang, contrairement aux globules rouges qui sont des cellules (bien qu'anucléées également).", a:"figurés"},
+    {q:"L'extravasation de GR dans le purpura entraîne des lésions de couleur _____.", a:"rouge-violacée"},
+    {q:"Pourquoi le purpura est-il qualifié de signe 'transversal' ?", a:"Parce qu'il n'est pas spécifique aux pathologies hématologiques"},
+    {q:"Quel signe clinique de gravité met en jeu le pronostic vital du patient lors d'une thrombopénie ?", a:"Le risque d'hémorragie spontanée (notamment cérébrale ou digestive)"},
+    {q:"Quelle est la taille approximative des pétéchies ?", a:"La taille d'une tête d'épingle"},
+    {q:"Les bulles hémorragiques buccales indiquent généralement un taux de plaquettes très _____.", a:"bas (ou faible / sévère)"},
+    {q:"L'enquête étiologique d'une thrombopénie cherche à distinguer les causes _____ des causes centrales.", a:"périphériques"},
+    {q:"Que signifie PTI dans le contexte de la thrombopénie ?", a:"Purpura Thrombopénique Immunologique"},
+    {q:"L'agrégation des plaquettes forme un thrombus qui prévient l'_____.", a:"hémorragie"},
+    {q:"Vrai ou Faux : L'automate de numération peut compter les plaquettes à l'intérieur d'un amas.", a:"Faux"},
+    {q:"Le frottis sanguin permet d'éliminer une fausse thrombopénie en vérifiant l'absence d'_____.", a:"amas (ou agrégats) plaquettaires"},
+    {q:"Une hémorragie du _____ d'œil est un signe de gravité neurologique/sensorielle.", a:"fond"},
+    {q:"Le clou plaquettaire est la base de l'hémostase _____.", a:"primaire"},
+    {q:"En cas de thrombopénie sévère, quel pourcentage de mortalité est associé aux complications hémorragiques ?", a:"5 %"},
+    {q:"Quel constituant sanguin est responsable de la couleur violacée initiale du purpura ?", a:"Les globules rouges (extravasés)"},
+    {q:"Le tube _____ (couleur bleue souvent) est l'alternative classique au tube EDTA.", a:"citraté"},
+    {q:"Comment appelle-t-on les plaques purpuriques larges aux contours mal limités ?", a:"Les ecchymoses"},
+    {q:"La thrombopénie est définie par un taux de plaquettes inférieur à _____ G/L.", a:"150"},
+    {q:"Quelle est la principale complication d'une thrombopénie lors d'un acte invasif ?", a:"L'hémorragie post-opératoire ou traumatique"},
+    {q:"Pourquoi recherche-t-on systématiquement des signes de gravité devant toute thrombopénie ?", a:"Car le pronostic vital peut être engagé à court terme"},
+    {q:"Le terme 'extravasation' signifie que les cellules sortent du _____.", a:"vaisseau (sanguin)"},
+    {q:"Dans quel plan du cours se situe l'étude du PTI et de la MAT ?", a:"Dans l'étude des étiologies des thrombopénies"},
+    {q:"Quel signe clinique muqueux correspond à une hémorragie oculaire superficielle ?", a:"L'hémorragie conjonctivale"}
+  ],
+  "2-2": [
+    {q:"Quel type d'infection bactérienne grave est associé au purpura fulminans ?", a:"Une méningite."},
+    {q:"Quel aspect cutané du purpura évoque une infection par méningocoque ou pneumocoque ?", a:"L'aspect en carte de géographie (confluent et/ou nécrotique)."},
+    {q:"Quels sont les deux principaux agents infectieux responsables du purpura fulminans ?", a:"Le méningocoque et le pneumocoque."},
+    {q:"Citez un signe neurologique d'alerte devant une thrombopénie grave évoquant un syndrome méningé.", a:"Des céphalées (douleur en casque, diffuse)."},
+    {q:"En l'absence de facteurs aggravants, en dessous de quel seuil de plaquettes voit-on généralement les signes de gravité ?", a:"20 G/L."}
+  ],
+  "2-3": [
+    {q:"À partir de quel seuil de plaquettes une hémorragie devient-elle possible en présence de facteurs aggravants ?", a:"50 G/L."},
+    {q:"Quel âge est considéré comme un facteur clinique aggravant augmentant le risque hémorragique ?", a:"Plus de 65 ans."},
+    {q:"Citez deux anomalies de l'hémostase constitutionnelle aggravant le risque hémorragique.", a:"La maladie de Willebrand et les hémophilies."},
+    {q:"Quelle pathologie de l'hémostase acquise est un facteur de risque hémorragique majeur ?", a:"La CIVD (coagulation intravasculaire disséminée)."},
+    {q:"Quels types de traitements médicamenteux sont des facteurs aggravants de la thrombopénie ?", a:"Les anti-agrégants plaquettaires et les anticoagulants."},
+    {q:"Citez deux exemples de pathologies sous-jacentes potentiellement hémorragiques à surveiller.", a:"Les ulcères digestifs et les anévrysmes."},
+    {q:"Entre une thrombopénie centrale et périphérique, laquelle présente le plus de risques hémorragiques ?", a:"La thrombopénie d'origine centrale."}
+  ],
+  "2-4": [
+    {q:"Quel type d'injection est formellement proscrit en cas de thrombopénie profonde ?", a:"Les injections intramusculaires."},
+    {q:"Quelles précautions prendre pour une biopsie ou une chirurgie si les plaquettes sont < 50 G/L ?", a:"Différer le geste, transfuser des plaquettes ou augmenter le temps de compression."},
+    {q:"Citez deux procédures médicales contre-indiquées si le taux de plaquettes est inférieur à 20 G/L.", a:"La ponction lombaire et la ponction pleurale (ou péricardique)."},
+    {q:"Pourquoi les voyages en avion sont-ils déconseillés si les plaquettes sont < 20 G/L ?", a:"À cause des risques liés à la dépressurisation."}
+  ],
+  "2-5": [
+    {q:"Quelles sont les trois grandes causes de thrombopénies périphériques ?", a:"Destruction accélérée, séquestration splénique et consommation excessive."},
+    {q:"Quel est le mécanisme principal des thrombopénies centrales ?", a:"Un défaut de production dans la moelle osseuse (diminution de la mégacaryopoïèse)."},
+    {q:"Comment se présente généralement l'hémogramme dans une thrombopénie périphérique ?", a:"Une thrombopénie isolée."},
+    {q:"Comment se présente souvent l'hémogramme dans une thrombopénie centrale ?", a:"Une atteinte associée d'autres lignées cellulaires sanguines."}
+  ],
+  "2-6": [
+    {q:"Citez trois exemples d'infections virales pouvant causer une destruction accélérée des plaquettes.", a:"Le VIH, le VHC et le VHB."},
+    {q:"Quels sont les deux types de causes allo-immunes de thrombopénie ?", a:"Post-transfusionnelle et fœto-maternelle."},
+    {q:"Citez deux classes de médicaments fréquemment impliquées dans les thrombopénies immuno-allergiques.", a:"Les AINS et les antibiotiques."},
+    {q:"Que signifie l'acronyme PTI ?", a:"Purpura Thrombopénique Immunologique."},
+    {q:"Quelle pathologie hépatique est la cause la plus fréquente d'hypersplénisme avec thrombopénie ?", a:"La cirrhose (provoquant une hypertension portale)."},
+    {q:"Quel est le mécanisme de la thrombopénie dans la MAT ?", a:"Une consommation par activation des plaquettes formant des microthrombies."},
+    {q:"Qu'est-ce que le HELLP syndrome ?", a:"Une complication de la grossesse similaire à la MAT."}
+  ],
+  "2-7": [
+    {q:"Citez deux causes d'insuffisance médullaire entraînant une thrombopénie centrale.", a:"Les syndromes myélodysplasiques et l'aplasie médullaire."},
+    {q:"Quelle carence vitaminique est associée à une anémie macrocytaire et une thrombopénie centrale ?", a:"La carence en vitamine B12 ou en folates."},
+    {q:"Quels types de cellules peuvent envahir la moelle et causer une thrombopénie centrale ?", a:"Des cellules d'hémopathies malignes (leucémies) ou des métastases de cancers solides."},
+    {q:"Quel toxique a un mécanisme complexe impactant directement la thrombopoïèse ?", a:"L'alcool."}
+  ],
+  "2-8": [
+    {q:"Quelle est la définition biologique simplifiée du PTI ?", a:"Une thrombopénie isolée < 100 G/L d'origine auto-immune."},
+    {q:"Dans quelle population le PTI est-il le plus fréquent ?", a:"Chez l'enfant."},
+    {q:"Quel est le pourcentage de PTI considérés comme idiopathiques ?", a:"80%."},
+    {q:"Citez une cause de PTI secondaire.", a:"Le Lupus Érythémateux Disséminé (LED) ou des hémopathies lymphoïdes."}
+  ],
+  "2-9": [
+    {q:"Pourquoi dit-on que le diagnostic du PTI est un diagnostic d'élimination ?", a:"Car il nécessite d'écarter les amas, la MAT, la CIVD, l'hypersplénisme et l'insuffisance médullaire."},
+    {q:"Quel traitement est indiqué pour un PTI si les plaquettes sont < 30 G/L ?", a:"Une corticothérapie (éventuellement associée à des immunoglobulines IV)."}
+  ],
+  "2-10": [
+    {q:"La MAT associe une thrombopénie de consommation et une _____.", a:"Anémie hémolytique de type mécanique."},
+    {q:"Quel élément biologique sur le frottis sanguin signe une MAT ?", a:"La présence de schizocytes > 1%."},
+    {q:"Quels sont les quatre signes biologiques d'hémolyse ?", a:"Anémie régénérative, haptoglobine effondrée, LDH élevées et bilirubine augmentée."},
+    {q:"Devant une anémie régénérative avec thrombopénie, quel examen du sang est indispensable ?", a:"Le frottis sanguin (recherche de schizocytes)."},
+    {q:"Pourquoi l'anémie hémolytique est-elle considérée comme une urgence ?", a:"La déglobulisation rapide peut mettre en jeu le pronostic vital."}
+  ],
+  "2-11": [
+    {q:"Que signifie l'acronyme PTT ?", a:"Purpura Thrombotique Thrombocytopénique."},
+    {q:"Quels signes cliniques distinguent le PTT chez l'adulte ?", a:"Fièvre, troubles de la conscience et douleurs abdominales."},
+    {q:"Quel enzyme est déficitaire dans le diagnostic de certitude du PTT ?", a:"L'enzyme ADAMTS13."},
+    {q:"Que signifie l'acronyme SHU ?", a:"Syndrome Hémolytique et Urémique."},
+    {q:"Quelle est la triade clinique classique du SHU chez l'enfant ?", a:"Atteinte rénale aiguë, troubles digestifs (diarrhée) et anémie hémolytique."},
+    {q:"Quelle bactérie est la plus fréquemment responsable du SHU ?", a:"Escherichia coli O157:H7."}
+  ],
+  "2-12": [
+    {q:"Citez un antécédent personnel à rechercher systématiquement face à une thrombopénie.", a:"Hépatopathie, cancer, maladie auto-immune ou infection récente."},
+    {q:"Pourquoi l'historique de voyage dans un pays tropical est-il pertinent ?", a:"Pour rechercher un paludisme."}
+  ],
+  "2-13": [
+    {q:"Que signifie l'acronyme TIH ?", a:"Thrombopénie Induite par l'Héparine."},
+    {q:"Quel est l'antigène cible des anticorps dans la TIH ?", a:"Le facteur 4 plaquettaire (PF4)."},
+    {q:"Quel est le paradoxe clinique de la TIH malgré la thrombopénie ?", a:"Un risque élevé de thromboses artérielles et veineuses."},
+    {q:"Comment réagit une thrombopénie médicamenteuse lors d'une deuxième exposition au produit ?", a:"Elle s'installe de façon beaucoup plus brutale."},
+    {q:"Quel est le délai habituel de sensibilisation immunitaire lors de la première introduction d'un médicament allergisant ?", a:"Une dizaine de jours à quelques semaines."}
+  ],
+  "2-14": [
+    {q:"Concept : Schizocytes", a:"Définition : Fragments d'hématies lysées au contact de microthrombies, caractéristiques de la MAT."},
+    {q:"Vrai ou Faux : Le PTI s'accompagne généralement d'une splénomégalie.", a:"Faux (l'examen clinique est normal, l'absence d'hypersplénisme est un critère)."},
+    {q:"Quelle est l'origine présumée d'une thrombopénie si elle est isolée sur l'hémogramme ?", a:"Périphérique."},
+    {q:"Quel est le mécanisme de la thrombopénie dans le cadre d'un hypersplénisme ?", a:"La séquestration des plaquettes dans la rate élargie."},
+    {q:"Quel facteur aggravant lié à l'hémostase est spécifiquement mentionné comme acquis ?", a:"La CIVD (Coagulation Intravasculaire Disséminée)."},
+    {q:"Quel signe neurologique précis évoque une gravité immédiate ?", a:"Un déficit focal."},
+    {q:"Quels types de sports sont à proscrire si les plaquettes sont < 20 G/L ?", a:"Les sports traumatisants."},
+    {q:"Le purpura confluent et nécrotique évoque un risque de quelle pathologie infectieuse ?", a:"Le purpura fulminans."},
+    {q:"Une thrombopénie centrale est causée par un défaut de production de quelles cellules ?", a:"Les mégacaryocytes (mégacaryopoïèse)."},
+    {q:"Citez un exemple de maladie auto-immune pouvant causer un PTI secondaire.", a:"Le LED (Lupus Érythémateux Disséminé)."},
+    {q:"Quelle est la valeur attendue des schizocytes sur un frottis normal ?", a:"< 0,1%."},
+    {q:"Quel paramètre biologique définit une anémie comme 'régénérative' ?", a:"Un taux élevé de réticulocytes."},
+    {q:"L'association 'thrombopénie + anémie hémolytique mécanique' définit quel syndrome ?", a:"La Microangiopathie Thrombotique (MAT)."},
+    {q:"Quelle enzyme est dosée pour confirmer un PTT ?", a:"ADAMTS13."},
+    {q:"Outre E. coli, citez deux autres bactéries causant le SHU.", a:"Shigella spp. et Salmonella spp."},
+    {q:"Vrai ou Faux : L'alcoolisme n'agit que par carence vitaminique sur les plaquettes.", a:"Faux (il a aussi un impact direct complexe sur la thrombopoïèse)."},
+    {q:"Dans quel contexte particulier survient le HELLP syndrome ?", a:"La grossesse."},
+    {q:"Quelle est l'origine du purpura si l'examen clinique montre des amas plaquettaires ?", a:"Il s'agit souvent d'une fausse thrombopénie (à éliminer pour le PTI)."},
+    {q:"Une thrombopénie profonde avec risque vital immédiat nécessite quel type de traitement en urgence ?", a:"Un traitement pour faire remonter les plaquettes (Corticoïdes/IgIV)."},
+    {q:"Le purpura ecchymotique extensif évoluant rapidement est un signe de _____.", a:"Gravité (Purpura fulminans)."},
+    {q:"Quel geste invasif nécessite une discussion au cas par cas si les plaquettes sont à 40 G/L ?", a:"Une chirurgie ou une biopsie."},
+    {q:"Quel est le risque principal d'un purpura nécrotique ?", a:"Une infection bactérienne grave (méningococcémie)."},
+    {q:"Le PTI est-il une pathologie de production ou de destruction ?", a:"De destruction (périphérique)."},
+    {q:"Citez un facteur aggravant lié à une chirurgie.", a:"Une chirurgie récente ou la nécessité immédiate d'un geste chirurgical."},
+    {q:"Quel est le terme médical pour la formation anormale de caillots consommant les plaquettes dans tout l'organisme ?", a:"La CIVD."},
+    {q:"Comment appelle-t-on une baisse de deux lignées cellulaires (ex: plaquettes et globules rouges) ?", a:"Une bicytopénie."},
+    {q:"Quel examen complémentaire simple permet d'éliminer une fausse thrombopénie par amas ?", a:"Le frottis sanguin."}
+  ],
+  "3-2": [
+    {q:"Définition : Purpura", a:"Éruption cutanée ou muqueuse de taches hémorragiques ne s'effaçant pas à la vitropression."},
+    {q:"Quels sont les trois mécanismes principaux à l'origine d'un purpura ?", a:"Thrombopénie, thrombopathie ou anomalie de la perméabilité vasculaire."},
+    {q:"Le purpura par thrombopénie peut se manifester par des pétéchies ou des _____.", a:"Ecchymoses"},
+    {q:"Quel est le mécanisme physiologique du purpura ?", a:"L'extravasation des globules rouges dans le derme."},
+    {q:"Un purpura rugueux et palpable est le signe d'un purpura _____.", a:"Vasculaire"},
+    {q:"Le purpura est une lésion _____ à la vitropression.", a:"Persistante (ne s'efface pas)"}
+  ],
+  "3-3": [
+    {q:"Quel est le rôle principal de l'examen clinique initial devant une thrombopénie ?", a:"Évaluer la gravité de la thrombopénie et orienter le diagnostic étiologique."},
+    {q:"Que recherche-t-on prioritairement lors de l'examen cutanéo-muqueux d'une thrombopénie ?", a:"Des signes d'hémorragies (purpura, atteinte de la cavité buccale)."},
+    {q:"Quel examen clinique permet de dépister une hémorragie rétinienne ?", a:"Le fond d'œil."},
+    {q:"Pourquoi la mesure de la température est-elle cruciale devant un purpura ?", a:"Pour éliminer une urgence infectieuse comme le purpura fulminans."},
+    {q:"Que peut suggérer la présence d'adénopathies associée à une thrombopénie ?", a:"Une infection ou une hémopathie maligne."},
+    {q:"Quelle caractéristique physique à la palpation oriente vers un purpura vasculaire ?", a:"Le caractère infiltré (relief, rugueux)."},
+    {q:"Un purpura plan et sans relief est qualifié de _____.", a:"Non infiltré"},
+    {q:"À quel type de pathologie correspond généralement un purpura non infiltré ?", a:"Un purpura plaquettaire (thrombopénie ou thrombopathie)."},
+    {q:"Définition : Pétéchies", a:"Éléments hémorragiques punctiformes de la taille d'une tête d'épingle."},
+    {q:"Définition : Ecchymoses", a:"Placards hémorragiques aux contours mal limités."},
+    {q:"Comment appelle-t-on des ecchymoses se présentant sous forme de traînées linéaires ?", a:"Des vibices."},
+    {q:"Quelle est la description clinique d'un purpura nécrotique ?", a:"Lésions hémorragiques surélevées par une zone de nécrose."},
+    {q:"Quel aspect clinique prend le purpura en cas de thrombopathie isolée ?", a:"Un aspect uniquement ecchymotique."},
+    {q:"Citez deux signes cliniques d'urgence hémorragique à rechercher devant un purpura.", a:"Bulles hémorragiques buccales et hémorragies au fond d'œil."},
+    {q:"Pourquoi une localisation pharyngée d'un syndrome hémorragique est-elle grave ?", a:"À cause du risque de retentissement fonctionnel (obstruction respiratoire)."},
+    {q:"Quels sont les deux diagnostics d'urgence absolue devant un purpura ?", a:"Thrombopénie à risque hémorragique majeur et purpura fulminans."}
+  ],
+  "3-4": [
+    {q:"À quel seuil de plaquettes le risque hémorragique devient-il cliniquement préoccupant ?", a:"En dessous de 20 G/L."},
+    {q:"L'agrégation plaquettaire sur _____ est une cause classique de fausse thrombopénie.", a:"EDTA"},
+    {q:"Citez deux types de gestes strictement contre-indiqués en cas de thrombopénie sévère.", a:"Injections intra-musculaires et ponctions profondes."},
+    {q:"Quel est le seuil minimal de plaquettes recommandé pour une chirurgie majeure ?", a:"80 à 100 G/L."}
+  ],
+  "3-5": [
+    {q:"Citez deux causes possibles de splénomégalie associée à une baisse des plaquettes.", a:"L'hypertension portale ou une hémopathie maligne."},
+    {q:"Quel est le premier examen biologique obligatoire à réaliser devant une thrombopénie ?", a:"NFS + réticulocytes + frottis sanguin."},
+    {q:"Quel est l'intérêt du frottis sanguin concernant le compte plaquettaire ?", a:"Éliminer une fausse thrombopénie par amas plaquettaires."},
+    {q:"La présence de schizocytes sur un frottis sanguin s'observe surtout dans les _____.", a:"Anémies régénératives (ou mécaniques)"},
+    {q:"Que signifie la présence de blastes au frottis sanguin ?", a:"Une suspicion de leucémie."},
+    {q:"Quelle anomalie des polynucléaires évoque une carence en folates ou vitamine B12 ?", a:"L'hypersegmentation des noyaux."},
+    {q:"Quel type d'anémie est classiquement associé aux polynucléaires hypersegmentés ?", a:"L'anémie macrocytaire."},
+    {q:"Quels tests constituent le bilan d'hémostase de 2e intention ?", a:"TP, TCA et Fibrinogène."},
+    {q:"Pourquoi est-il nécessaire d'éliminer une CIVD devant une thrombopénie ?", a:"Car ce trouble de l'hémostase aggrave considérablement le risque hémorragique."},
+    {q:"Quelles sérologies virales sont systématiquement demandées dans le bilan d'orientation ?", a:"VIH, VHB et VHC."},
+    {q:"Quels examens biologiques recherchent une pathologie auto-immune associée ?", a:"AAN, anticorps anti-ADN, anticorps antiphospholipides et bilan thyroïdien."},
+    {q:"Comment recherche-t-on un déficit immunitaire dans le cadre d'une thrombopénie ?", a:"Par une électrophorèse des protéines sériques et un dosage des immunoglobulines."},
+    {q:"Quel examen d'imagerie explore une suspicion d'hypersplénisme ?", a:"L'échographie abdominale."},
+    {q:"Quelle est l'indication majeure du myélogramme en cas de thrombopénie ?", a:"Exclure une hémopathie (leucémie aiguë, SMD, aplasie)."},
+    {q:"Le myélogramme est-il indiqué dans le PTI typique de l'adulte jeune ?", a:"Non, il n'est pas systématique si la thrombopénie est isolée."},
+    {q:"À partir de quel âge le myélogramme devient-il recommandé pour éliminer un SMD ?", a:"Après 60 ans."},
+    {q:"En dehors de l'âge, quelle situation clinique du PTI impose un myélogramme ?", a:"Un PTI réfractaire au traitement."}
+  ],
+  "3-6": [
+    {q:"Comment définit-on le diagnostic du Purpura Thrombopénique Immunologique (PTI) ?", a:"C'est un diagnostic d'exclusion (ou d'élimination)."},
+    {q:"Quelle lignée cellulaire de la moelle osseuse est analysée lors d'une thrombopénie ?", a:"La lignée mégacaryocytaire."},
+    {q:"Quel est l'aspect de la moelle osseuse dans une thrombopénie d'origine périphérique ?", a:"Moelle riche en mégacaryocytes."},
+    {q:"Comment se caractérise la lignée mégacaryocytaire dans une thrombopénie centrale ?", a:"Moelle pauvre en mégacaryocytes, ou présence de formes anormales."},
+    {q:"Qu'est-ce que la dysmyélopoïèse ?", a:"Une anomalie qualitative de la maturation des lignées cellulaires dans la moelle."},
+    {q:"Quelle est la principale caractéristique du Syndrome Myélodysplasique (SMD) ?", a:"Une production anormale d'éléments détruits précocement dans la moelle (avortement intramédullaire)."},
+    {q:"Quel type d'étude remplace le myélogramme pour le diagnostic des maladies constitutionnelles ?", a:"L'étude de la fonction plaquettaire."}
+  ],
+  "3-7": [
+    {q:"Quels signes neurologiques peuvent accompagner une infection à méningocoque ?", a:"Céphalées, confusion ou déficit neurologique."},
+    {q:"Quel aspect cutané macroscopique évoque un purpura fulminans ?", a:"Un aspect en carte de géographie."},
+    {q:"Quelle pathologie de l'hémostase est quasi systématiquement associée au purpura fulminans ?", a:"La CIVD (Coagulation Intravasculaire Disséminée)."},
+    {q:"Pourquoi le purpura nécrotique ou extensif est-il une urgence ?", a:"Il évoque un purpura fulminans d'origine infectieuse mettant en jeu le pronostic vital."}
+  ],
+  "3-8": [
+    {q:"Une thrombopénie est dite 'centrale' si la moelle osseuse est _____ en mégacaryocytes.", a:"Pauvre"},
+    {q:"Quel seuil de plaquettes est l'alerte minimale pour autoriser des gestes invasifs ?", a:"50 G/L."},
+    {q:"Pourquoi la présence d'hépatomégalie oriente-t-elle le diagnostic de thrombopénie ?", a:"Elle suggère une maladie hépatique, une hémopathie ou une infection chronique."},
+    {q:"Quel examen morphologique permet d'identifier des maladies constitutionnelles plaquettaires ?", a:"L'étude de la morphologie des plaquettes (sur frottis)."},
+    {q:"La découverte de cellules anormales (blastes) dans le sang impose quel geste ?", a:"Un myélogramme."},
+    {q:"Pourquoi recherche-t-on une hémorragie au fond d'œil ?", a:"Car elle témoigne d'un risque élevé d'hémorragie méningée."},
+    {q:"Un purpura fébrile sans thrombopénie évoque préférentiellement une cause _____.", a:"Vasculaire infectieuse (ex: méningocoque)"},
+    {q:"Quels sont les seuils d'alerte du taux de plaquettes nécessitant une vigilance particulière ?", a:"< 50 G/L et < 20 G/L."}
+  ],
+  "3-9": [
+    {q:"Quels virus de la famille Herpesviridae peuvent être recherchés si le contexte est infectieux ?", a:"EBV et CMV."},
+    {q:"L'électrophorèse des protéines sériques aide à diagnostiquer un _____ _____.", a:"Déficit immunitaire"},
+    {q:"La thrombopénie isolée est la caractéristique biologique principale du _____.", a:"PTI (Purpura Thrombopénique Immunologique)"},
+    {q:"Pourquoi le SMD entraîne-t-il des cytopénies périphériques malgré une moelle parfois riche ?", a:"À cause d'une production qualitativement anormale et d'une destruction intra-médullaire."},
+    {q:"Quels signes cutanés sont typiquement décrits comme 'en traînées linéaires' ?", a:"Les vibices."},
+    {q:"Un purpura infiltré suggère une anomalie de la _____ _____.", a:"Perméabilité vasculaire"},
+    {q:"La prise d'anticoagulants constitue un facteur de _____ devant une thrombopénie.", a:"Gravité"}
+  ],
+  "3-10": [
+    {q:"Quel organe peut être à l'origine d'une thrombopénie par séquestration (hypersplénisme) ?", a:"La rate (splénomégalie)."},
+    {q:"L'étude de la fonction plaquettaire est privilégiée en cas de suspicion de _____ _____.", a:"Maladie constitutionnelle"},
+    {q:"Que permet d'éliminer la normalité du TP et du TCA ?", a:"Un trouble majeur de l'hémostase secondaire."},
+    {q:"La présence de pétéchies et de nécrose cutanée est typique du purpura _____.", a:"Vasculaire"},
+    {q:"Dans quel cas un myélogramme est-il indispensable pour exclure une aplasie ?", a:"Devant une suspicion de cause centrale (pancytopénie ou thrombopénie non isolée)."},
+    {q:"Le terme 'infiltré' pour un purpura est synonyme de _____ à la palpation.", a:"Rugueux (ou palpable / en relief)"},
+    {q:"Quel test biologique simple permet de suspecter une carence en B12 ou folates ?", a:"La NFS (montrant une macrocytose) et le frottis (polynucléaires hypersegmentés)."}
+  ],
+  "3-11": [
+    {q:"La ponction lombaire est-elle considérée comme une ponction profonde (contre-indiquée) ?", a:"Oui, tout comme les biopsies ou ponctions d'organes profonds."},
+    {q:"Quelle est l'origine du purpura fulminans ?", a:"Infectieuse (souvent méningocoque)."},
+    {q:"Une anémie associée à une thrombopénie doit faire rechercher des _____ au frottis.", a:"Schizocytes"},
+    {q:"Quel bilan d'organe est nécessaire en cas d'hépatomégalie et thrombopénie ?", a:"Un bilan biologique hépatique et une échographie."}
+  ],
+  "3-12": [
+    {q:"Pourquoi le PTI est-il qualifié de diagnostic d'élimination ?", a:"Car il n'existe aucun examen spécifique pour le confirmer directement."},
+    {q:"Un purpura ecchymotique isolé sans thrombopénie oriente vers une _____.", a:"Thrombopathie"},
+    {q:"Quel signe clinique impose l'hospitalisation immédiate devant un purpura ?", a:"La fièvre ou des signes de choc."},
+    {q:"L'absence de mégacaryocytes dans la moelle signe une origine _____ de la thrombopénie.", a:"Centrale"},
+    {q:"Que signifie un aspect 'carte de géographie' pour des lésions de purpura ?", a:"Des lésions nécrotiques étendues et irrégulières, typiques de l'urgence infectieuse."}
+  ],
+  "4-2": [
+    {q:"Définition biologique d'une thrombopénie (seuil NFS)", a:"Plaquettes < 150 G/L"},
+    {q:"À quel seuil de plaquettes le purpura survient-il généralement ?", a:"Bien inférieur à 50 G/L"},
+    {q:"Quel est le risque majeur d'une thrombopénie avec des plaquettes < 20 G/L ?", a:"Risque d'hémorragies spontanées (Urgence)"},
+    {q:"Vrai ou Faux : Le purpura thrombopénique est lié à une anomalie qualitative des plaquettes.", a:"Faux (anomalie quantitative)"},
+    {q:"Définition : Purpura", a:"Hémorragie cutanée ou muqueuse ne s'effaçant pas à la vitropression."}
+  ],
+  "4-3": [
+    {q:"Quels sont les deux signes cliniques cutanés typiques du purpura thrombopénique ?", a:"Pétéchies et ecchymoses"},
+    {q:"Le purpura pétéchial se présente sous forme de _____.", a:"Petites taches rouges punctiformes ne s'effaçant pas à la pression."},
+    {q:"Le purpura ecchymotique se présente sous forme de _____.", a:"Larges taches de couleur bleue/violette (bleus)."}
+  ],
+  "4-4": [
+    {q:"Quelles sont les trois grandes familles de purpura vasculaire ?", a:"Infectieux, immunologique et fragilité capillaire"},
+    {q:"Chez quelle population retrouve-t-on le plus souvent un purpura par fragilité du collagène ?", a:"Les personnes âgées"},
+    {q:"Quelle est l'urgence vitale à évoquer devant tout purpura fébrile ?", a:"Le purpura fulminans"},
+    {q:"Quel agent infectieux est la cause principale du purpura fulminans ?", a:"Le méningocoque"},
+    {q:"Quelle population d'adultes est particulièrement à risque de purpura fulminans ?", a:"Les adultes splénectomisés"},
+    {q:"Quel antibiotique doit être administré en urgence face à un purpura fulminans ?", a:"Ceftriaxone à forte dose"},
+    {q:"Quel est l'aspect clinique caractéristique des lésions cutanées du purpura fulminans ?", a:"Extensif, nécrotique, en carte de géographie"},
+    {q:"Quelles sont les deux anomalies biologiques majeures du purpura fulminans ?", a:"Thrombopénie d'installation rapide et CIVD"},
+    {q:"Association : Purpura + Fièvre = _____", a:"Urgence (Purpura fulminans / Endocardite)"},
+    {q:"Association : Purpura + Signes hémorragiques = _____", a:"Urgence (Thrombopénie sévère)"},
+    {q:"Pourquoi faut-il traquer le purpura devant tout collapsus fébrile ?", a:"Pour traiter précocement un éventuel purpura fulminans."}
+  ],
+  "4-5": [
+    {q:"Quel type de purpura est lié à un défaut de la fonction plaquettaire ?", a:"Le purpura thrombopathique"},
+    {q:"Quel signe clinique est prédominant dans le purpura thrombopathique ?", a:"L'ecchymose (++)"},
+    {q:"Citez deux classes médicamenteuses pouvant causer une thrombopathie acquise.", a:"Anti-agrégants plaquettaires et AINS"},
+    {q:"Quelles maladies hématologiques peuvent entraîner une thrombopathie acquise ?", a:"SMD (Syndrome Myélodysplasique) et SMP (Syndrome Myéloprolifératif)"},
+    {q:"Quel signe biologique permet de distinguer un purpura thrombopénique d'un purpura vasculaire ?", a:"Le taux de plaquettes à la NFS."},
+    {q:"L'aspect 'nécrotique' d'un purpura suggère une origine _____.", a:"Infectieuse (Purpura fulminans) ou vasculaire sévère."},
+    {q:"L'aspect 'infiltré' d'un purpura est évocateur d'une _____.", a:"Vascularite (purpura vasculaire immunologique)."}
+  ],
+  "4-6": [
+    {q:"Citez une cause périphérique de thrombopénie d'origine immunologique.", a:"Le PTI (Purpura Thrombopénique Immunologique)"},
+    {q:"La CIVD est classée parmi les causes _____ de thrombopénie.", a:"Périphériques"},
+    {q:"La MAT (Microangiopathie Thrombotique) est une cause _____ de thrombopénie.", a:"Périphérique"},
+    {q:"Citez deux types de carences vitaminiques entraînant une thrombopénie centrale.", a:"Carence en folates et en vitamine B12"},
+    {q:"Le SMD (Syndrome Myélodysplasique) est une cause _____ de thrombopénie.", a:"Centrale"},
+    {q:"Quel examen permet de confirmer l'origine centrale d'une thrombopénie ?", a:"Le myélogramme"},
+    {q:"Que recherche-t-on spécifiquement sur le frottis sanguin face à une thrombopénie ?", a:"Anomalies des autres lignées, blastes ou schizocytes"},
+    {q:"Concept : Thrombopathie constitutionnelle", a:"Anomalie génétique de la fonction plaquettaire présente dès la naissance."},
+    {q:"Quel est le risque principal d'un purpura avec CIVD ?", a:"Hémorragies massives et défaillance multiviscérale."},
+    {q:"Quel est le premier réflexe devant un purpura avec signes de gravité ?", a:"Éliminer l'urgence vitale et faire une NFS en urgence."}
+  ],
+  "4-7": [
+    {q:"Quel mécanisme cause une thrombopénie dans l'aplasie médullaire ?", a:"Mécanisme central (défaut de production)"},
+    {q:"Quel mécanisme cause une thrombopénie lors d'une infection virale ?", a:"Mécanisme périphérique"},
+    {q:"Une myélofibrose entraîne une thrombopénie de type _____.", a:"Central"},
+    {q:"Un envahissement médullaire cause une thrombopénie _____.", a:"Centrale"},
+    {q:"Les causes immunoallergiques de thrombopénie sont classées comme _____.", a:"Périphériques"},
+    {q:"Les thrombopénies post-transfusionnelles sont d'origine _____.", a:"Périphérique"},
+    {q:"Dans quel cas un myélogramme est-il indiqué pour une thrombopénie ?", a:"Si l'on suspecte une cause centrale (ex: anomalie des autres lignées)."},
+    {q:"Devant une thrombopénie, que signifie 'recherche de signes de gravité' ?", a:"Vérifier la présence de saignements muqueux ou viscéraux (bulles hémorragiques, etc.)."},
+    {q:"Quel est le but principal de l'hémoculture devant un purpura ?", a:"Identifier un agent infectieux responsable (ex: méningocoque)."}
+  ],
+  "4-8": [
+    {q:"Où se situe le purpura dans l'endocardite d'Osler ?", a:"Conjonctives, région sus-claviculaire et extrémités des doigts"},
+    {q:"Quel aspect clinique prennent les lésions aux doigts dans l'endocardite d'Osler ?", a:"Aspect de faux panaris"},
+    {q:"Quels examens biologiques sont nécessaires devant un purpura fébrile ?", a:"NFS, bilan d'hémostase, hémocultures et ponction lombaire"},
+    {q:"Quelles sont les caractéristiques cliniques habituelles du purpura vasculaire immunologique ?", a:"Pétéchial, infiltré, aux membres inférieurs, évoluant par poussées"},
+    {q:"Citez deux types de lésions cutanées (hors purpura) associées aux vascularites.", a:"Cocardes érythémateuses, nodules dermiques, urticaire ou livedo réticulaire"},
+    {q:"Quelles atteintes d'organes peuvent accompagner une vascularite systémique ?", a:"Arthralgies, myalgies, Raynaud, neuropathie ou glomérulopathie"},
+    {q:"Quels antibiotiques sont fréquemment en cause dans l'angéite par hypersensibilité ?", a:"Pénicillines, cyclines et sulfamides"},
+    {q:"Outre les antibiotiques, quels médicaments peuvent causer une angéite par hypersensibilité ?", a:"AINS, diurétiques thiazidiques et AVK"},
+    {q:"Citez trois causes de purpura vasculaire lié à une dysglobulinémie.", a:"Cryoglobulinémie, amylose et gammapathies monoclonales"},
+    {q:"Quels anticorps sont associés aux vascularites systémiques de l'adulte ?", a:"Anticorps anti-ANCA"},
+    {q:"Quelle maladie auto-immune peut causer une vascularite par dépôt de complexes immuns ?", a:"Le lupus"},
+    {q:"Une neuropathie périphérique associée à un purpura oriente vers une _____.", a:"Vascularite systémique."},
+    {q:"Le purpura cryoglobulinémique est lié à une _____.", a:"Dysglobulinémie."},
+    {q:"Le purpura de l'amylose est une forme de purpura _____.", a:"Vasculaire lié à une dysglobulinémie."},
+    {q:"Quel examen d'imagerie ou fonctionnel est utile pour l'endocardite d'Osler ?", a:"L'échocardiographie (pour visualiser l'atteinte de l'endocarde)."},
+    {q:"L'aspect de 'cocarde érythémateuse' est un signe de _____.", a:"Vascularite cutanée."},
+    {q:"Le livedo réticulaire peut être associé à un purpura de type _____.", a:"Vasculaire (vascularite)."},
+    {q:"Une glomérulopathie associée à un purpura évoque une _____.", a:"Atteinte systémique (vascularite ou purpura rhumatoïde)."}
+  ],
+  "4-9": [
+    {q:"La ceftriaxone est efficace contre quel germe du purpura fulminans ?", a:"Le méningocoque (Neisseria meningitidis)."},
+    {q:"La présence de schizocytes sur le frottis sanguin évoque une _____.", a:"MAT (Microangiopathie Thrombotique)."},
+    {q:"Un purpura qui évolue par 'poussées' est typique des _____.", a:"Vascularites (causes immunologiques)."}
+  ],
+  "4-10": [
+    {q:"Quelle est la nature des dépôts immuns dans le purpura rhumatoïde ?", a:"Dépôts de complexes immuns à IgA"},
+    {q:"Dans quel contexte survient classiquement le purpura rhumatoïde chez l'enfant ?", a:"Après un épisode infectieux"},
+    {q:"Quelle est la localisation préférentielle du purpura rhumatoïde ?", a:"Membres inférieurs, en particulier aux chevilles"},
+    {q:"Quel facteur postural aggrave le purpura rhumatoïde ?", a:"L'orthostatisme"},
+    {q:"Quels signes articulaires et digestifs accompagnent souvent le purpura rhumatoïde ?", a:"Arthralgies et douleurs abdominales"},
+    {q:"Quelle est la complication rénale redoutée du purpura rhumatoïde ?", a:"Glomérulonéphrite avec dépôts IgA"},
+    {q:"Vrai ou Faux : Le purpura rhumatoïde est généralement bénin chez l'enfant.", a:"Vrai"},
+    {q:"Pourquoi le purpura rhumatoïde est-il aggravé par l'orthostatisme ?", a:"À cause de l'augmentation de la pression hydrostatique dans les membres inférieurs."},
+    {q:"Vrai ou Faux : Les thrombopathies constitutionnelles sont fréquentes.", a:"Faux (elles sont rares)."}
+  ],
+  "4-11": [
+    {q:"Quelle est la conduite à tenir immédiate devant un purpura fulminans suspecté au domicile ?", a:"Injection immédiate de Ceftriaxone et transfert en réanimation."},
+    {q:"Quel type de purpura est favorisé par les corticoïdes au long cours (fragilité tissulaire) ?", a:"Purpura vasculaire (fragilité capillaire)."}
+  ],
+  "4-12": [
+    {q:"Le purpura rhumatoïde est aussi appelé maladie de _____-_____.", a:"Henoch-Schönlein"},
+    {q:"Le purpura rhumatoïde peut-il s'accompagner d'oedèmes ?", a:"Oui, de façon inconstante."},
+    {q:"Qu'est-ce qu'une vascularite ?", a:"Une inflammation de la paroi des vaisseaux sanguins."}
+  ],
+  "6-2": [
+    {q:"Citez deux techniques d'études fonctionnelles utilisées pour le diagnostic des thrombopathies.", a:"L'agrégométrie plaquettaire et la cytométrie en flux."},
+    {q:"Quel est l'objectif de la cytométrie en flux dans le diagnostic des thrombopathies ?", a:"Compter le nombre de récepteurs sur la membrane des plaquettes."}
+  ],
+  "6-3": [
+    {q:"Citez le premier rôle physiologique du facteur de Willebrand (VWF) lors d'une brèche vasculaire.", a:"L'adhésion plaquettaire en interagissant avec le collagène et la GP Ib-IX-V."},
+    {q:"Quel est le second rôle physiologique du facteur de Willebrand vis-à-vis de la coagulation ?", a:"Transporter et protéger le facteur VIII pour augmenter sa disponibilité."},
+    {q:"Le VWF interagit avec quelle structure de la paroi vasculaire lors d'une brèche ?", a:"Le collagène."}
+  ],
+  "6-4": [
+    {q:"Quelle est l'anomalie moléculaire caractéristique du Syndrome de Bernard-Soulier ?", a:"Un déficit quantitatif sévère du complexe glycoprotéique GP Ib-IX-V."},
+    {q:"Dans le Syndrome de Bernard-Soulier, quelle liaison est perturbée par l'anomalie membranaire ?", a:"La liaison au facteur de Willebrand (VWF)."},
+    {q:"Quelle est l'anomalie morphologique des plaquettes visible sur un frottis sanguin dans le Syndrome de Bernard-Soulier ?", a:"La présence de macrothrombopénie (plaquettes de la taille d'une hématie)."},
+    {q:"Quel est le mode de transmission du Syndrome de Bernard-Soulier ?", a:"Autosomique récessive."},
+    {q:"Quelle est la fréquence approximative du Syndrome de Bernard-Soulier ?", a:"1/1 000 000."},
+    {q:"Quelle glycoprotéine membranaire est déficiente dans la Thrombasthénie de Glanzmann ?", a:"La GP IIb-IIIa."},
+    {q:"Dans la Thrombasthénie de Glanzmann, l'absence de GP IIb-IIIa empêche la liaison avec quelle protéine ?", a:"Le fibrinogène."},
+    {q:"Comment apparaissent le nombre et la morphologie des plaquettes dans la Thrombasthénie de Glanzmann ?", a:"Normaux."},
+    {q:"Quel est le mode de transmission de la Thrombasthénie de Glanzmann ?", a:"Autosomique récessive."},
+    {q:"Quelle est la principale conséquence du déficit en GP Ib-IX-V au niveau plaquettaire ?", a:"Une anomalie de liaison au facteur de Willebrand (VWF)."},
+    {q:"Qu'est-ce qui caractérise le déficit dans le Syndrome de Bernard-Soulier sur le plan quantitatif ?", a:"Un déficit sévère de la glycoprotéine membranaire."},
+    {q:"Sur un frottis sanguin, comment différencie-t-on Bernard-Soulier de Glanzmann ?", a:"Bernard-Soulier présente des macroplaquettes, tandis que Glanzmann a des plaquettes normales."},
+    {q:"Quelle est la sévérité du syndrome hémorragique dans la Thrombasthénie de Glanzmann ?", a:"Très sévère (+++)."}
+  ],
+  "6-5": [
+    {q:"Le gène MYH-9 code pour quelle protéine spécifique ?", a:"La chaîne lourde IIA de myosine non musculaire."},
+    {q:"Quelle anomalie structurelle intracellulaire résulte d'une mutation du gène MYH-9 ?", a:"Une désorganisation des microtubules."},
+    {q:"Quel est le mode de transmission du Syndrome MYH9 ?", a:"Autosomique dominant."},
+    {q:"Quelle est la plage de concentration plaquettaire typique dans le Syndrome MYH9 ?", a:"Entre 10 et 180 G/l."},
+    {q:"Quelle anomalie cytologique particulière peut-on observer sur le frottis sanguin d'un patient atteint du Syndrome MYH9 ?", a:"La présence de corps de Döhle."},
+    {q:"Outre la thrombopénie, quelles sont les deux anomalies cliniques générales souvent associées au Syndrome MYH9 ?", a:"La surdité et l'insuffisance rénale."},
+    {q:"Quelle est l'anomalie génétique à l'origine du Syndrome de Wiskott-Aldrich ?", a:"Une anomalie du gène WASP."},
+    {q:"Quelle est la taille caractéristique des plaquettes dans le Syndrome de Wiskott-Aldrich ?", a:"Très petites (microplaquettes, < 8 fl)."},
+    {q:"Quel est le mode de transmission du Syndrome de Wiskott-Aldrich ?", a:"Transmission liée à l'X."},
+    {q:"Citez deux symptômes non hématologiques associés au Syndrome de Wiskott-Aldrich.", a:"L'eczéma et un déficit immunitaire cellulaire."},
+    {q:"Quelle est l'anomalie structurelle à l'origine du Syndrome des plaquettes grises ?", a:"Une anomalie des granules alpha (mutation du gène NBEAL2)."},
+    {q:"Pourquoi les plaquettes sont-elles qualifiées de « grises » dans ce syndrome ?", a:"Elles apparaissent complètement décolorées au laboratoire."},
+    {q:"Quelle anomalie du cytosquelette est responsable de la microthrombopénie dans le Wiskott-Aldrich ?", a:"Une anomalie de la mégacaryopoïèse et de la réorganisation du cytosquelette."}
+  ],
+  "6-6": [
+    {q:"Quel gène est muté dans le Syndrome des plaquettes grises ?", a:"Le gène NBEAL2."}
+  ],
+  "6-7": [
+    {q:"Quelle est la prévalence de porteurs de la maladie de Willebrand dans la population générale ?", a:"1 personne sur 100."},
+    {q:"Quelle est la fréquence des personnes symptomatiques pour la maladie de Willebrand ?", a:"Environ 1 pour 1 000."},
+    {q:"Quel est le mode de transmission habituel de la maladie de Willebrand ?", a:"Autosomique dominant."},
+    {q:"Quels sont les signes cliniques cutanéo-muqueux typiques d'une anomalie de l'hémostase primaire ?", a:"Épistaxis, gingivorragies, ménométrorragies et ecchymoses."},
+    {q:"Qu'est-ce que la « chute d'escarre » dans le contexte chirurgical d'un patient Willebrand ?", a:"Un saignement post-opératoire lié à la chute du petit caillot cicatriciel initial."},
+    {q:"Pourquoi est-il important de diagnostiquer la maladie de Willebrand chez les patients jeunes ?", a:"Pour différencier le caractère constitutionnel du caractère acquis."}
+  ],
+  "6-8": [
+    {q:"Qu'est-ce que le type 1 de la maladie de Willebrand ?", a:"Un déficit quantitatif partiel en facteur Willebrand."},
+    {q:"Dans le type 1 de Willebrand, comment est la qualité du facteur présent ?", a:"Normale (pas d'anomalie fonctionnelle)."},
+    {q:"Comment évolue le taux de facteur VIII dans le type 1 de la maladie de Willebrand ?", a:"Il diminue de façon proportionnelle à la baisse du VWF."},
+    {q:"Quelle est la caractéristique biologique majeure du type 3 de la maladie de Willebrand ?", a:"Une absence quasi totale de facteur circulant (< 5%)."},
+    {q:"Quel est le mode de transmission spécifique du type 3 de la maladie de Willebrand ?", a:"Transmission récessive."},
+    {q:"Dans le type 1 de Willebrand, pourquoi l'efficacité globale est-elle diminuée ?", a:"Simplement parce qu'il y a moins de facteur disponible, pas parce qu'il fonctionne mal."},
+    {q:"Pourquoi le facteur VIII est-il fortement diminué dans le type 3 de Willebrand ?", a:"Car il n'est plus protégé par le VWF circulant."},
+    {q:"Quelle est la principale différence de transmission entre le type 1 et le type 3 de Willebrand ?", a:"Le type 1 est généralement dominant alors que le type 3 est récessif."}
+  ],
+  "6-9": [
+    {q:"Définissez le type 2 de la maladie de Willebrand.", a:"Il s'agit d'un déficit qualitatif du facteur Willebrand."},
+    {q:"Quelle est la particularité fonctionnelle du sous-type Willebrand 2n ?", a:"Le facteur VWF est en taux normal mais ne reconnaît pas le facteur VIII."},
+    {q:"Quelle pathologie le type 2n de Willebrand simule-t-il biologiquement ?", a:"L'hémophilie A."},
+    {q:"Quelle est la conséquence d'une augmentation de l'affinité du VWF pour la GP Ib-IX-V dans certains types 2 ?", a:"Une anomalie qualitative de la fonction du facteur Willebrand."},
+    {q:"Citez une raison pour laquelle le ratio Activité/Ag peut être bas dans le type 2.", a:"Une diminution de l'affinité du facteur pour la GP Ib-IX-V."}
+  ],
+  "6-10": [
+    {q:"Dans le type 1 de Willebrand, comment sont les ratios VIII/Ag et Activité/Ag ?", a:"Tous deux sont supérieurs à 0,7 (homogènes)."}
+  ],
+  "6-11": [
+    {q:"Comment varie le TCA (TCK) chez un patient Willebrand ?", a:"Normal ou allongé, selon le taux de facteur VIII associé."},
+    {q:"À partir de quel taux de facteur VIII observe-t-on généralement un TCA normal ?", a:"Environ 45%."},
+    {q:"Quels sont les deux dosages systématiques à réaliser pour le diagnostic du facteur Willebrand ?", a:"Le dosage de l'activité (vWF:RCo) et celui de l'antigène (vWF:Ag)."},
+    {q:"Dans la maladie de Willebrand type 1, quel est le seuil de taux de VWF pour un groupe sanguin O ?", a:"Inférieur à 40%."}
+  ],
+  "6-12": [
+    {q:"Quel ratio permet de s'assurer que le facteur VWF transporte correctement le facteur VIII ?", a:"Le ratio VIII/antigène."},
+    {q:"Quelle valeur de ratio activité/antigène définit une bonne qualité du facteur VWF dans le type 1 ?", a:"Un ratio > 0,7."},
+    {q:"Quel paramètre biologique permet de distinguer formellement le type 2 du type 1 de Willebrand ?", a:"Un ratio activité/antigène < 0,7 (indique une mauvaise qualité)."},
+    {q:"Quel est le ratio activité/antigène attendu dans un type 2 de Willebrand ?", a:"Inférieur à 0,7."},
+    {q:"Comment est le temps d'occlusion plaquettaire chez un patient atteint de la maladie de Willebrand ?", a:"Allongé."}
+  ],
+  "6-13": [
+    {q:"Le ratio VIII/antigène est généralement inférieur à 0,7 dans quel sous-type de Willebrand ?", a:"Le type 2n."},
+    {q:"Comment le médecin peut-il suspecter une forme acquise plutôt que constitutionnelle chez un patient de 50 ans ?", a:"Si la symptomatologie hémorragique est d'apparition récente (interrogatoire sur l'évolution)."},
+    {q:"Quel test est nécessaire pour confirmer l'efficacité de la desmopressine chez un patient ?", a:"Un test thérapeutique (ou test à la desmopressine) pour vérifier la réponse individuelle."}
+  ],
+  "6-14": [
+    {q:"Citez quatre classes de médicaments à éviter absolument chez les patients atteints de pathologies hémorragiques.", a:"Aspirine, antiagrégants, anti-inflammatoires et anticoagulants."},
+    {q:"Quelle voie d'administration médicamenteuse est contre-indiquée dans la maladie de Willebrand ?", a:"La voie intra-musculaire."}
+  ],
+  "6-15": [
+    {q:"Quel est le traitement de substitution pour la maladie de Willebrand constitutionnelle ?", a:"L'apport direct de facteurs de von Willebrand."},
+    {q:"Vrai ou Faux : On utilise un traitement au long cours pour corriger définitivement le déficit de Willebrand constitutionnel.", a:"Faux, on utilise surtout des traitements préventifs ponctuels (ex: avant une chirurgie)."}
+  ],
+  "6-16": [
+    {q:"Quel est le mécanisme d'action de la DESMOPRESSINE dans le traitement de la maladie de Willebrand ?", a:"Elle mobilise et libère le stock de facteur VWF présent dans les plaquettes."},
+    {q:"Dans quel type de maladie de Willebrand la desmopressine est-elle formellement contre-indiquée ?", a:"Le type 2b (risque de thrombopénie majeure rapide)."},
+    {q:"Qu'est-ce que la tachyphylaxie associée à l'usage de la desmopressine ?", a:"Une perte rapide d'efficacité par épuisement des stocks de facteur VWF."},
+    {q:"Citez deux effets indésirables potentiels de la desmopressine liés à son analogie avec l'ADH.", a:"Poussées hypertensives et hyponatrémies sévères."},
+    {q:"Quelle variante ethnique spécifique de la maladie de Willebrand est mentionnée en France ?", a:"La variante « GYPSY »."},
+    {q:"Dans le Syndrome MYH9, comment évolue la symptomatologie hémorragique ?", a:"Elle est variable car elle dépend du taux de plaquettes circulant."},
+    {q:"Quelle est la fréquence de la maladie de Wiskott-Aldrich ?", a:"1/250 000."}
+  ],
+  "5-2": [
+    {q:"Quelles sont les deux parties principales de l'examen clinique d'un syndrome hémorragique ?", a:"L'interrogatoire et l'examen physique."},
+    {q:"Citez trois exemples de localisations de saignements cutanés.", a:"L'ecchymose, la pétéchie et le purpura."},
+    {q:"Comment définit-on médicalement une gingivorragie ?", a:"Un saignement au niveau des gencives."},
+    {q:"Quel terme désigne un saignement à l'intérieur des articulations ?", a:"L'hémarthrose."}
+  ],
+  "5-3": [
+    {q:"Le caractère spontané d'un saignement est-il un critère de gravité supérieure ou inférieure au saignement provoqué ?", a:"Supérieure."},
+    {q:"À partir de quelle fréquence un épistaxis est-il considéré comme significatif pour l'orientation diagnostique ?", a:"Au moins 1 fois par semaine."},
+    {q:"Une pathologie hémorragique se manifestant depuis l'enfance oriente vers quelle origine ?", a:"Une origine constitutionnelle."},
+    {q:"Vers quel type de pathologie s'oriente-t-on si les ecchymoses apparaissent pour la première fois à l'âge adulte ?", a:"Une pathologie acquise."},
+    {q:"Quel outil clinique permet de visualiser la transmission héréditaire d'une symptomatologie hémorragique ?", a:"L'arbre généalogique."},
+    {q:"Pourquoi est-il crucial d'identifier les antécédents obstétricaux lors de l'interrogatoire ?", a:"Pour détecter des symptomatologies provoquées ou des contre-indications opératoires."},
+    {q:"Citez deux exemples de médicaments antiagrégants plaquettaires cités dans le cours.", a:"L'aspirine et le Plavix."},
+    {q:"Outre les antiagrégants et anticoagulants, quelle classe d'antidépresseurs peut provoquer des saignements ?", a:"Les IRS (Inhibiteurs de Recapture de la Sérotonine)."}
+  ],
+  "5-4": [
+    {q:"Quels paramètres vitaux permettent d'évaluer l'état de choc lors de l'examen physique ?", a:"La fréquence respiratoire (FR), le pouls (FC), la tension artérielle (PA) et la saturation."},
+    {q:"La présence de bulles hémorragiques buccales est un critère de gravité pour quelle pathologie ?", a:"Le PTI (Purpura Thrombopénique Immunologique) sévère."},
+    {q:"Une métrorragie récidivante isolée justifie quel type d'examen spécialisé ?", a:"Une consultation gynécologique."},
+    {q:"Quels sont les trois signes cliniques évocateurs d'un choc avec mauvaise tolérance hémodynamique ?", a:"L'hypotension (TAS < 90 mmHg), la tachycardie et la confusion."}
+  ],
+  "5-5": [
+    {q:"Quelle est la limite de taille définissant une pétéchie par rapport au purpura ?", a:"Moins de 2 mm."},
+    {q:"Quel score clinique est utilisé pour quantifier l'abondance des règles ?", a:"Le score de Higham."},
+    {q:"À partir de quel volume de perte sanguine mensuelle définit-on une ménorragie abondante ?", a:"Plus de 100 ml/mois."},
+    {q:"Quelle est la différence entre l'hématurie et l'hémoglobinurie ?", a:"L'hématurie est la présence d'hématies dans les urines, tandis que l'hémoglobinurie est la présence d'hémoglobine."},
+    {q:"Qu'est-ce qu'une ecchymose ?", a:"Un épanchement de sang diffus sous la peau, communément appelé « bleu »."},
+    {q:"Quel terme définit des règles trop abondantes ou trop longues (> 7 jours) ?", a:"La ménorragie."},
+    {q:"Quelle est la caractéristique physique commune au purpura et aux pétéchies ?", a:"Ce sont des taches rouges qui ne disparaissent pas à la pression."},
+    {q:"Pourquoi un examen spécialisé ORL est-il nécessaire pour une épistaxis récidivante unique ?", a:"Pour éliminer un problème purement vasculaire localisé au niveau du nez."},
+    {q:"Comment qualifie-t-on une hématurie détectable uniquement par analyse biologique ?", a:"Microscopique."},
+    {q:"Qu'est-ce que l'épistaxis ?", a:"Un saignement de nez (muqueuse nasale)."},
+    {q:"Le purpura est constitué de taches violacées situées sur _____.", a:"Tout le corps."},
+    {q:"Une hématurie microscopique est détectée par _____.", a:"Le microscope."}
+  ],
+  "5-6": [
+    {q:"Vers quel type d'anomalie orientent des saignements muqueux et cutanés spontanés ?", a:"Une anomalie de l'hémostase primaire."},
+    {q:"Quels sont les trois éléments pouvant être en cause dans une anomalie de l'hémostase primaire ?", a:"La qualité des plaquettes, leur quantité et le Facteur de Willebrand."},
+    {q:"Vers quel type d'anomalie orientent des hématomes profonds et des hémarthroses ?", a:"Une anomalie de la coagulation."},
+    {q:"Dans quel contexte peut-on observer des hémorragies des muqueuses lors d'une anomalie de la coagulation ?", a:"Uniquement lors d'un contexte post-traumatique (provoqué)."},
+    {q:"Lors de l'examen physique, quel signe cutané oriente préférentiellement vers une thrombopénie ?", a:"Le purpura ou les pétéchies."},
+    {q:"Dans l'hémostase primaire, les saignements des muqueuses sont généralement de caractère _____.", a:"Spontané."},
+    {q:"L'orientation diagnostique vers une anomalie plaquettaire est suggérée par quels signes ?", a:"Des pétéchies et purpuras."}
+  ],
+  "5-7": [
+    {q:"Quel récepteur membranaire plaquettaire sert de récepteur au facteur de Willebrand ?", a:"GP\\ Ib/IX/V."},
+    {q:"Quel récepteur membranaire plaquettaire sert de récepteur au fibrinogène ?", a:"GP\\ IIb/IIIa."},
+    {q:"Quels composants intracytoplasmiques de la plaquette peuvent être déficitaires dans les thrombopathies ?", a:"Les granules ( ou denses)."},
+    {q:"Quelles structures plaquettaires sont entourées en rouge dans le schéma descriptif des thrombopathies ?", a:"Les récepteurs GP\\ Ib/IX/V et GP\\ IIb/IIIa."},
+    {q:"Quel récepteur plaquettaire lie le fibrinogène pour permettre l'agrégation ?", a:"GP\\ IIb/IIIa."}
+  ],
+  "5-8": [
+    {q:"Quelle est la cause numéro 1 des thrombopathies acquises en France ?", a:"Les médicaments."},
+    {q:"Citez une pathologie maligne pouvant causer une thrombopathie acquise par excès d'anticorps.", a:"La gammapathie monoclonale (IgG ou IgM)."},
+    {q:"Quel test biologique évaluant la fonction plaquettaire est typiquement allongé dans une thrombopathie ?", a:"Le temps d'occlusion plaquettaire (TOP)."},
+    {q:"Comment est généralement le taux de facteur Willebrand dans une thrombopathie acquise ?", a:"Normal."},
+    {q:"Dans une thrombopathie isolée, comment sont les résultats du TP, du TCA et du Fibrinogène ?", a:"Normaux."},
+    {q:"Quelle maladie hématologique est caractérisée par des plaquettes de mauvaise qualité visibles au frottis ?", a:"Le syndrome myélodysplasique (SMD)."},
+    {q:"Quelle est la conséquence d'un syndrome myéloprolifératif (SMP) sur l'interaction plaquette-Willebrand ?", a:"Les plaquettes peuvent trop reconnaître les facteurs de Willebrand."},
+    {q:"Quel est le devenir habituel du frottis sanguin dans une thrombopathie acquise ?", a:"Normal (en dehors du SMD)."},
+    {q:"Citez un médicament antiagrégant plaquettaire agissant sur la fonction mais n'étant pas l'aspirine.", a:"Le Plavix."},
+    {q:"Quel est le principal risque lié à l'utilisation clinique des anticoagulants ?", a:"La provocation de saignements."},
+    {q:"Quel est l'impact des AINS sur la fonction plaquettaire ?", a:"Ils provoquent une thrombopathie comme effet secondaire."}
+  ],
+  "5-9": [
+    {q:"Quelle est la fréquence approximative des thrombopathies constitutionnelles dans la population ?", a:"Moins de 1 cas pour 100 000 personnes."},
+    {q:"Comment est la numération plaquettaire dans les thrombopathies constitutionnelles ?", a:"Elle peut être normale ou diminuée selon le type d'anomalie."},
+    {q:"Vrai ou Faux : Le temps d'occlusion plaquettaire (TOP) est raccourci dans les thrombopathies constitutionnelles graves.", a:"Faux (il est allongé)."},
+    {q:"Dans quel contexte génétique un garçon est-il préférentiellement atteint par une pathologie hémorragique ?", a:"Une transmission liée à l'X."},
+    {q:"Quel type de transmission génétique implique que tous les individus porteurs du gène dans la famille seront malades ?", a:"Autosomique dominante."},
+    {q:"Le syndrome hémorragique cutanéo-muqueux présent dès la naissance est typique de _____.", a:"La thrombopathie constitutionnelle."}
+  ],
+  "5-10": [
+    {q:"Quel état clinique est suspecté face à une perte de plus de 30% de la masse sanguine ?", a:"Un état de choc."},
+    {q:"Qu'indique une gingivorragie survenant à chaque brossage de dents ?", a:"Une anomalie médicalement significative."},
+    {q:"Dans les anomalies de la coagulation, jusqu'où les signes hémorragiques peuvent-ils atteindre les tissus ?", a:"Jusqu'au rétropéritoine et au système nerveux central (SNC)."},
+    {q:"Comment définit-on un hématome profond ?", a:"Un saignement intramusculaire."},
+    {q:"Dans quel cas un examen neurologique est-il particulièrement indiqué lors d'un syndrome hémorragique ?", a:"Pour vérifier si la perte sanguine est tolérée par le patient (recherche de confusion)."},
+    {q:"La saturation en oxygène (O2) est prise lors de l'examen physique pour évaluer _____.", a:"L'état de choc."},
+    {q:"Quelle anomalie de la coagulation est caractérisée par une consommation généralisée des facteurs ?", a:"La CIVD (Coagulation Intravasculaire Disséminée)."},
+    {q:"L'insuffisance hépatique cause quel type d'anomalies de la coagulation ?", a:"Des anomalies acquises."},
+    {q:"Les hémophilies appartiennent à quelle sous-catégorie des anomalies de la coagulation ?", a:"Anomalies constitutionnelles."},
+    {q:"Quels sont les deux types de maladie de Willebrand mentionnés dans le plan du cours ?", a:"Type 1 et type 2."},
+    {q:"Quel examen est réalisé spécifiquement pour le diagnostic de la thrombose veineuse profonde (TVP) ?", a:"La démarche diagnostique de thrombose veineuse."},
+    {q:"La fibrinolyse aiguë primitive est une anomalie de la coagulation de type _____.", a:"Acquise."},
+    {q:"Concept : Hypovitaminose K", a:"Il s'agit d'une anomalie acquise de la coagulation liée à une carence en vitamine K."},
+    {q:"Quel critère de gravité est évalué par l'abondance d'un saignement ?", a:"La durée du saignement et son volume."},
+    {q:"Quelles sont les deux localisations de saignements graves citées dans l'interrogatoire ?", a:"Intracrânien et intra-péritonéal."},
+    {q:"Comment appelle-t-on le temps de saignement automatisé mesuré sur machine ?", a:"Le temps d'occlusion plaquettaire (TOP)."},
+    {q:"Dans une thrombopathie acquise, la numération plaquettaire est-elle toujours anormale ?", a:"Non, elle peut être normale ou anormale selon la cause."},
+    {q:"Vrai ou Faux : Les anomalies de l'hémostase primaire concernent uniquement les plaquettes.", a:"Faux (elles concernent aussi le Facteur Willebrand)."},
+    {q:"La confusion mentale chez un patient qui saigne est un signe de _____.", a:"Choc hémorragique grave."},
+    {q:"Quelle est la conséquence d'un déficit en granules plaquettaires ?", a:"Un dysfonctionnement de la plaquette (thrombopathie)."},
+    {q:"Le purpura se distingue de l'ecchymose par sa nature de _____.", a:"Petites taches vs épanchement diffus."},
+    {q:"Quel test est perturbé dans une thrombopathie alors que le TP et le TCA sont normaux ?", a:"Le Temps d'Occlusion Plaquettaire (TOP)."},
+    {q:"Pourquoi faut-il vérifier tous les téguments lors de l'examen physique ?", a:"Pour localiser précisément les ecchymoses et le purpura."},
+    {q:"Le saignement musculaire profond est appelé _____.", a:"Hématome."},
+    {q:"Dans quel contexte peut-on voir une hématurie macroscopique ?", a:"Lorsque le sang est visible directement dans les urines à l'œil nu."},
+    {q:"Une pathologie autosomique récessive donne quelle chance de transmission selon le cours ?", a:"1 chance sur 2."}
+  ],
+  "7-3": [
+    {q:"Quel mécanisme biologique déclenche la Coagulation Intravasculaire Disséminée (CIVD) ?", a:"Une activation diffuse de la coagulation due à un excès de facteur tissulaire généré par les cellules."},
+    {q:"Quels types de cellules peuvent générer l'excès de facteur tissulaire à l'origine d'une CIVD ?", a:"Les macrophages et les cellules tumorales."},
+    {q:"Quelle dualité pathologique caractérise la CIVD ?", a:"L'association d'une pathologie thrombotique à une pathologie hémorragique."},
+    {q:"Citez trois exemples de facteurs causaux infectieux de la CIVD.", a:"Les infections bactériennes sévères (bacille gram-), le méningocoque et les infections parasitaires."},
+    {q:"Quels domaines chirurgicaux lourds sont particulièrement associés au risque de CIVD ?", a:"La chirurgie du poumon et de la prostate."},
+    {q:"Quels sont les deux types de manifestations cliniques permettant de reconnaître une CIVD ?", a:"Les saignements cutanéomuqueux et les microthromboses (rénales, hépatiques, cérébrales)."},
+    {q:"Comment définit-on cliniquement le 'purpura fulminans' ?", a:"L'association d'un purpura et d'un état fébrile avec des lésions nécrotiques cutanées."},
+    {q:"Quel est l'état du Taux de Prothrombine (TP) lors du diagnostic biologique d'une CIVD ?", a:"Le TP est diminué."},
+    {q:"Comment évolue le taux de Facteur V dans une CIVD ?", a:"Le taux de Facteur V est diminué."},
+    {q:"Quelle est l'évolution du taux de fibrinogène dans le bilan biologique d'une CIVD ?", a:"Le taux de fibrinogène est diminué."},
+    {q:"Quel est l'impact de la CIVD sur la numération plaquettaire ?", a:"Elle provoque une thrombopénie."},
+    {q:"Quel marqueur de la fibrinolyse est augmenté lors d'une CIVD ?", a:"Les D-dimères."},
+    {q:"Dans la CIVD, quels sont les trois principaux marqueurs biologiques à connaître absolument ?", a:"La diminution du TP, du Facteur V et du fibrinogène."},
+    {q:"Pourquoi le taux de facteurs diminue-t-il dans la CIVD ?", a:"En raison de leur utilisation massive pour la formation de nombreux caillots."},
+    {q:"Comment le diagnostic de purpura fulminans est-il classé en termes de priorité médicale ?", a:"C'est une urgence !"}
+  ],
+  "7-4": [
+    {q:"Quel est le mécanisme physiopathologique de la fibrinolyse aiguë primitive ?", a:"Une activation diffuse du plasminogène en plasmine fonctionnelle dépassant les capacités des inhibiteurs."},
+    {q:"Quelles substances sont dégradées par la plasmine lors d'une fibrinolyse aiguë ?", a:"Le fibrinogène, la fibrine et tous les facteurs de la coagulation."},
+    {q:"Quelle est la différence clinique majeure entre la fibrinolyse et la CIVD concernant les caillots ?", a:"Dans la fibrinolyse, il n'y a pas de micro-caillots, contrairement à la CIVD."},
+    {q:"Quel seuil de fibrinogène est typiquement observé dans le diagnostic de la fibrinolyse ?", a:"Une diminution du fibrinogène inférieure à 1 g/L."},
+    {q:"Quel est l'examen biologique de référence pour diagnostiquer une fibrinolyse ?", a:"Le temps de lyse des euglobulines."},
+    {q:"Quelle valeur du temps de lyse des euglobulines indique une pathologie de fibrinolyse ?", a:"Un temps inférieur à 30 minutes."},
+    {q:"Quelle est l'origine du point de départ d'une fibrinolyse aiguë liée à la grossesse ?", a:"Une grossesse 'mal vécue' (complication obstétricale)."},
+    {q:"Dans la fibrinolyse, quel est l'état du Facteur V ?", a:"Le Facteur V est diminué."},
+    {q:"Quel est le rôle des inhibiteurs de la plasmine en temps normal ?", a:"Ils contrôlent la plasmine pour éviter une dégradation excessive du fibrinogène."}
+  ],
+  "7-5": [
+    {q:"Quels sont les facteurs de la coagulation dits 'vitamine K dépendants' ?", a:"Les facteurs II, VII, IX, X ainsi que les protéines C et S."},
+    {q:"Dans une hypovitaminose K, quel est l'état des facteurs non dépendants de la vitamine K ?", a:"Les autres facteurs sont normaux."},
+    {q:"Pourquoi le nouveau-né est-il particulièrement à risque d'hypovitaminose K ?", a:"À cause d'un foie immature et d'une carence d'apport en vitamine K."},
+    {q:"Quelle mesure systématique est prise en France à la naissance pour prévenir les saignements du nouveau-né ?", a:"L'administration de vitamine K par voie orale (per os)."},
+    {q:"Par quel mécanisme les antibiotiques peuvent-ils causer une hypovitaminose K ?", a:"En éliminant les bactéries du tube digestif qui produisent la vitamine K."},
+    {q:"Quel est l'impact d'une hypovitaminose K sur le Temps de Céphaline Activée (TCA) ?", a:"Le TCA est allongé."},
+    {q:"Comment évolue la numération plaquettaire dans une hypovitaminose K ?", a:"La numération plaquettaire est normale."},
+    {q:"Que contient le médicament 'PPSB' utilisé pour traiter les urgences hémorragiques ?", a:"Il contient les facteurs de la coagulation nécessaires (Facteurs II, VII, IX, X)."},
+    {q:"Pourquoi préfère-t-on l'injection de PPSB à la vitamine K en cas d'urgence ?", a:"Le PPSB agit en 5 minutes, alors que la vitamine K nécessite environ 24 heures pour la synthèse des facteurs."},
+    {q:"Pourquoi l'insuffisance hépato-cellulaire entraîne-t-elle une baisse de tous les facteurs de coagulation ?", a:"Parce que le foie est le lieu de synthèse de tous les facteurs de la coagulation."},
+    {q:"Quels facteurs de la voie exogène diminuent de manière homogène en cas d'insuffisance hépato-cellulaire ?", a:"Les facteurs II, V, VII et X."},
+    {q:"Quelle est la cause de la thrombopénie observée spécifiquement dans la cirrhose chronique ?", a:"L'hypersplénisme, qui entraîne une séquestration des plaquettes."},
+    {q:"Quel marqueur biologique de cytolyse augmente lors d'une insuffisance hépato-cellulaire ?", a:"Les transaminases."},
+    {q:"Quel est l'effet de la 'mort au rat' sur la coagulation ?", a:"Elle provoque une hypovitaminose K."},
+    {q:"Pourquoi l'arrêt de l'alimentation peut-il mener à un trouble de la coagulation ?", a:"Il entraîne une carence en vitamine K (hypovitaminose K)."},
+    {q:"Dans l'insuffisance hépato-cellulaire aiguë, quel est l'état habituel des plaquettes ?", a:"Le taux de plaquettes est normal."},
+    {q:"Quelle est la différence biologique entre une insuffisance hépato-cellulaire et une hypovitaminose K concernant les facteurs ?", a:"Dans l'insuffisance hépatique tout diminue, alors que dans l'hypovitaminose K, seuls les facteurs vitamine K dépendants sont bas."}
+  ],
+  "7-6": [
+    {q:"Que sont les inhibiteurs de facteurs de coagulation ?", a:"Des anticorps dirigés contre les protéines de la coagulation."},
+    {q:"Quel est l'inhibiteur de facteur le plus fréquemment rencontré en pathologie ?", a:"L'anti-facteur VIII."},
+    {q:"Quel est le taux de mortalité associé à la présence d'inhibiteurs de facteurs ?", a:"10 à 20%."},
+    {q:"Quelles populations sont principalement touchées par l'apparition d'inhibiteurs ?", a:"Les femmes jeunes venant d'accoucher (jusqu'à 1 an après) et les personnes âgées de plus de 60 ans."},
+    {q:"Citez trois pathologies sous-jacentes pouvant causer l'apparition d'inhibiteurs.", a:"Un cancer, une maladie auto-immune ou une maladie de système comme le lupus."},
+    {q:"Quel est le taux de facteur VIII typique lors d'une suspicion d'inhibiteur anti-facteur VIII ?", a:"Un taux très bas, inférieur à 5%."},
+    {q:"Dans le diagnostic biologique d'un inhibiteur anti-VIII, comment sont le TP et le facteur Willebrand (FW) ?", a:"Le TP et le FW sont normaux."},
+    {q:"Quel est le mode d'action du Novoseven dans le traitement des inhibiteurs ?", a:"Il stoppe le saignement en activant directement la coagulation."},
+    {q:"Quel médicament en développement vise à reconstituer l'action du facteur VIII pour passer du facteur IX au X ?", a:"L'Emicizumab."},
+    {q:"Quelle pathologie de système est fréquemment associée aux inhibiteurs de facteur VIII ?", a:"Le lupus."},
+    {q:"Pourquoi les gestes invasifs (chirurgie) sont-ils risqués chez un patient avec inhibiteur ?", a:"Car ils provoquent des saignements massifs (saignement +++)."},
+    {q:"Quel est le traitement de fond si l'inhibiteur de facteur est causé par un cancer ?", a:"On traite le cancer sous-jacent."}
+  ],
+  "7-7": [
+    {q:"Quel est le taux hémostatique minimal requis pour le Facteur VII selon le tableau des déficits ?", a:"20%."},
+    {q:"Quelle est la valeur de référence du fibrinogène chez l'adulte ?", a:"1,5 à 4 g/L."},
+    {q:"Quelle est la fréquence des déficits en Facteur V dans la population ?", a:"1 par million."},
+    {q:"Quelle est la référence adulte pour l'activité du Facteur XIII ?", a:"50%."}
+  ],
+  "7-8": [
+    {q:"Quel est le mode de transmission génétique de l'hémophilie ?", a:"C'est une maladie liée au chromosome X (hommes malades, femmes conductrices)."},
+    {q:"Quelle proportion des nouveaux cas d'hémophilie correspond à des mutations 'de novo' ?", a:"30%."},
+    {q:"Quels sont les sites de saignements caractéristiques de l'hémophilie ?", a:"Les muscles et les articulations."},
+    {q:"Quel facteur est déficitaire dans l'hémophilie A ?", a:"Le facteur VIII."},
+    {q:"Quelle est la fréquence de l'hémophilie A chez les nouveau-nés de sexe masculin ?", a:"1 pour 5 000 naissances."},
+    {q:"Quel facteur est déficitaire dans l'hémophilie B ?", a:"Le facteur IX."},
+    {q:"Quelle est la fréquence de l'hémophilie B chez les nouveau-nés de sexe masculin ?", a:"1 pour 30 000 naissances."},
+    {q:"Quel est le traitement biologique substitutif pour une hémophilie B ?", a:"L'apport de facteur IX."}
+  ],
+  "7-9": [
+    {q:"Comment est le Temps de Céphaline Activée (TCA) chez un patient hémophile ?", a:"Le TCA est allongé."},
+    {q:"Quel est le taux de facteur circulant définissant une hémophilie sévère ?", a:"Un taux inférieur à 1%."},
+    {q:"Quel est le taux de facteur circulant définissant une hémophilie mineure ?", a:"Un taux inférieur à 40%."},
+    {q:"À quel âge les saignements se manifestent-ils généralement dans les cas d'hémophilie sévère ?", a:"Dès l'âge de la marche, lorsque les articulations sont mises sous tension."},
+    {q:"Quelle complication articulaire résulte d'inflammations répétées dues aux saignements hémophiliques ?", a:"Les arthropathies."},
+    {q:"Quelle est la conséquence clinique locale possible d'un hématome cérébral chez un hémophile ?", a:"Des compressions optiques."},
+    {q:"Pourquoi la sévérité clinique de l'hémophilie est-elle prévisible ?", a:"Parce qu'elle dépend directement du taux de facteurs circulants."},
+    {q:"Quel test permet de différencier biologiquement une hémophilie A d'une hémophilie B ?", a:"Le dosage spécifique des facteurs VIII (diminué dans la A) et IX (diminué dans la B)."}
+  ],
+  "7-10": [
+    {q:"Quelle est la cause principale d'une thrombose artérielle ?", a:"Une lésion endothéliale et vasculaire due à l'athérosclérose (gras)."},
+    {q:"Où s'active la coagulation lors d'une thrombose artérielle ?", a:"Au niveau de la plaque d'athérome lorsqu'une brèche se forme."},
+    {q:"Citez trois facteurs de risque (FDR) majeurs de la thrombose artérielle.", a:"Le tabagisme, le diabète et l'hypertension artérielle (TA)."},
+    {q:"Quelle est la cause physiologique principale d'une thrombose veineuse ?", a:"La stase veineuse due à l'immobilisation."},
+    {q:"Quelle est la fréquence approximative de la thrombose veineuse dans la population ?", a:"1 pour 1 000."},
+    {q:"Quel mécanisme lie l'âge et le sexe au risque de thrombose artérielle ?", a:"Ce sont des facteurs de risque non modifiables (hommes plus touchés que les femmes)."},
+    {q:"Quel événement déclenche l'activation des plaquettes dans une artère ?", a:"Une brèche au niveau d'une plaque d'athérome."},
+    {q:"Quels sont les trois territoires principaux touchés par la thrombose artérielle ?", a:"Coronaire, cérébral et artères périphériques."}
+  ],
+  "7-11": [
+    {q:"Comment appelle-t-on couramment une thrombose veineuse profonde ?", a:"Une phlébite."},
+    {q:"Quelle localisation de thrombose veineuse présente le plus grand risque d'embolie pulmonaire ?", a:"La thrombose proximale (allant du genou à la veine cave)."},
+    {q:"Où se situe anatomiquement une thrombose veineuse dite 'distale' ?", a:"Sous le genou."},
+    {q:"Quelle est la définition d'une thrombose veineuse superficielle ?", a:"Un caillot se formant dans une veine proche de la surface de la peau."},
+    {q:"Quel est l'impact d'un vol d'avion prolongé sur le risque thrombotique ?", a:"Il favorise la stase veineuse et donc la thrombose veineuse."}
+  ],
+  "8-2": [
+    {q:"Pourquoi la thrombose veineuse est-elle considérée comme une urgence thérapeutique ?", a:"Elle peut entraîner une embolie pulmonaire mortelle."},
+    {q:"Quelle est la localisation majoritaire des thromboses veineuses ?", a:"Le membre inférieur."},
+    {q:"Citez deux maladies hématologiques rares constituant des facteurs de risque de thrombose.", a:"La thrombocytémie essentielle et la maladie de Vaquez."},
+    {q:"Quel type de traitement hormonal favorise la survenue de caillots ?", a:"La contraception oestroprogestative."},
+    {q:"Pourquoi la grossesse augmente-t-elle le risque de thrombose ?", a:"À cause du pic d'oestrogènes qui favorise la formation de caillots."},
+    {q:"Citez trois facteurs de risque biologiques de thrombose veineuse.", a:"L'âge, les antécédents familiaux et le surpoids/obésité."},
+    {q:"Définition : Embolie pulmonaire (EP)", a:"Présence d'un caillot dans l'artère pulmonaire."},
+    {q:"Quel est le taux de mortalité moyen associé à l'embolie pulmonaire ?", a:"10%."},
+    {q:"Citez quatre signes cliniques évocateurs d'une embolie pulmonaire.", a:"Douleur thoracique, essoufflement, tachycardie et petite fièvre."},
+    {q:"Quel est le nombre approximatif de cas d'embolie pulmonaire par an en France ?", a:"50 000 à 100 000 cas."}
+  ],
+  "8-3": [
+    {q:"À quoi servent les scores de Wells ou de Genève ?", a:"À classer la probabilité clinique (faible, intermédiaire ou élevée) d'une phlébite ou EP."},
+    {q:"Quelle est la conduite à tenir si la probabilité clinique d'épisode thrombotique est élevée ?", a:"Réaliser directement une imagerie sans dosage de D-dimères."},
+    {q:"Quel examen d'imagerie est privilégié pour diagnostiquer une phlébite de la jambe ?", a:"L'écho-Doppler."},
+    {q:"Quels sont les deux examens d'imagerie possibles pour diagnostiquer une embolie pulmonaire ?", a:"L'angioscanner ou la scintigraphie pulmonaire."}
+  ],
+  "8-4": [
+    {q:"Définition : D-dimères", a:"Fragments produits lors de la dégradation de la fibrine par fibrinolyse."},
+    {q:"Quel est le seuil standard de positivité des D-dimères ?", a:"500 ng/ml."},
+    {q:"Comment varie le seuil des D-dimères chez les patients ?", a:"Il est adapté en fonction de l'âge du patient."},
+    {q:"Quelle est la signification d'un taux de D-dimères inférieur à 500 ng/ml ?", a:"L'exclusion de la thrombose (excellente valeur prédictive négative)."},
+    {q:"Concept : Valeur prédictive négative (VPN) des D-dimères", a:"Si le test est négatif, on est quasiment certain qu'il n'y a pas de thrombose."}
+  ],
+  "8-5": [
+    {q:"Pourquoi les D-dimères ont-ils une valeur prédictive positive basse ?", a:"Car de nombreuses situations (inflammation, cancer) peuvent les augmenter sans thrombose."},
+    {q:"Citez trois situations non thrombotiques où les D-dimères sont augmentés.", a:"Sujet âgé, syndrome inflammatoire et insuffisance rénale."},
+    {q:"Comment évolue le taux de D-dimères au cours de la grossesse ?", a:"Il augmente progressivement avec l'évolution de la grossesse."}
+  ],
+  "8-6": [
+    {q:"Chez quel profil d'homme doit-on systématiquement faire une enquête étiologique après un premier épisode de TVP proximale ?", a:"Un homme jeune de moins de 50 ans sans facteur de risque évident."},
+    {q:"À partir de quel nombre d'épisodes de thrombose avant 50 ans l'enquête est-elle systématique ?", a:"Dès le deuxième épisode."},
+    {q:"Dans quelles localisations inhabituelles une thrombose justifie-t-elle une enquête ?", a:"Localisations digestive, cérébrale ou au membre supérieur."},
+    {q:"Quelle est la conduite à tenir pour une thrombose distale chez un homme ?", a:"Aucune enquête n'est réalisée."},
+    {q:"Pourquoi fait-on une enquête systématique pour une thrombose distale chez une femme sous contraceptif ?", a:"Pour évaluer les risques en vue d'une future grossesse."},
+    {q:"Qu'est-ce qu'une thrombose 'spontanée' ?", a:"Une thrombose survenant sans aucun facteur de risque identifié."},
+    {q:"Pourquoi ne fait-on pas d'enquête chez un patient âgé avec varices après une thrombose ?", a:"L'épisode est considéré comme normal vu l'âge et les facteurs de risque présents."},
+    {q:"Dans quel cas une femme de moins de 50 ans n'aurait-elle pas besoin d'une enquête systématique après une thrombose ?", a:"Si elle présente des varices (facteur de risque local évident)."}
+  ],
+  "8-7": [
+    {q:"Définition : Bilan de thrombophilie", a:"Analyses sanguines visant à comprendre la cause d'un caillot chez un patient jeune ou sans FDR."},
+    {q:"Quel est l'équilibre rompu dans le sang menant à la formation de caillots ?", a:"L'équilibre entre les facteurs de coagulation et les freins (anticoagulants naturels)."}
+  ],
+  "8-8": [
+    {q:"Quel est le mécanisme du syndrome des anti-phospholipides (SAPL) ?", a:"Des anticorps activent les plaquettes, les cellules endothéliales et les monocytes."},
+    {q:"Quels sont les trois risques majeurs associés au SAPL ?", a:"Thrombose veineuse, thrombose artérielle et pathologies placentaires."},
+    {q:"Citez deux maladies pouvant être associées au syndrome des anti-phospholipides.", a:"Le lupus et certaines hémopathies (ou infections comme le VIH)."},
+    {q:"Quel constituant sanguin est la cible des anticorps dans le SAPL ?", a:"Les phospholipides plaquettaires."}
+  ],
+  "8-9": [
+    {q:"Quel critère clinique de SAPL concerne la durée de la grossesse ?", a:"Mort fœtale inexpliquée après 10 semaines d'aménorrhée."},
+    {q:"Quel critère clinique de SAPL est lié à la prématurité ?", a:"Naissance avant 34 semaines avec éclampsie ou lésion placentaire."},
+    {q:"Combien de fausses couches précoces inexpliquées définissent un critère clinique de SAPL ?", a:"Au moins 3 fausses couches."},
+    {q:"Citez les deux types d'anticorps à rechercher pour le diagnostic biologique du SAPL.", a:"Anticardiolipines et antibeta2GP1 (IgG ou IgM)."},
+    {q:"Quel test spécifique permet de mettre en évidence un anticoagulant de type lupique ?", a:"Le test au venin de vipère de Russel (ou TCA phosphosensible)."},
+    {q:"Quelle est la condition de persistance pour valider un critère biologique de SAPL ?", a:"Le marqueur doit être retrouvé identique 3 mois après le premier test."}
+  ],
+  "8-10": [
+    {q:"Quel est le déficit constitutionnel en anticoagulant le plus rare et le plus sévère ?", a:"Le déficit en anti-thrombine."},
+    {q:"Quelle est la pénétrance du déficit en anti-thrombine ?", a:"100% (tous les porteurs sont symptomatiques)."},
+    {q:"Citez deux médicaments pouvant diminuer le taux d'anti-thrombine.", a:"Les héparines et la L-asparaginase."},
+    {q:"Quel syndrome rénal peut provoquer une baisse de l'anti-thrombine ?", a:"Le syndrome néphrotique (fuite dans les urines)."},
+    {q:"Quel est le mode de transmission du déficit en protéine C ?", a:"Autosomique dominant."},
+    {q:"Quelle pathologie cutanée grave survient chez un nouveau-né homozygote pour le déficit en protéine C ?", a:"Le purpura fulminans."},
+    {q:"Quelles sont les trois causes acquises de baisse de la protéine C ?", a:"Insuffisance hépatique, traitement par AVK et carence en vitamine K."},
+    {q:"Quel est l'effet de la grossesse sur le taux de protéine C ?", a:"Il peut être augmenté."},
+    {q:"Pourquoi le taux de protéine S diminue-t-il pendant la grossesse ou sous contraceptif ?", a:"À cause de l'influence négative des oestrogènes."}
+  ],
+  "8-11": [
+    {q:"Quel est le nom de la mutation spécifique du facteur II ?", a:"Mutation G20210A."},
+    {q:"Comment la mutation du facteur II affecte-t-elle la protéine ?", a:"Elle modifie la fonction (activité augmentée) mais pas nécessairement le taux."},
+    {q:"Quel examen permet de diagnostiquer une mutation du facteur II ou du facteur V ?", a:"Une étude génétique (étude de polymorphisme)."},
+    {q:"Quelle population est principalement touchée par la mutation du facteur V Leiden ?", a:"La population caucasienne."},
+    {q:"Quelle formalité est obligatoire avant de réaliser une étude génétique constitutionnelle (mutations II et V) ?", a:"L'accord signé du patient."}
+  ],
+  "8-12": [
+    {q:"Quel est le risque relatif (RR) de thrombose pour un déficit en anti-thrombine ?", a:"50."},
+    {q:"Quel est le risque relatif (RR) pour une mutation du facteur V Leiden à l'état hétérozygote ?", a:"5 à 10."},
+    {q:"Quels sont les facteurs de risque constitutionnels les plus fréquents dans la population générale ?", a:"Les mutations des facteurs II et V (3 à 5% de la population)."},
+    {q:"Quel est le risque relatif (RR) de thrombose pour un déficit en protéine C ?", a:"15."},
+    {q:"Quel est le risque relatif (RR) de thrombose pour un déficit en protéine S ?", a:"10."},
+    {q:"Quel est le risque relatif (RR) pour une mutation du facteur V Leiden à l'état homozygote ?", a:"50 à 80."},
+    {q:"Comment se transmettent généralement les déficits en protéines C, S et l'anti-thrombine ?", a:"De manière autosomique dominante."}
+  ],
+  "8-13": [
+    {q:"Pourquoi ne faut-il pas doser l'anti-thrombine, la protéine C ou S en phase aiguë de thrombose ?", a:"Il existe un risque de faux positif par consommation transitoire de ces protéines."},
+    {q:"Quels tests de thrombophilie peuvent être effectués à n'importe quel moment sans être faussés ?", a:"Les tests génétiques (mutations II et V) car l'ADN ne change pas."},
+    {q:"Quelle protéine anticoagulante est spécifiquement diminuée chez la femme enceinte ?", a:"La protéine S."},
+    {q:"Quelle est la règle générale pour réaliser un bilan de thrombophilie fiable ?", a:"Attendre la fin de la phase aiguë et l'arrêt des anticoagulants."},
+    {q:"Quel organe, outre les jambes, peut être le siège d'une thrombose veineuse ?", a:"Le cerveau (thrombose veineuse cérébrale) ou le système digestif."},
+    {q:"Quel déficit a une pénétrance variable, signifiant qu'on ne thrombose pas forcément si on est porteur ?", a:"Le déficit en protéine C ou protéine S."}
+  ],
+  "8-14": [
+    {q:"Quel est l'impact des AVK sur le dosage de la protéine C et S ?", a:"Ils provoquent une baisse (faux positif) car ces protéines sont vitamine K dépendantes."},
+    {q:"Combien de temps l'interférence des AVK sur le bilan de thrombophilie persiste-t-elle ?", a:"3 semaines."},
+    {q:"Quel est l'effet des Anticoagulants Oraux Directs (AOD) sur le bilan de thrombophilie ?", a:"Ils peuvent rendre les protéines faussement normales ou élevées (faux négatif)."},
+    {q:"Quelle est la durée de l'interférence des AOD sur les tests biologiques ?", a:"4 jours."},
+    {q:"Pourquoi l'héparine peut-elle fausser le dosage de l'anti-thrombine ?", a:"Elle amplifie l'action de l'anti-thrombine, augmentant sa consommation (faux positif)."},
+    {q:"L'index de Rosner est utilisé pour diagnostiquer quel type d'anomalie ?", a:"L'anticoagulant de type lupique (si index > 15)."}
+  ]
+};
+
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: pdf.id + "-" + s });
+  }
+});
+
+let current = 0;
+const visited = new Set();
+
+function buildSidebar() {
+  const sb = document.getElementById("sidebar");
+  let h = "";
+  pdfs.forEach(pdf => {
+    h += '<h3 class="' + pdf.badge + '">' + pdf.label + '</h3>';
+    for (let s = 1; s <= pdf.totalSlides; s++) {
+      const idx = allSlides.findIndex(x => x.pdf === pdf.id && x.slide === s);
+      h += '<div class="sidebar-item" data-idx="' + idx + '" id="sb-' + idx + '">Diapo ' + s + '</div>';
+    }
+  });
+  sb.innerHTML = h;
+  sb.querySelectorAll(".sidebar-item").forEach(el => {
+    el.addEventListener("click", () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+
+function buildSlides() {
+  const main = document.getElementById("main");
+  let h = "";
+  allSlides.forEach((sl, idx) => {
+    const pdf = pdfs.find(p => p.id === sl.pdf);
+    const fcs = flashcardMap[sl.key] || [];
+    h += '<div class="slide-section" id="slide-' + idx + '">';
+    h += '<span class="pdf-badge ' + pdf.badge + '">' + pdf.label + '</span>';
+    h += '<div class="slide-img-wrap"><img src="slides/pdf' + sl.pdf + '_slide' + sl.slide + '.png" alt="Diapo ' + sl.slide + '" loading="lazy"></div>';
+    if (fcs.length > 0) {
+      h += '<div class="fc-section"><h3>Flashcards (' + fcs.length + ')</h3>';
+      h += '<button class="btn-reveal" onclick="revealAll(' + idx + ')">Révéler toutes les réponses</button>';
+      h += '<div class="fc-grid">';
+      fcs.forEach((fc, i) => {
+        h += '<div class="flashcard" onclick="this.classList.toggle(\'flipped\')">';
+        h += '<div class="fc-inner">';
+        h += '<div class="fc-front"><span class="fc-num">' + (i + 1) + '</span><span class="fc-text">' + fc.q + '</span><span class="fc-hint">cliquer</span></div>';
+        h += '<div class="fc-back"><span class="fc-num">✓</span><span class="fc-text">' + fc.a + '</span></div>';
+        h += '</div></div>';
+      });
+      h += '</div></div>';
+    } else {
+      h += '<p class="no-fc">Pas de flashcards pour cette diapo.</p>';
+    }
+    h += '<div class="bottom-nav">';
+    h += '<button class="btn btn-prev" onclick="goTo(' + (idx - 1) + ')"' + (idx === 0 ? " disabled" : "") + '>← Précédent</button>';
+    h += '<button class="btn btn-next" onclick="goTo(' + (idx + 1) + ')"' + (idx === allSlides.length - 1 ? " disabled" : "") + '>Suivant →</button>';
+    h += '</div></div>';
+  });
+  main.innerHTML = h;
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= allSlides.length) return;
+  document.querySelectorAll(".slide-section").forEach(el => el.classList.remove("active"));
+  document.getElementById("slide-" + idx).classList.add("active");
+  visited.add(idx);
+  current = idx;
+  document.querySelectorAll(".sidebar-item").forEach(el => el.classList.remove("active"));
+  const sbEl = document.getElementById("sb-" + idx);
+  if (sbEl) {
+    sbEl.classList.add("active");
+    sbEl.scrollIntoView({ block: "nearest" });
+  }
+  visited.forEach(v => {
+    const vEl = document.getElementById("sb-" + v);
+    if (vEl && v !== idx) vEl.classList.add("completed");
+  });
+  document.getElementById("progressFill").style.width = ((idx + 1) / allSlides.length * 100) + "%";
+  document.getElementById("navCounter").textContent = (idx + 1) + " / " + allSlides.length;
+  window.scrollTo(0, 0);
+}
+
+function revealAll(idx) {
+  document.getElementById("slide-" + idx).querySelectorAll(".flashcard").forEach(fc => fc.classList.add("flipped"));
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); goTo(current + 1); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); goTo(current - 1); }
+});
+
+buildSidebar();
+buildSlides();
+goTo(0);
+</script>
+</body>
+</html>

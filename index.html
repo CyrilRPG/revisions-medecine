@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révisions Médecine — Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a14;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 80px 20px 40px;
+    max-width: 800px;
+  }
+  .hero-icon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #7c8aff 0%, #ff6b9d 50%, #ffb347 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: #888;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  /* STATS BAR */
+  .stats {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin: 30px 0 50px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #7c8aff;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+  }
+
+  /* GRID */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 0 24px 80px;
+  }
+
+  .course-card {
+    background: linear-gradient(145deg, #12121f 0%, #181830 100%);
+    border: 1px solid #2a2a4a;
+    border-radius: 20px;
+    padding: 32px 28px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .course-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 20px 20px 0 0;
+  }
+  .course-card:nth-child(1)::before { background: linear-gradient(90deg, #5b9aff, #7c8aff); }
+  .course-card:nth-child(2)::before { background: linear-gradient(90deg, #ff6b9d, #ff8a80); }
+  .course-card:nth-child(3)::before { background: linear-gradient(90deg, #ffb347, #ffd700); }
+
+  .course-card:hover {
+    transform: translateY(-6px);
+    border-color: #4a4a6a;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .card-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 0.88rem;
+    color: #888;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .tag-slides { background: #1a2744; color: #5b9aff; }
+  .tag-fc { background: #1a3a2a; color: #4ade80; }
+  .tag-pdf { background: #2a1a3a; color: #c084fc; }
+
+  .card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(124, 138, 255, 0.1);
+    border: 1px solid rgba(124, 138, 255, 0.2);
+    border-radius: 12px;
+    color: #7c8aff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .course-card:hover .card-btn {
+    background: rgba(124, 138, 255, 0.2);
+    border-color: #7c8aff;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    color: #444;
+    font-size: 0.78rem;
+  }
+  .footer a {
+    color: #7c8aff;
+    text-decoration: none;
+  }
+
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 1.6rem; }
+    .courses-grid { grid-template-columns: 1fr; padding: 0 16px 60px; }
+    .stats { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-icon">🩺</div>
+  <h1>Révisions Médecine</h1>
+  <p>Cours interactifs avec diapos et flashcards intégrées. Navigue, révise, mémorise.</p>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">3</div>
+    <div class="stat-label">Cours</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">226</div>
+    <div class="stat-label">Diapos</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">~1 300</div>
+    <div class="stat-label">Flashcards</div>
+  </div>
+</div>
+
+<div class="courses-grid">
+
+  <a class="course-card" href="Andrologie/cours_andrologie.html">
+    <div class="card-emoji">🧬</div>
+    <div class="card-title">Andrologie</div>
+    <div class="card-desc">Anatomie de l'appareil reproducteur masculin, spermatogenèse, maturation, voies spermatiques, glandes annexes, prostate et fonction sexuelle.</div>
+    <div class="card-tags">
+      <span class="tag tag-slides">72 diapos</span>
+      <span class="tag tag-fc">~340 flashcards</span>
+      <span class="tag tag-pdf">6 PDF</span>
+    </div>
+    <div class="card-btn">Ouvrir le cours →</div>
+  </a>
+
+  <a class="course-card" href="Thrombop%C3%A9nie%20h%C3%A9morragie/cours_thrombopenie_hemorragie.html">
+    <div class="card-emoji">🩸</div>
+    <div class="card-title">Thrombopénie & Hémorragie</div>
+    <div class="card-desc">Thrombopénies, purpura, syndromes hémorragiques constitutionnels et acquis, thrombopathies, maladie de Willebrand, hémophilies.</div>
+    <div class="card-tags">
+      <span class="tag tag-slides">104 diapos</span>
+      <span class="tag tag-fc">~646 flashcards</span>
+      <span class="tag tag-pdf">8 PDF</span>
+    </div>
+    <div class="card-btn">Ouvrir le cours →</div>
+  </a>
+
+  <a class="course-card" href="gammapathies/cours_gammapathies.html">
+    <div class="card-emoji">🔬</div>
+    <div class="card-title">Gammapathies Monoclonales</div>
+    <div class="card-desc">Biologie des immunoglobulines, électrophorèse, immunofixation, MGUS, myélome multiple, Waldenström, critères CRAB.</div>
+    <div class="card-tags">
+      <span class="tag tag-slides">50 diapos</span>
+      <span class="tag tag-fc">314 flashcards</span>
+      <span class="tag tag-pdf">4 PDF</span>
+    </div>
+    <div class="card-btn">Ouvrir le cours →</div>
+  </a>
+
+</div>
+
+<div class="footer">
+  Généré avec ❤️ pour les révisions — <a href="https://github.com">GitHub Pages</a>
+</div>
+
+</body>
+</html>

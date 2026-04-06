@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gammapathies - Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Gammapathies</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 50</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Monoclonal_Gammopathy_Biology_and_Diagnosis", label: "Gammapathie Monoclonale : Biologie et Diagnostic", badge: "pdf-1", totalSlides: 15 },
+  { id: 2, name: "Monoclonal_Gammopathy_Diagnostics", label: "Gammapathies Monoclonales : Algorithme Diagnostique", badge: "pdf-2", totalSlides: 13 },
+  { id: 3, name: "Monoclonal_Gammopathy_Atlas", label: "Atlas Diagnostique des Gammapathies", badge: "pdf-3", totalSlides: 10 },
+  { id: 4, name: "Gammapathies_and_Myeloma", label: "Gammapathies Monoclonales & Myélome Multiple", badge: "pdf-4", totalSlides: 12 },
+];
+
+// Flashcards mapped to [pdfId, slideNum]
+const flashcardMap = {
+  // ===== PDF 1: Monoclonal_Gammopathy_Biology_and_Diagnosis =====
+  "1-2": [
+    {q:"Définition : Gammapathie monoclonale", a:"Anomalie protidique liée à la production en excès d\'une même immunoglobuline par un seul clone plasmocytaire."},
+    {q:"Dans quels milieux biologiques une immunoglobuline monoclonale peut-elle être détectée ?", a:"Dans le sang et/ou les urines."},
+    {q:"Quelle cellule produit les immunoglobulines ?", a:"Le plasmocyte."},
+    {q:"Quelle est la fonction biologique principale d\'une immunoglobuline ?", a:"Elle possède une fonction d\'anticorps permettant l\'immunité humorale."},
+    {q:"Contre quoi les anticorps produits par les plasmocytes se dirigent-ils lors d\'une infection ?", a:"Contre des antigènes (Ag) spécifiques pour neutraliser les bactéries."},
+    {q:"Que signifie l\'acronyme MGUS (ou GMSI en français) ?", a:"Gammapathie monoclonale de signification indéterminée."},
+    {q:"Citez deux exemples de syndromes lymphoprolifératifs d\'origine tumorale.", a:"La maladie de Waldenström et la leucémie lymphoïde chronique (LLC)."},
+    {q:"Quelle est l\'origine pathologique du myélome ?", a:"Une origine tumorale liée aux plasmocytes."}
+  ],
+  "1-3": [
+    {q:"D\'où proviennent les lymphocytes B (LB) à l\'origine ?", a:"De la moelle osseuse."},
+    {q:"Comment appelle-t-on le récepteur à l\'antigène situé à la surface des lymphocytes B ?", a:"Le BCR (B-cell receptor)."},
+    {q:"Quelle est la structure moléculaire du récepteur BCR ?", a:"Il possède une structure de type immunoglobuline associée à la membrane."},
+    {q:"Qu\'est-ce qu\'un lymphocyte B « naïf » ?", a:"Un lymphocyte mature qui a quitté la moelle osseuse mais n\'a jamais rencontré son antigène spécifique."},
+    {q:"Où migre un lymphocyte B une fois activé par un agent infectieux ?", a:"Dans les organes lymphoïdes périphériques, principalement les ganglions."}
+  ],
+  "1-4": [
+    {q:"Quelle étape de maturation subit le lymphocyte B dans les organes lymphoïdes périphériques pour amplifier la réponse ?", a:"Une prolifération intense pour obtenir un clone lymphocytaire."},
+    {q:"En quels types de cellules le lymphocyte B se différencie-t-il après l\'étape de sélection ?", a:"En lymphocytes B mémoires et en plasmocytes."},
+    {q:"Quel est le stade ultime de maturation du lymphocyte B ?", a:"Le plasmocyte."},
+    {q:"Quelle est la relation entre le BCR et l\'immunoglobuline sécrétée par le plasmocyte ?", a:"Le plasmocyte sécrète l\'immunoglobuline qui constituait initialement son BCR."}
+  ],
+  "1-5": [
+    {q:"Quels sont les deux mécanismes d\'élimination des antigènes induits par les anticorps ?", a:"La phagocytose ou l\'utilisation des compléments."},
+    {q:"Où se localisent préférentiellement les plasmocytes après leur maturation (lieu de résidence finale) ?", a:"Dans la moelle osseuse."},
+    {q:"Pourquoi ne détecte-t-on normalement pas de plasmocytes dans le sang ?", a:"Car leur passage sanguin est très furtif (moins de 1-2 %)."}
+  ],
+  "1-6": [
+    {q:"De combien de chaînes une immunoglobuline est-elle composée au total ?", a:"Quatre chaînes (2 chaînes lourdes et 2 chaînes légères identiques)."},
+    {q:"Quels sont les quatre types possibles de chaînes lourdes mentionnés pour les immunoglobulines matures ?", a:"G, E, A ou D."},
+    {q:"Quels sont les deux types possibles de chaînes légères ?", a:"Kappa (κ) ou Lambda (λ)."},
+    {q:"Quel domaine de l\'immunoglobuline sert de site de reconnaissance de l\'antigène ?", a:"Le domaine variable."},
+    {q:"Où la variabilité du domaine variable des immunoglobulines est-elle acquise ?", a:"Dans la moelle osseuse pendant la différenciation du lymphocyte B."},
+    {q:"Le domaine constant d\'une chaîne d\'immunoglobuline change-t-il selon l\'antigène reconnu ?", a:"Non, il est le même pour toutes les immunoglobulines d\'une même classe."},
+    {q:"Un plasmocyte peut-il sécréter plusieurs types d\'immunoglobulines différents au cours de sa vie ?", a:"Non, il ne sécrète qu\'un seul type d\'immunoglobuline, définissant un clone spécifique."},
+    {q:"Quel est le rôle biologique des chaînes légères au sein de l\'immunoglobuline ?", a:"Elles ajoutent de la variabilité au site de reconnaissance de l\'antigène."},
+    {q:"Quel élément de la structure de l\'immunoglobuline détermine son isotype (IgM, IgG, etc.) ?", a:"La nature de la chaîne lourde."}
+  ],
+  "1-7": [
+    {q:"Quel type d\'immunoglobuline est toujours exprimé par un lymphocyte B naïf ?", a:"Une IgM."},
+    {q:"Quelles sont les caractéristiques de la réponse immunitaire primaire liée à l\' IgM ?", a:"Elle est rapide, peu efficace, peu durable et de faible affinité pour l\'antigène."},
+    {q:"Comment appelle-t-on le processus où la partie constante d\'une IgM est remplacée par une chaîne G, A, D ou E ?", a:"Le changement de classe (ou commutation isotypique)."},
+    {q:"Pourquoi le changement de classe des immunoglobulines est-il bénéfique ?", a:"Il permet d\'obtenir une réponse plus efficace, durable et reproductible lors d\'une ré-infection."},
+    {q:"Vrai ou Faux : Les plasmocytes clonaux et tumoraux du myélome sécrètent principalement des IgM.", a:"Faux, ils sécrètent des IgG, IgA, IgD ou IgE."}
+  ],
+  "1-8": [
+    {q:"Quelle classe d\'immunoglobuline est la plus abondante dans l\'organisme ?", a:"L\' IgG."},
+    {q:"Quelle est la fonction spécifique de l\' IgA ?", a:"L\'immunité des muqueuses."},
+    {q:"Dans quel processus pathologique les IgE sont-elles principalement impliquées ?", a:"Les processus allergiques."},
+    {q:"Quelle est la fonction de l\' IgD ?", a:"L\'activation lymphocytaire."},
+    {q:"Comment définit-on une population lymphocytaire physiologique capable de reconnaître des milliards d\'antigènes ?", a:"Une population polyclonale."}
+  ],
+  "1-9": [
+    {q:"La prolifération des lymphocytes B dans les centres germinatifs permet d\'augmenter l\'_____ de l\' Ig envers l\'antigène.", a:"Affinité"},
+    {q:"Quelle protéine est la plus lente lors de la migration par électrophorèse ?", a:"L\'albumine (selon le texte, bien que techniquement c\'est la plus rapide vers l\'anode, le texte la qualifie de plus lente dans le contexte de signal intégré)."}
+  ],
+  "1-10": [
+    {q:"L\'immunoglobuline monoclonale est un marqueur indirect de quoi ?", a:"D\'une prolifération clonale plasmocytaire."}
+  ],
+  "1-11": [
+    {q:"En quoi consiste l\'examen d\'électrophorèse des protéines plasmatiques ?", a:"À faire migrer les protéines du plasma dans un champ électrique selon leur taille et leur charge."},
+    {q:"Quel est le premier pic, le plus à gauche et le plus abondant, sur un tracé d\'électrophorèse ?", a:"L\'albumine."},
+    {q:"Citez les 5 zones de migration des globulines après l\'albumine sur une EPP.", a:"α 1, α 2, β 1, β 2 et γ."},
+    {q:"Quelle est l\'allure normale de la zone gamma sur une électrophorèse polyclonale ?", a:"Une allure en cloche (ou dôme)."}
+  ],
+  "1-12": [
+    {q:"Comment appelle-t-on la déformation étroite de la zone gamma en cas de prolifération massive d\'un seul clone ?", a:"Un pic d\'allure monoclonale."},
+    {q:"Peut-on confirmer la monoclonalité d\'une immunoglobuline avec la seule électrophorèse des protides ?", a:"Non, elle permet seulement de la suspecter."}
+  ],
+  "1-13": [
+    {q:"Quels sont les deux examens biochimiques fondamentaux pour le diagnostic d\'une gammapathie ?", a:"L\'électrophorèse des protides (EPP) et l\'immunofixation."},
+    {q:"Quel examen permet de détecter la présence d\'une immunoglobuline monoclonale en grande quantité dans le sang ?", a:"L\'électrophorèse des protides (EPP)."},
+    {q:"Dans quelle zone de migration de l\'électrophorèse trouve-t-on l\'immunoglobuline monoclonale ?", a:"La zone « Gamma »."},
+    {q:"Quel est l\'objectif de l\'examen d\'immunofixation ?", a:"Déterminer le type d\'immunoglobuline (IgG, IgA, IgE, etc.)."}
+  ],
+  "1-14": [
+    {q:"Le BCR est une immunoglobuline _____ au lymphocyte B.", a:"Associée à la membrane"},
+    {q:"Un plasmocyte est-il capable de changer l\'antigène qu\'il reconnaît ?", a:"Non, il n\'existe pas de changement de reconnaissance."},
+    {q:"Quelle est l\'origine des pathologies comme le Waldenström ou la LLC ?", a:"Une origine tumorale (syndrome lymphoprolifératif)."},
+    {q:"Dans la structure de l\' Ig, les deux chaînes lourdes sont-elles identiques entre elles ?", a:"Oui, elles sont identiques."},
+    {q:"Quelle chaîne d\' Ig est représentée en rose sur les schémas du cours ?", a:"La chaîne légère."},
+    {q:"Comment évolue le nombre de possibilités de reconnaissance d\' Ag en associant chaînes lourdes et légères ?", a:"Il passe de 10^9 à 10^(12) environ."},
+    {q:"Les lymphocytes B mémoires servent à simplifier le processus en cas de _____.", a:"Ré-infection par le même antigène."},
+    {q:"Quel domaine de l\' Ig est identique pour toutes les immunoglobulines d\'une même classe ?", a:"Le domaine constant."}
+  ],
+  "1-15": [
+    {q:"Où se fait l\'intégration du signal de migration pour donner le tracé de l\' EPP ?", a:"Lors de la migration des protéines sous champ électrique."},
+    {q:"Terme : Répertoire de l\'immunité", a:"Capacité de produire une diversité importante d\'immunoglobulines spécifiques à une multitude d\'antigènes."},
+    {q:"La zone des gammaglobulines contient l\'ensemble des _____.", a:"Immunoglobulines (Ig)."},
+    {q:"Dans une gammapathie monoclonale, le clone produit son Ig en quantité suffisamment importante pour être _____.", a:"Détectable."},
+    {q:"L\'immunité humorale est assurée par la production d\'_____.", a:"Anticorps."},
+    {q:"Le lymphocyte B activé migre spécifiquement vers les _____.", a:"Ganglions."},
+    {q:"Le précurseur du lymphocyte B dans la moelle osseuse est une _____.", a:"Cellule souche immature."},
+    {q:"Quelle est la conséquence d\'une prolifération intense des LB après activation ?", a:"L\'amplification de la réponse immunitaire."},
+    {q:"Vrai ou Faux : On cherche les plasmocytes dans le sang pour diagnostiquer un myélome.", a:"Faux, on les cherche toujours dans la moelle osseuse."},
+    {q:"Quelle partie de l\' IgM est remplacée lors du changement de classe ?", a:"La chaîne lourde (passage de la chaîne μ à γ, α, δ ou ε)."},
+    {q:"Les immunoglobulines sont des _____ produites par les plasmocytes.", a:"Glycoprotéines."},
+    {q:"Le pic d\'allure monoclonale sur l\' EPP est qualifié d\'_____.", a:"Étroit."},
+    {q:"Quelle pathologie est liée à une symptomatologie lymphocytaire plutôt que plasmocytaire ?", a:"Le lymphome."},
+    {q:"Combien de types de chaînes légères peut posséder une seule molécule d\'immunoglobuline ?", a:"Un seul type (soit Kappa, soit Lambda)."},
+    {q:"La migration dans la zone « Gamma » est caractéristique de quelle protéine ?", a:"L\'immunoglobuline monoclonale (ou les Ig en général)."},
+    {q:"Le passage des plasmocytes dans le sang est dit _____.", a:"Furtif."},
+    {q:"La partie variable de type M est remplacée par une chaîne _____ lors de la maturation pour une immunité durable.", a:"G."},
+    {q:"Quel examen détermine si une Ig est de type IgG Kappa ou IgA Lambda ?", a:"L\'immunofixation."},
+    {q:"Les anticorps permettent la destruction des bactéries par phagocytose ou par utilisation des _____.", a:"Compléments."}
+  ],
+  // ===== PDF 2: Monoclonal_Gammopathy_Diagnostics =====
+  "2-2": [
+    {q:"De quel terme provient le nom de la pathologie « gammapathie » ?", a:"De la zone des gammaglobulines sur l\'électrophorèse."},
+    {q:"Qu\'est-ce qui définit biologiquement l\'apparition d\'une gammapathie ?", a:"L\'obtention d\'un pic monoclonal sur la courbe d\'électrophorèse."},
+    {q:"Quelles sont les deux entités correspondant à une prolifération plasmocytaire monoclonale ?", a:"Le myélome et la gammapathie monoclonale de signification indéterminée (MGUS)."},
+    {q:"Dans une prolifération plasmocytaire, quel type d\'immunoglobuline n\'est jamais produit ?", a:"L\'immunoglobuline de type IgM."},
+    {q:"Quelles sont les classes d\'Ig les plus souvent retrouvées dans une prolifération plasmocytaire ?", a:"Les IgG et les IgA."}
+  ],
+  "2-3": [
+    {q:"Outre les IgG et IgA, quelles classes d\'Ig plus rares peuvent être produites par un plasmocyte tumoral ?", a:"Les IgD ou les IgE."},
+    {q:"Où se situe principalement la prolifération des plasmocytes clonaux ?", a:"Dans la moelle osseuse."},
+    {q:"Comment appelle-t-on le stade cellulaire intermédiaire bloqué juste avant la différenciation en plasmocyte dans la prolifération lymphocytaire ?", a:"Le lympho-plasmocyte."},
+    {q:"Quel type d\'immunoglobuline est spécifiquement sécrété lors d\'une prolifération lymphocytaire ou lympho-plasmocytaire ?", a:"L\'IgM."},
+    {q:"Quelle est la particularité de la localisation de la prolifération dans une pathologie type Waldenström ?", a:"La prolifération est ganglionnaire (organes lymphoïdes secondaires)."},
+    {q:"Citez deux exemples d\'hémopathies lymphoïdes révélées par un pic d\'IgM.", a:"La maladie de Waldenström et la leucémie lymphoïde."},
+    {q:"Pourquoi le switch de classe n\'a-t-il pas lieu dans le cas d\'un lympho-plasmocyte ?", a:"Car la cellule est bloquée à un stade de maturation avant ce processus (expression d\'une IgM)."}
+  ],
+  "2-4": [
+    {q:"Quels sont les deux examens biochimiques indispensables pour le diagnostic d\'une Ig monoclonale ?", a:"L\'électrophorèse des protéines (EPP) et l\'immunofixation (ou immunotypage)."},
+    {q:"Quelle est la limite de l\'électrophorèse des protéines (EPP) seule dans le diagnostic ?", a:"Elle permet uniquement de suspecter la gammapathie sans prouver la monoclonalité."},
+    {q:"Quel aspect visuel sur l\'EPP suspecte une gammapathie monoclonale ?", a:"La présence d\'un pic étroit dans la zone des gammaglobulines."},
+    {q:"Quel examen permet d\'affirmer le caractère monoclonal d\'une immunoglobuline ?", a:"L\'immunofixation."},
+    {q:"Quels sont les cinq types d\'anticorps étudiés lors d\'une immunofixation standard ?", a:"Anti-γ (G), anti-α (A), anti-μ (M), anti-κ (k) et anti-λ (l)."},
+    {q:"Quelle manifestation visuelle indique la présence d\'une protéine lors de l\'immunofixation ?", a:"Une réaction colorée se manifestant par une bande violette."},
+    {q:"Que doit-on mettre en évidence à l\'immunofixation pour confirmer la monoclonalité ?", a:"Un seul type de chaîne lourde et un seul type de chaîne légère."}
+  ],
+  "2-5": [
+    {q:"À quoi correspond une immunofixation où tous les types de chaînes (G, A, M, κ, λ) sont détectés ?", a:"À une population de gammaglobulines polyclonale (cas normal)."},
+    {q:"Pourquoi la bande gamma (G) est-elle généralement la plus intense dans une immunofixation normale ?", a:"Car les IgG représentent la fraction d\'immunoglobulines la plus abondante dans le sérum."},
+    {q:"Si l\'immunofixation révèle une bande intense uniquement en G et en κ, quel est le type de l\'Ig monoclonale ?", a:"Une IgG-κ."},
+    {q:"L\'intensité d\'un pic à l\'EPP est-elle toujours forte en cas de monoclonalité ?", a:"Non, l\'intensité est variable, d\'où l\'importance systématique de l\'immunofixation."},
+    {q:"Pourquoi le dosage pondéral des Ig n\'est-il pas réalisé en première intention ?", a:"Car il sert principalement au suivi et à l\'évaluation des complications après le diagnostic."}
+  ],
+  "2-6": [
+    {q:"Qu\'arrive-t-il à la proportion des plasmocytes polyclonaux lorsqu\'un clone plasmocytaire prolifère ?", a:"Leur proportion diminue."},
+    {q:"Comment définit-on l\'hypogammaglobulinémie résiduelle dans une gammapathie ?", a:"La diminution des immunoglobulines polyclonales autres que le pic monoclonal."},
+    {q:"Quelle est la conséquence clinique majeure de l\'hypogammaglobulinémie chez un patient atteint de myélome ?", a:"Une sensibilité accrue aux infections par manque d\'Ig polyclonales protectrices."},
+    {q:"Quel terme technique désigne la vulnérabilité infectieuse liée à la baisse des autres classes d\'Ig ?", a:"Déficit immunitaire humoral à restriction de synthèse."}
+  ],
+  "2-7": [
+    {q:"Pourquoi dose-t-on les chaînes légères libres pour le suivi des patients ?", a:"Elles sont plus petites, plus mobiles et s\'accumulent suite au catabolisme de l\'Ig monoclonale."},
+    {q:"Quelle est la proportion normale approximative du ratio κ / λ ?", a:"Environ deux tiers de κ pour un tiers de λ."},
+    {q:"Que signifie biologiquement une augmentation du ratio R (κ / λ) dans le sérum ?", a:"Une présence excessive de chaînes κ libres."}
+  ],
+  "2-8": [
+    {q:"Pourquoi le dosage des chaînes légères peut-il remplacer l\'EPP lors de certains contrôles ?", a:"C\'est une méthode de suivi simplifiée car le ratio est un indicateur constant de la clonalité."},
+    {q:"Quelle propriété physique permet aux chaînes légères de se retrouver dans les urines ?", a:"Leur petite taille qui leur permet de traverser le filtre glomérulaire rénal."},
+    {q:"Comment appelle-t-on la présence de chaînes légères monoclonales dans les urines ?", a:"La protéinurie de Bence-Jones."}
+  ],
+  "2-9": [
+    {q:"Pourquoi la bandelette urinaire est-elle souvent un mauvais test pour détecter la protéinurie de Bence-Jones ?", a:"La quantité de chaînes légères est souvent trop faible pour positiver le test de détection classique des protéines."},
+    {q:"Dans quel contexte la bandelette urinaire devient-elle importante pour un patient avec myélome ?", a:"Pour détecter une éventuelle lésion rénale consécutive à la pathologie."},
+    {q:"Quel est le seul test fiable pour détecter précisément les chaînes légères dans les urines ?", a:"L\'immunofixation urinaire."}
+  ],
+  "2-10": [
+    {q:"Qu\'est-ce qu\'une gammapathie à chaînes légères ?", a:"Une pathologie où le clone produit une immunoglobuline incomplète (chaînes κ ou λ seules)."},
+    {q:"Quel est l\'aspect typique de l\'EPP sanguine lors d\'une gammapathie à chaînes légères ?", a:"Une hypogammaglobulinémie (zone gamma aplatie) sans pic visible."},
+    {q:"Pourquoi l\'hypogammaglobulinémie est-elle qualifiée de « trompeuse » à l\'EPP ?", a:"Elle masque une production excessive de chaînes légères non détectées par cet examen."},
+    {q:"Quels examens permettent de diagnostiquer une gammapathie à chaînes légères si l\'EPP est non concluante ?", a:"Le ratio des chaînes légères sériques et l\'immunofixation urinaire."},
+    {q:"Toute hypogammaglobulinémie signe-t-elle forcément une gammapathie à chaînes légères ?", a:"Non, elle peut résulter de n\'importe quel déficit immunitaire humoral."},
+    {q:"Dans quelle situation le pic monoclonal est-il détectable dans le sang ET l\'urine ?", a:"Lors de la sécrétion d\'une Ig monoclonale complète (catabolisme) ou de chaînes légères seules."}
+  ],
+  "2-11": [
+    {q:"À quel type de prolifération appartient la maladie de Waldenström ?", a:"À la prolifération lymphocytaire (ou syndrome lymphoprolifératif)."},
+    {q:"Pourquoi sépare-t-on cliniquement les pics IgM des pics non IgM ?", a:"Car ils reflètent des physiopathologies différentes (lymphocytaire vs plasmocytaire)."},
+    {q:"Vrai ou Faux : Les chaînes lourdes peuvent normalement traverser le filtre glomérulaire.", a:"Faux, seules les chaînes légères le peuvent en raison de leur petite taille."},
+    {q:"Comment l\'immunotypage caractérise-t-il la nature de l\'Ig ?", a:"En identifiant précisément le type de chaîne lourde et le type de chaîne légère présents."},
+    {q:"Quelle est l\'origine cellulaire d\'un pic d\'IgG monoclonal ?", a:"Un clone plasmocytaire tumoral ou anormal."},
+    {q:"Une immunofixation urinaire révélant une bande intense en L (lambda) suggère quoi ?", a:"Une production excessive d\'Ig monoclonales suivie d\'une élimination urinaire (Bence-Jones)."},
+    {q:"Que se passe-t-il au niveau du centre germinatif lors de la formation d\'un lympho-plasmocyte pathologique ?", a:"La cellule ne réalise pas son switch de classe et continue d\'exprimer l\'IgM."},
+    {q:"L\'atteinte rénale dans le myélome est-elle une cause ou une conséquence de la gammapathie ?", a:"C\'est une conséquence de la pathologie."},
+    {q:"L\'EPP permet de distinguer précisément chaque classe d\'immunoglobulines (G, A, M). Vrai ou Faux ?", a:"Faux, elle ne donne qu\'un signal global correspondant à l\'ensemble des gammaglobulines."},
+    {q:"Quel paramètre de l\'EPP est modifié lors d\'un déficit immunitaire humoral ?", a:"La zone des gammaglobulines est aplatie (hypogammaglobulinémie)."},
+    {q:"Lorsqu\'une hypogammaglobulinémie inexpliquée est vue à l\'EPP, quel réflexe de dosage faut-il avoir ?", a:"Doser les chaînes légères libres pour détecter une gammapathie à chaînes légères."},
+    {q:"Une sécrétion uniquement de la chaîne légère K ou L par le plasmocyte définit une immunoglobuline _____.", a:"Incomplète."}
+  ],
+  "2-12": [
+    {q:"Quel examen confirme que le pic étroit vu à l\'EPP est bien monoclonal ?", a:"L\'immunofixation."},
+    {q:"Dans le schéma de l\'immunofixation, que signifie l\'abréviation \'ELP\' ?", a:"Électrophorèse (piste de référence sans anticorps spécifique)."},
+    {q:"Quelle classe d\'immunoglobuline est associée à la chaîne lourde mu (μ) ?", a:"L\'IgM."},
+    {q:"Quelle classe d\'immunoglobuline est associée à la chaîne lourde alpha (α) ?", a:"L\'IgA."},
+    {q:"Quelle classe d\'immunoglobuline est associée à la chaîne lourde gamma (γ) ?", a:"L\'IgG."},
+    {q:"Pourquoi peut-on observer plusieurs clones plasmocytaires en même temps ?", a:"C\'est possible mais rare, et souvent de signification indéterminée."},
+    {q:"Quel organe lymphoïde secondaire est souvent le site de prolifération dans la maladie de Waldenström ?", a:"Les ganglions (ou la rate)."},
+    {q:"Le terme « monoclonal » signifie que toutes les Ig proviennent de _____.", a:"Un seul et même clone cellulaire (plasmocytaire ou lymphocytaire)."},
+    {q:"Dans une IF normale, pourquoi la bande κ est-elle plus forte que la λ ?", a:"Parce qu\'il y a physiologiquement plus d\'Ig associées à des chaînes κ."}
+  ],
+  "2-13": [
+    {q:"Quel examen permet de calculer le ratio Kappa/Lambda ?", a:"Le dosage des chaînes légères libres dans le sérum."},
+    {q:"La protéinurie de Bence-Jones est caractéristique de quelles pathologies ?", a:"Certaines gammapathies monoclonales (notamment le myélome)."},
+    {q:"Un pic d\'IgM étroit est le révélateur de quelle catégorie de pathologie ?", a:"Une hémopathie lymphoïde ou syndrome lymphoprolifératif."},
+    {q:"Comment appelle-t-on le clone qui devient tumoral dans le cas du myélome ?", a:"Le clone plasmocytaire."},
+    {q:"L\'accumulation d\'Ig monoclonale résulte de sa production excessive et de son _____ dans l\'organisme.", a:"Catabolisme."},
+    {q:"Que recherche-t-on si le ratio κ / λ est fortement diminué ?", a:"Un excès de chaînes légères λ (monoclonales)."},
+    {q:"Pourquoi le diagnostic de gammapathie à chaînes légères est-il difficile avec la seule EPP ?", a:"Car les chaînes légères ne migrent pas dans la zone gamma comme les Ig complètes."},
+    {q:"Quel examen biochimique permet de quantifier précisément chaque classe d\'Ig (IgG, IgA, etc.) ?", a:"Le dosage pondéral des immunoglobulines."},
+    {q:"Si une bande violette apparaît uniquement sous \'M\' et \'l\' en immunofixation, quel est le diagnostic biologique ?", a:"Une IgM-λ monoclonale."},
+    {q:"Où se fait l\'infiltration des plasmocytes clonaux dans le cas d\'un myélome ?", a:"Dans la moelle osseuse."},
+    {q:"Dans une gammapathie monoclonale, les Ig polyclonales résiduelles sont-elles visibles sur le tracé de l\'EPP ?", a:"Non, leur diminution n\'est généralement pas visible directement sur le tracé si le pic est présent."}
+  ],
+  // ===== PDF 3: Monoclonal_Gammopathy_Atlas =====
+  "3-2": [
+    {q:"Quels sont les deux examens fondamentaux pour le diagnostic d\'une gammapathie ?", a:"L\'électrophorèse des protéines et l\'immunofixation."},
+    {q:"Le MGUS est-il une pathologie maligne ?", a:"Non, mais il présente un risque d\'évolution vers un myélome."},
+    {q:"Quelle distinction est capitale lors de la découverte d\'une gammapathie ?", a:"Distinguer les gammapathies non-IgM des gammapathies IgM."},
+    {q:"Devant quel type de pic monoclonal doit-on impérativement chercher les signes CRAB ?", a:"Un pic non-IgM."},
+    {q:"Vers quel type général de pathologie oriente un pic monoclonal de type IgM ?", a:"Une hémopathie lymphoïde mature (syndrome lymphoprolifératif ou lymphome)."}
+  ],
+  "3-3": [
+    {q:"Que signifie l\'acronyme CRAB dans le contexte du myélome ?", a:"Hypercalcémie, Insuffisance rénale, Anémie, et Bone lesions (lésions osseuses)."},
+    {q:"Quelle est la cause de l\'hypercalcémie dans le myélome multiple ?", a:"La résorption osseuse excessive induite par les plasmocytes tumoraux."},
+    {q:"Quels sont les trois types de troubles que peut provoquer une hypercalcémie ?", a:"Troubles neurologiques, digestifs et rénaux."},
+    {q:"Mécanisme de l\'insuffisance rénale dans le myélome :", a:"L\'élimination massive de chaînes légères monoclonales provoquant des dépôts glomérulaires et une tubulopathie."},
+    {q:"Quel type d\'anémie est majoritairement observé sur l\'hémogramme d\'un patient atteint de myélome ?", a:"Une anémie normocytaire normochrome."},
+    {q:"Quelle est l\'origine de l\'anémie dans le myélome ?", a:"L\'envahissement de la moelle osseuse par les plasmocytes tumoraux."},
+    {q:"Que peut-on observer sur un frottis sanguin en présence d\'une Ig monoclonale ?", a:"Des hématies en rouleaux."},
+    {q:"Pourquoi les hématies forment-elles des rouleaux (piles) en cas de gammapathie ?", a:"L\'immunoglobuline monoclonale augmente la viscosité des globules rouges."}
+  ],
+  "3-4": [
+    {q:"Dans le myélome multiple, observe-t-on généralement une tuméfaction des organes hématopoïétiques ?", a:"Non, il n\'y a jamais d\'adénopathies ni de splénomégalie."},
+    {q:"Quel type d\'examen est jugé indispensable au diagnostic et à la recherche de complications médullaires ?", a:"L\'imagerie."},
+    {q:"Quelles sont les deux lésions osseuses caractéristiques visibles sur une radiographie standard de myélome ?", a:"Les géodes (lacunes à l\'emporte-pièce) et les tassements vertébraux."},
+    {q:"Définition : Géodes osseuses", a:"Zones de lyse osseuse apparaissant comme des lacunes à l\'emporte-pièce sur les radiographies."},
+    {q:"Quel est l\'examen de référence pour détecter les lésions ostéolytiques, plus sensible que la radiographie ?", a:"Le scanner (TDM)."},
+    {q:"Pourquoi le scanner doit-il être réalisé sans injection de produit de contraste chez un patient suspect de myélome ?", a:"Pour éviter d\'aggraver une éventuelle atteinte rénale par les produits iodés."},
+    {q:"Quel examen d\'imagerie est indiqué spécifiquement pour rechercher des lésions focales dans la moelle osseuse ?", a:"L\'IRM."}
+  ],
+  "3-5": [
+    {q:"Quel est l\'examen clé indispensable pour confirmer le diagnostic de myélome ?", a:"Le myélogramme."},
+    {q:"Quel seuil de plasmocytose médullaire est recherché pour le diagnostic du myélome ?", a:"Une plasmocytose supérieure à 10 %."},
+    {q:"Quelle est la caractéristique morphologique des plasmocytes dans le myélome ?", a:"Ils sont dystrophiques avec un noyau excentré."}
+  ],
+  "3-6": [
+    {q:"Quel pourcentage des MGUS sont de type IgM ?", a:"Entre 15 et 20 %."},
+    {q:"Vers quels types de pathologies un MGUS à IgM peut-il évoluer ?", a:"Une prolifération lymphoplasmocytaire ou un lymphome."},
+    {q:"Quels sont les deux critères biologiques d\'un MGUS à IgM ?", a:"IgM < 15\\ g/L et absence d\'infiltration lymphocytaire ou lymphoplasmocytaire."},
+    {q:"La maladie de Waldenström est associée à quel type d\'immunoglobuline ?", a:"L\'immunoglobuline M (IgM)."},
+    {q:"Quelles pathologies composent les syndromes lymphoprolifératifs B chroniques accompagnant une IgM ?", a:"Maladie de Waldenström, LLC et lymphome de la zone marginale."},
+    {q:"Quelle est la conduite à tenir systématique devant la découverte d\'une IgM monoclonale ?", a:"Rechercher un syndrome lymphoprolifératif."},
+    {q:"Signes cliniques du syndrome tumoral dans les pathologies à IgM :", a:"Adénopathies et splénomégalie."}
+  ],
+  "3-7": [
+    {q:"Quelle est la différence clinique majeure entre le myélome et la maladie de Waldenström concernant l\'os ?", a:"Il n\'y a pas de signes osseux dans la maladie de Waldenström."},
+    {q:"Quels paramètres l\'hémogramme explore-t-il spécifiquement lors d\'une suspicion de syndrome lymphoprolifératif ?", a:"L\'anémie et l\'hyperlymphocytose."},
+    {q:"Outre l\'hémogramme, quels examens biologiques complètent le bilan d\'une IgM monoclonale ?", a:"Immunophénotypage lymphocytaire, cryoglobulinémie et agglutinines froides."},
+    {q:"Que recherche-t-on à la biopsie ostéomédullaire en cas d\' IgM monoclonale ?", a:"Une infiltration lymphocytaire."}
+  ],
+  "3-8": [
+    {q:"Pourquoi l\' IgM favorise-t-elle le syndrome d\'hyperviscosité ?", a:"C\'est une macromolécule organisée en pentamère."},
+    {q:"Quels sont les symptômes neurologiques d\'un syndrome d\'hyperviscosité ?", a:"Céphalées, vertiges, obnubilation, syndrome confusionnel ou neuropathies périphériques."},
+    {q:"Quel examen est nécessaire pour détecter une rétinopathie liée à l\'hyperviscosité ?", a:"L\'examen du fond d\'œil."},
+    {q:"Quel est le risque ophtalmologique majeur du syndrome d\'hyperviscosité ?", a:"Les hémorragies rétiniennes."},
+    {q:"Quelles sont les deux causes possibles d\'un syndrome hémorragique lié à une IgM ?", a:"Une activité anti-facteur VIII (ou Willebrand) ou une thrombopathie."},
+    {q:"Quelles sont les manifestations cutanées typiques d\'une cryoglobulinémie ?", a:"Purpura, phénomène de Raynaud ou nécrose des extrémités."},
+    {q:"Quels organes peuvent être touchés par les dépôts de cryoglobulines en dehors de la peau ?", a:"Les articulations (polyarthralgies), les nerfs (névrites) et les reins (néphropathies glomérulaires)."},
+    {q:"Définition : Maladie des agglutinines froides", a:"Hémolyse survenant après une exposition au froid due à une activité anti-i ou anti-I."},
+    {q:"Les agglutinines froides dirigent leur activité contre quels antigènes ?", a:"Les antigènes érythrocytaires i ou I."},
+    {q:"Quelle protéine neurale est la cible de l\'activité auto-immune dans certaines neuropathies à IgM ?", a:"La MAG (Myelin Associated Glycoprotein)."}
+  ],
+  "3-9": [
+    {q:"Vrai ou Faux : Le myélome peut se manifester par une splénomégalie.", a:"Faux, il n\'y a jamais de splénomégalie dans le myélome."},
+    {q:"L\'anémie du myélome est-elle généralement régénérative ou non régénérative (selon le mécanisme décrit) ?", a:"Non régénérative (centrale), car elle résulte de l\'envahissement médullaire."},
+    {q:"Qu\'indique la présence de plasmocytes avec un noyau excentré sur un myélogramme ?", a:"Elle suggère une origine plasmocytaire maligne (myélome)."},
+    {q:"Dans le cadre d\'une IgM, que signifie l\'acronyme AEG ?", a:"Altération de l\'état général."},
+    {q:"Quel signe clinique différencie immédiatement une pathologie à IgM d\'un myélome multiple ?", a:"La présence d\'un syndrome tumoral (adénopathies/splénomégalie) et l\'absence de signes osseux."},
+    {q:"Comment appelle-t-on les piles de globules rouges visibles au microscope en cas d\'hyperviscosité ?", a:"Hématies en rouleaux."},
+    {q:"Pourquoi l\'imagerie est-elle décrite comme \'indispensable\' au diagnostic du myélome ?", a:"Pour détecter les zones de lyse osseuse et prévenir les complications comme les tassements vertébraux."},
+    {q:"Quel est l\'inconvénient majeur de la radiographie standard comparée au scanner dans le myélome ?", a:"Elle manque de sensibilité pour détecter les lésions osseuses précoces."},
+    {q:"Dans l\'insuffisance rénale du myélome, où se situent principalement les dépôts de chaînes légères ?", a:"Au niveau glomérulaire et tubulaire (tubulopathie)."}
+  ],
+  "3-10": [
+    {q:"Le MGUS à IgM est caractérisé par une absence de _____ clinique.", a:"signe"},
+    {q:"L\'immunofixation sert à confirmer le diagnostic d\'une _____ après l\'électrophorèse.", a:"gammapathie"},
+    {q:"Dans la maladie de Waldenström, le clone proliférant sécrète une _____ de surface.", a:"IgM"},
+    {q:"Une hypercalcémie sévère dans le myélome peut entraîner un syndrome _____.", a:"confusionnel"},
+    {q:"Le scanner pour le myélome est systématiquement réalisé _____ injection.", a:"sans"},
+    {q:"Le myélogramme montre une _____ médullaire supérieure à 10 %.", a:"plasmocytose"},
+    {q:"La viscosité sanguine augmentée par l\' IgM peut causer des troubles _____.", a:"visuels"},
+    {q:"La cryoglobulinémie peut entraîner une _____ des extrémités en cas de froid sévère.", a:"nécrose"},
+    {q:"Concept : Phénomène de Raynaud", a:"Trouble circulatoire des extrémités (doigts bleus/blancs) souvent lié à une cryoglobulinémie dans ce contexte."},
+    {q:"Concept : Plasmocyte dystrophique", a:"Cellule immunitaire anormale sécrétant une immunoglobuline, caractéristique du myélome multiple."},
+    {q:"Concept : Pentamère d\' IgM", a:"Structure complexe de l\' IgM composée de cinq unités, responsable de la forte augmentation de la viscosité plasmatique."},
+    {q:"Quel examen permet de confirmer une hyperlymphocytose lors du bilan d\'une IgM ?", a:"L\'hémogramme."},
+    {q:"Quelle manifestation articulaire peut être liée à une cryoglobulinémie ?", a:"Les polyarthralgies."},
+    {q:"Quel type de neuropathie est associé à l\'activité anti-MAG ?", a:"Une neuropathie périphérique."},
+    {q:"Pourquoi le myélome provoque-t-il des tassements vertébraux ?", a:"À cause de la fragilisation osseuse due aux lésions ostéolytiques (géodes)."},
+    {q:"L\'immunophénotypage lymphocytaire est utile pour caractériser quelle catégorie de gammapathie ?", a:"Les gammapathies à IgM (syndromes lymphoprolifératifs)."},
+    {q:"Quelle est la valeur seuil de l\' IgM pour parler de MGUS ?", a:"Moins de 15\\ g/L."},
+    {q:"Quelle cellule est responsable de la sécrétion de l\'immunoglobuline dans le myélome ?", a:"Le plasmocyte (tumoral)."},
+    {q:"La maladie de Waldenström fait partie des lymphomes de _____ grade.", a:"bas"},
+    {q:"Le frottis sanguin permet d\'observer les hématies en _____.", a:"rouleaux"},
+    {q:"L\'atteinte rénale dans le myélome est aggravée par les produits de contraste _____.", a:"iodés"},
+    {q:"Une anémie _____ normochrome est typique du myélome.", a:"normocytaire"},
+    {q:"L\'activité anti-facteur VIII induite par l\' IgM provoque un syndrome _____.", a:"hémorragique"},
+    {q:"L\'obnubilation est un signe neurologique du syndrome d\' _____.", a:"hyperviscosité"},
+    {q:"Les _____ osseuses sont des zones de lyse visibles à la radiographie.", a:"géodes"},
+    {q:"La biopsie ostéomédullaire recherche une _____ lymphocytaire dans la maladie de Waldenström.", a:"infiltration"},
+    {q:"L\' IgM monoclonale est souvent associée à une _____ lymphoïde mature.", a:"hémopathie"}
+  ],
+  // ===== PDF 4: Gammapathies_and_Myeloma =====
+  "4-2": [
+    {q:"Dans quelle circonstance les gammapathies monoclonales sont-elles majoritairement découvertes ?", a:"De manière fortuite, lors d\'un bilan biologique de routine."},
+    {q:"Quel examen biologique permet de mettre en évidence un pic monoclonal chez un patient asymptomatique ?", a:"L\'électrophorèse des protéines sériques (EPP)."},
+    {q:"Citez deux complications directement liées à l\'activité ou la quantité de l\'immunoglobuline monoclonale.", a:"L\'hyperviscosité et les signes neurosensoriels."},
+    {q:"À quoi sont liées les infections bactériennes à répétition dans le myélome ?", a:"À l\'hypogammaglobulinémie (déficit immunitaire humoral)."},
+    {q:"Quelle pathologie suspecter spécifiquement devant un pic d\'IgM associé à un syndrome tumoral ?", a:"La maladie de Waldenström (syndrome lymphoprolifératif B)."}
+  ],
+  "4-3": [
+    {q:"Que signifie l\'acronyme GMSI (ou MGUS) ?", a:"Gammapathie Monoclonale de Signification Indéterminée."},
+    {q:"Quelles sont les deux principales étiologies des gammapathies monoclonales ?", a:"Le MGUS et les hémopathies malignes (myélome, Waldenström)."},
+    {q:"Vers quelles pathologies s\'oriente-t-on devant une gammapathie de type non-IgM ?", a:"Vers un MGUS ou un Myélome."},
+    {q:"Définition : MGUS", a:"Une prolifération clonale plasmocytaire sans critères de malignité."}
+  ],
+  "4-4": [
+    {q:"À partir de quel âge la prévalence du MGUS augmente-t-elle de façon notable ?", a:"Au-delà de 70 ans."},
+    {q:"Quels sont les deux types d\'immunoglobulines les plus fréquents dans le MGUS ?", a:"L\'IgG et l\'IgA."},
+    {q:"Le MGUS est considéré comme un état _____ évoluant vers le myélome.", a:"prémyélomateux"},
+    {q:"Quel est le risque annuel de progression d\'un patient avec MGUS vers un myélome ?", a:"1 % par an."},
+    {q:"Quelle est la fréquence recommandée pour la surveillance clinique et biologique d\'un MGUS ?", a:"Annuelle."},
+    {q:"Quel est le seuil de taux d\'Ig monoclonale pour définir un MGUS ?", a:"Moins de 30 g/L."},
+    {q:"Quel est le pourcentage maximal de plasmocytose médullaire autorisé pour un diagnostic de MGUS ?", a:"Moins de 10 %."}
+  ],
+  "4-5": [
+    {q:"Quels sont les quatre critères de l\'acronyme CRAB ?", a:"Calcémie, Rein (insuffisance), Anémie, et Bone (lésions osseuses)."},
+    {q:"Comment est la calcémie dans un diagnostic de MGUS ?", a:"Normale (absence de critère CRAB)."},
+    {q:"Quels paramètres biologiques doit-on inclure dans la surveillance d\'un MGUS ? (Citez 3)", a:"Hémogramme, fonction rénale, calcémie (ou protéinurie, EPP)."},
+    {q:"Sous quelles conditions peut-on éviter une exploration médullaire systématique lors d\'un pic monoclonal ?", a:"Pic modéré, âge < 70 ans et absence de signes évoquant un myélome."},
+    {q:"Quel examen d\'imagerie doit être pratiqué en cas de suspicion d\'évolution d\'un MGUS ?", a:"Une imagerie pour rechercher des lésions osseuses."},
+    {q:"Quel examen permet de confirmer l\'infiltration plasmocytaire dans la moelle ?", a:"Le myélogramme."},
+    {q:"Quelle est la proportion du myélome parmi les cancers hématologiques ?", a:"10 %."}
+  ],
+  "4-6": [
+    {q:"Le myélome est une prolifération d\'un clone de _____ tumoraux.", a:"plasmocytes"},
+    {q:"Quel est le mécanisme principal des atteintes osseuses douloureuses dans le myélome ?", a:"L\'activation des ostéoclastes par les plasmocytes anormaux, provoquant une résorption osseuse."},
+    {q:"Pourquoi l\'infiltration plasmocytaire médullaire entraîne-t-elle une anémie ?", a:"Par mécanisme d\'insuffisance médullaire."},
+    {q:"Quelle est l\'origine de l\'hypercalcémie dans le myélome multiple ?", a:"L\'hyper-résorption osseuse libérant du Ca^(2+) dans le sang."},
+    {q:"Quelles sont les deux complications majeures possibles de l\'hypercalcémie ?", a:"Complications cardiaques et métaboliques."},
+    {q:"Qu\'est-ce qui cause le syndrome d\'hyperviscosité dans les gammapathies ?", a:"La production excessive de protéines monoclonales (IgG, IgA ou chaînes légères)."},
+    {q:"Quel est l\'impact de l\'élimination urinaire des chaînes légères sur le rein ?", a:"Elle provoque une altération de la fonction rénale (tubulopathie)."},
+    {q:"Quels sont les deux critères biologiques requis pour un Myélome Indolent ?", a:"Ig monoclonale 30 g/L ET plasmocytose médullaire > 10 %."},
+    {q:"Quelle est la principale différence clinique entre le myélome indolent et symptomatique ?", a:"L\'absence de symptômes CRAB dans la forme indolente."}
+  ],
+  "4-7": [
+    {q:"Définition du critère \'B\' (Bone) du CRAB à l\'imagerie ?", a:"Au moins une lésion ostéolytique supérieure à 5 mm."},
+    {q:"Quel nom porte également le myélome multiple ?", a:"La maladie de Kahler."},
+    {q:"Quel taux de plasmocytes médullaires constitue un critère de malignité symptomatique d\'emblée ?", a:"60 %."},
+    {q:"Quel ratio de chaînes légères libres est considéré comme un critère de malignité ?", a:"Supérieur à 100."},
+    {q:"Que recherche l\'IRM au niveau musculaire comme critère de malignité ?", a:"Des liaisons focales."}
+  ],
+  "4-8": [
+    {q:"Seuil d\'hypercalcémie pour le critère \'C\' du CRAB (en mmol/L) ?", a:"Supérieur à 2,75 mmol/L."},
+    {q:"Seuil d\'hypercalcémie pour le critère \'C\' du CRAB (en mg/dL) ?", a:"Supérieur à 11 mg/dL."},
+    {q:"Valeur de la clairance MDRD définissant le critère \'R\' du CRAB ?", a:"Inférieure à 40 ml/min."},
+    {q:"Seuil de créatininémie pour le critère \'R\' du CRAB ?", a:"Supérieur à 117 μmol/L."},
+    {q:"Quel type d\'anémie est caractéristique du critère \'A\' du CRAB ?", a:"Anémie normocytaire normochrome."},
+    {q:"Seuil d\'hémoglobine (Hb) pour le critère \'A\' du CRAB ?", a:"Inférieur à 10 g/dL."}
+  ],
+  "4-9": [
+    {q:"Quel est l\'effet des plasmocytes sur la matrice osseuse ?", a:"Ils stimulent sa dégradation par l\'hyperstimulation des ostéoclastes."},
+    {q:"Vrai ou Faux : Le myélome indolent nécessite la présence d\'au moins un critère CRAB.", a:"Faux, les critères CRAB sont absents."},
+    {q:"Quel taux de protéinurie monoclonale urinaire définit le myélome indolent ?", a:"Supérieur à 500 mg/24h."},
+    {q:"Quelle est la condition sur le taux d\'Ig monoclonale pour le diagnostic de myélome symptomatique ?", a:"Le diagnostic est posé quel que soit le taux (sang ou urine), si un critère CRAB est présent."},
+    {q:"Comment l\'hypercalcémie contribue-t-elle à l\'insuffisance rénale ?", a:"En favorisant la tubulopathie et les maladies à dépôts."}
+  ],
+  "4-10": [
+    {q:"Pourquoi l\'anémie prédomine-t-elle au début de la maladie par rapport aux autres cytopénies ?", a:"Les autres cytopénies apparaissent plus tardivement avec l\'avancement du stade de la maladie."},
+    {q:"Quels sont les signes cliniques généraux (AEG) à rechercher devant un pic monoclonal ?", a:"L\'altération de l\'état général."},
+    {q:"Citez trois signes osseux évocateurs du myélome.", a:"Douleurs osseuses, fractures pathologiques et tassements vertébraux."},
+    {q:"Quel signe neurologique constitue une urgence chirurgicale dans le myélome ?", a:"La compression médullaire."},
+    {q:"Quels sont les syndromes hématologiques à rechercher en plus de l\'anémie ?", a:"Les syndromes hémorragique et infectieux."}
+  ],
+  "4-11": [
+    {q:"Le MGUS est une pathologie fréquente chez les sujets de plus de _____ ans.", a:"70"},
+    {q:"Qu\'est-ce qu\'une ostéopénie globale dans le cadre du myélome ?", a:"Une diminution diffuse de la densité osseuse favorisant douleurs et fractures."},
+    {q:"Quel est le risque évolutif majeur d\'un pic monoclonal de type IgG ?", a:"L\'évolution vers un myélome multiple."},
+    {q:"Dans quel type de gammapathie recherche-t-on spécifiquement des adénopathies (ADP) ou une splénomégalie (SMG) ?", a:"Dans les gammapathies à IgM."},
+    {q:"Quel est le statut de la fonction rénale dans le MGUS ?", a:"Normale (absence de critère R du CRAB)."},
+    {q:"Pourquoi dose-t-on le calcium lors de la surveillance d\'un MGUS ?", a:"Pour détecter précocement une hypercalcémie indiquant une progression vers le myélome."},
+    {q:"L\'insuffisance médullaire dans le myélome est la conséquence de _____ .", a:"l\'infiltration tumorale"},
+    {q:"Quel est l\'impact du déficit immunitaire humoral dans le myélome ?", a:"Une sensibilité accrue aux infections bactériennes sévères."},
+    {q:"Quelle est la valeur seuil de diminution de l\'Hb par rapport à la normale pour le critère \'A\' du CRAB ?", a:"Une diminution de 2 g/dL."},
+    {q:"Qu\'est-ce qu\'une plasmocytose médullaire ?", a:"Le pourcentage de plasmocytes présents dans la moelle osseuse."},
+    {q:"Quelle manifestation cardiaque peut révéler une hypercalcémie ?", a:"Des troubles du rythme ou des signes cardiaques de toxicité."},
+    {q:"Dans le myélome symptomatique, quel est le pourcentage minimal de plasmocytose médullaire ?", a:"10 %."},
+    {q:"Pourquoi pratique-t-on un hémogramme dans le suivi d\'un pic monoclonal ?", a:"Pour dépister l\'apparition d\'une anémie ou d\'autres cytopénies."},
+    {q:"Cloze : Le myélome est toujours précédé de la phase proliférative du _____ .", a:"MGUS"}
+  ],
+  "4-12": [
+    {q:"Quelle est la principale complication d\'un syndrome d\'hyperviscosité ?", a:"Des complications sensorielles."},
+    {q:"Quel examen permet de visualiser les tassements vertébraux ?", a:"L\'imagerie (radiographie, scanner ou IRM)."},
+    {q:"Le terme \'monoclonal\' signifie que les protéines proviennent toutes d\'un même _____ .", a:"clone (de plasmocytes)"},
+    {q:"Quel est l\'âge de prédilection du myélome multiple ?", a:"Le sujet âgé."},
+    {q:"Vrai ou Faux : Le MGUS présente des lésions osseuses lytiques à l\'imagerie.", a:"Faux."},
+    {q:"Quel est l\'objectif principal de la surveillance annuelle du MGUS ?", a:"Détecter précocement une progression vers un myélome (malignité)."},
+    {q:"L\'hyperstimulation des ostéoclastes mène directement à une _____ osseuse.", a:"fragilité (ou résorption)"},
+    {q:"Quel critère CRAB est lié à la dégradation de la matrice osseuse ?", a:"Le critère \'B\' (Bone / Lésions osseuses)."},
+    {q:"Pourquoi le myélogramme n\'est-il pas systématique pour un pic modéré chez un patient de moins de 70 ans ?", a:"Parce que la probabilité de myélome est faible en l\'absence de signes d\'appel."},
+    {q:"Une hypercalcémie supérieure à 2,75 mmol/L est un signe de complication _____ .", a:"métabolique"},
+    {q:"La protéinurie dans le myélome permet de détecter l\'élimination de _____ .", a:"chaînes légères"},
+    {q:"Comment définit-on cliniquement une fracture pathologique ?", a:"Une fracture survenant pour un traumatisme minime dû à la fragilité osseuse."},
+    {q:"Quel est le rôle diagnostique de l\'EPP ?", a:"Mettre en évidence et quantifier le pic monoclonal."}
+  ],
+};
+
+// Build flat slide list
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+
+let currentSlide = 0;
+const completed = new Set();
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      html += `<h3>${pdfs[curPdf-1].label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}">
+      <span class="check"></span>${s.pdf}.${s.slide} Diapo ${s.slide}
+    </div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+
+function buildSlide(s, idx) {
+  const pdf = pdfs[s.pdf-1];
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>${fcs.length} Flashcard${fcs.length>1?'s':''}</h3>
+      <button class="btn-reveal" onclick="revealAll(${idx})">Révéler toutes les réponses</button>
+      <div class="fc-grid">`;
+    fcs.forEach((fc, fi) => {
+      fcHtml += `<div class="flashcard" onclick="this.classList.toggle(\'flipped\')" id="fc-${idx}-${fi}">
+        <div class="fc-inner">
+          <div class="fc-front">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.q}</span>
+            <span class="fc-hint">cliquer</span>
+          </div>
+          <div class="fc-back">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.a}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+    fcHtml += '</div></div>';
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcards pour cette diapo.</p>';
+  }
+
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">PDF ${s.pdf} — ${pdf.name} — Diapo ${s.slide}/${pdf.totalSlides}</span>
+    <div class="slide-img-wrap">
+      <img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy">
+    </div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>&#8592; Précédent</button>
+      <span style="color:#666;font-size:0.85rem">${idx+1} / ${totalSlides}</span>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant &#8594;</button>
+    </div>
+  </div>`;
+}
+
+function buildMain() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order" style="display:none">
+    <h2>Ordre des PDF pour la plateforme</h2>
+    <ol>${pdfs.map(p => `<li><strong>${p.name}.pdf</strong> — ${p.label}</li>`).join('')}</ol>
+  </div>`;
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  const cur = document.getElementById(`slide-${currentSlide}`);
+  if (cur) cur.classList.remove('active');
+  completed.add(currentSlide);
+  const sbOld = document.getElementById(`sb-${currentSlide}`);
+  if (sbOld) { sbOld.classList.add('completed'); sbOld.querySelector('.check').textContent = '\u2713 '; }
+  currentSlide = idx;
+  document.getElementById(`slide-${idx}`).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const sbNew = document.getElementById(`sb-${idx}`);
+  if (sbNew) { sbNew.classList.add('active'); sbNew.scrollIntoView({block:'nearest'}); }
+  document.getElementById('progressFill').style.width = `${((idx+1)/totalSlides)*100}%`;
+  document.getElementById('navCounter').textContent = `${idx+1} / ${totalSlides}`;
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function revealAll(slideIdx) {
+  const s = allSlides[slideIdx];
+  const fcs = flashcardMap[s.key] || [];
+  fcs.forEach((_, fi) => {
+    const el = document.getElementById(`fc-${slideIdx}-${fi}`);
+    if (el) el.classList.add('flipped');
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+
+buildSidebar();
+buildMain();
+goTo(0);
+</script>
+</body>
+</html>

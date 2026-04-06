@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Andrologie - Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+  .pdf-5 { background: #3a1a2a; color: #ff6b9d; }
+  .pdf-6 { background: #1a3a3a; color: #22d3ee; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Andrologie</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 72</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Male_Reproductive_Blueprint", label: "Anatomie d'une Usine Microscopique", badge: "pdf-1", totalSlides: 12 },
+  { id: 2, name: "Sperm_Maturation_Pipeline", label: "Le Voyage vers la Fertilite", badge: "pdf-2", totalSlides: 12 },
+  { id: 3, name: "Male_Reproductive_Anatomy", label: "Voies et Glandes Annexes", badge: "pdf-3", totalSlides: 12 },
+  { id: 4, name: "Prostatic_Blueprint", label: "Architecture et Action : La Prostate", badge: "pdf-4", totalSlides: 11 },
+  { id: 5, name: "Male_Sexual_Function_Mechanics", label: "Mecanique de la Fonction Sexuelle", badge: "pdf-5", totalSlides: 11 },
+  { id: 6, name: "Male_Reproductive_Clinical_Blueprint", label: "Mecanismes, Pathologies et Diagnostics", badge: "pdf-6", totalSlides: 14 },
+];
+
+// Flashcards mapped to [pdfId, slideNum]
+const flashcardMap = {
+  // ===== PDF 1: Male_Reproductive_Blueprint =====
+  "1-2": [
+    {q:"Quelle est la fonction principale d'un epithelium de revetement ?", a:"Recouvrir les surfaces externes et internes du corps, des cavites et des conduits."},
+    {q:"Comment definit-on un epithelium simple ?", a:"Un epithelium compose d'une seule couche de cellules."},
+    {q:"Quelles sont les trois formes possibles des cellules d'un epithelium simple ?", a:"Aplaties (pavimenteuses), cubiques ou hautes (cylindriques)."},
+    {q:"Quel type d'epithelium est le mieux adapte a la diffusion, comme dans les alveoles pulmonaires ?", a:"L'epithelium pavimenteux simple."},
+    {q:"L'epithelium tapissant l'interieur des vaisseaux sanguins est appele _____.", a:"Endothelium."},
+    {q:"Comment appelle-t-on le revetement des cavites sereuses du corps ?", a:"Le mesothelium."},
+    {q:"Citez deux exemples de specialisations de surface des epitheliums simples.", a:"Les microvillosites et les cils."},
+  ],
+  "1-3": [
+    {q:"Quelle est la definition d'une glande ?", a:"Un ensemble de cellules epitheliales specialisees qui produisent des secretions."},
+    {q:"Quel mode de secretion deverse ses produits a la surface de la peau ou des muqueuses via un canal ?", a:"La secretion exocrine."},
+    {q:"Quel mode de secretion libere des molecules hormonales directement dans le sang ?", a:"La secretion endocrine."},
+    {q:"La secretion _____ libere des molecules hormonales dans l'environnement immediat de la cellule.", a:"Paracrine (ou autocrine)."},
+  ],
+  "1-5": [
+    {q:"Quelle est la forme et la longueur moyenne d'un testicule ?", a:"Une forme ovoide mesurant environ 4 cm de long."},
+    {q:"Quel est le poids moyen d'un testicule ?", a:"Entre 10 et 15 grammes."},
+    {q:"Quelle structure fixe le pole inferieur du testicule au scrotum ?", a:"Le gubernaculum testis."},
+    {q:"Comment se nomme la capsule conjonctive blanche et epaisse entourant le testicule ?", a:"L'albuginee testiculaire."},
+    {q:"Qu'est-ce que le corps d'Highmore ?", a:"Un epaississement de l'albuginee qui s'enfonce dans la profondeur du testicule."},
+    {q:"Quelles structures delimitent les lobules testiculaires ?", a:"Les cloisons radiaires (ou septa interlobulaires)."},
+  ],
+  "1-6": [
+    {q:"Combien de tubes seminiferes contient environ chaque lobule testiculaire ?", a:"2 ou 3 tubes."},
+    {q:"Quelle est la longueur approximative d'un tube seminifere ?", a:"De 30 cm a 1 m."},
+    {q:"Quel est le diametre moyen d'un tube seminifere ?", a:"Entre 150 et 300 micrometres."},
+    {q:"Chaque tube seminifere est entoure par une membrane _____.", a:"Propre."},
+    {q:"Quels types de structures trouve-t-on dans le tissu conjonctif entre les tubes seminiferes ?", a:"Des vaisseaux sanguins, lymphatiques, des nerfs et les cellules de Leydig."},
+  ],
+  "1-7": [
+    {q:"Quelle est la fonction exocrine du testicule ?", a:"La spermatogenese, localisee dans la paroi du tube seminifere."},
+    {q:"Quelle est la fonction endocrine du testicule ?", a:"La production d'androgenes (testosterone) par les cellules de Leydig."},
+    {q:"Quelles cellules de soutien se trouvent dans la paroi du tube seminifere aux cotes des cellules germinales ?", a:"Les cellules de Sertoli."},
+  ],
+  "1-8": [
+    {q:"Quelles sont les trois grandes phases de la spermatogenese ?", a:"La phase proliferative, la meiose et la spermiogenese."},
+    {q:"Quelle est la duree de la phase proliferative de la spermatogenese ?", a:"27 jours."},
+    {q:"Quelle est la duree de la meiose lors de la spermatogenese ?", a:"24 jours."},
+    {q:"Quelle est la duree de la spermiogenese ?", a:"23 jours."},
+    {q:"Comment appelle-t-on les cellules germinales souches qui se multiplient par mitose ?", a:"Les spermatogonies (Ad, Ap et B)."},
+    {q:"Quel evenement genetique majeur se produit dans les spermatocytes I avant la meiose ?", a:"La replication de l'ADN et le crossing-over."},
+    {q:"Combien de chromosomes possedent les spermatocytes II ?", a:"23 chromosomes (a 2 chromatides)."},
+    {q:"Quel est le produit final de la meiose II (equationnelle) ?", a:"Les spermatides."},
+    {q:"Les spermatides sont des cellules haploides possedant 23 chromosomes et _____ copie(s) d'ADN.", a:"1."},
+  ],
+  "1-9": [
+    {q:"Qu'est-ce que la spermiogenese ?", a:"La transformation des spermatides en spermatozoides sans division cellulaire."},
+    {q:"Citez deux modifications subies par la spermatide lors de la spermiogenese.", a:"La formation de l'acrosome et le developpement du flagelle."},
+    {q:"Qu'advient-il du noyau lors de la spermiogenese ?", a:"Il subit une condensation nucleaire."},
+  ],
+  "1-10": [
+    {q:"Quelle est la principale caracteristique de mobilite des spermatozoides a la sortie des testicules ?", a:"Ils n'ont pas de mobilite progressive."},
+    {q:"Citez une incapacite fonctionnelle du spermatozoide avant sa maturation post-testiculaire.", a:"L'incapacite a fixer la zone pellucide (ou a effectuer la reaction acrosomique)."},
+  ],
+  "1-11": [
+    {q:"Enumerez dans l'ordre les voies spermatiques intra-testiculaires et extra-testiculaires jusqu'a l'uretre.", a:"Tubes droits, rete testis, canaux efferents, canal epididymaire, canal deferent et canal ejaculateur."},
+    {q:"Quelle est la longueur approximative du canal epididymaire ?", a:"6 metres."},
+    {q:"Ou se jettent les tubes seminiferes a la fin de leur trajet tortueux ?", a:"Dans les tubes droits."},
+    {q:"Quel est le diametre des tubes droits ?", a:"25 micrometres."},
+    {q:"Quel type d'epithelium tapisse les tubes droits ?", a:"Un epithelium cubique."},
+    {q:"Quelle structure anatomique fait suite au canal epididymaire ?", a:"Le canal deferent."},
+    {q:"Dans quelle structure le spermatozoide acquiert-il ses capacites fecondantes ?", a:"Dans l'epididyme."},
+  ],
+  "1-12": [
+    {q:"Quel type d'epithelium tapisse la vessie et l'uretere ?", a:"L'epithelium transitionnel (pluristratifie)."},
+    {q:"L'epithelium cylindrique pseudostratifie cilie est typique de quelle region ?", a:"La muqueuse nasale (voies respiratoires)."},
+    {q:"Quel type d'epithelium constitue l'epiderme ?", a:"Epithelium pavimenteux pluristratifie keratinise."},
+    {q:"Quel est le role du rete testis ?", a:"C'est un reseau de canaux drainant le sperme des tubes droits vers les canaux efferents."},
+  ],
+
+  // ===== PDF 2: Sperm_Maturation_Pipeline =====
+  "2-2": [
+    {q:"Dans quelle structure du testicule le reseau du rete testis s'ouvre-t-il ?", a:"Le corps d'Highmore (mediastinum testis)."},
+    {q:"Quel type d'epithelium caracterise le rete testis ?", a:"Un epithelium pavimenteux."},
+    {q:"Quelle force permet la progression des spermatozoides immobiles dans les voies intra-testiculaires ?", a:"La pression du liquide seminal primitif."},
+    {q:"Quelles cellules testiculaires sont responsables de la secretion continue du liquide seminal primitif ?", a:"Les cellules de Sertoli."},
+  ],
+  "2-3": [
+    {q:"Combien de canaux efferents connectent le rete testis a l'epididyme ?", a:"10 a 12 canaux."},
+    {q:"Quelle est la longueur approximative d'un canal efferent ?", a:"20 cm."},
+    {q:"Quelle structure fibreuse les canaux efferents traversent-ils pour quitter le testicule ?", a:"L'albuginee."},
+    {q:"Quelle est la forme caracteristique du trajet des canaux efferents ?", a:"En spirale (formant des cones)."},
+  ],
+  "2-4": [
+    {q:"Quel type d'epithelium compose la paroi des canaux efferents ?", a:"Un epithelium prismatique."},
+    {q:"Quels sont les trois types cellulaires presents dans l'epithelium des canaux efferents ?", a:"Cellules ciliees, cellules glandulaires et cellules basales."},
+    {q:"Quel est le role des cellules ciliees dans les canaux efferents ?", a:"Aider a la progression des spermatozoides via des cils vibratiles."},
+    {q:"Quelles sont les deux fonctions principales des cellules glandulaires des canaux efferents ?", a:"La resorption du liquide seminal et la secretion de proteines."},
+    {q:"Quels elements specifiques du fluide testiculaire sont reabsorbes au niveau des canaux efferents ?", a:"L'eau et les ions Na+."},
+    {q:"Quel est l'effet de la reabsorption de fluide dans les canaux efferents sur les spermatozoides ?", a:"Une concentration des spermatozoides."},
+  ],
+  "2-5": [
+    {q:"Par quoi sont formes l'axe et la racine des cils vibratiles ?", a:"L'axoneme et le corpuscule basal."},
+    {q:"Quelle est la difference structurelle majeure entre les cils vibratiles et les stereocils ?", a:"L'absence de microtubules dans les stereocils."},
+    {q:"Comment evoluent la hauteur des cellules et la taille des stereocils de la tete vers la queue de l'epididyme ?", a:"Elles diminuent progressivement."},
+    {q:"Quelle structure histologique permet le brassage du liquide seminal dans les canaux efferents ?", a:"Les cils vibratiles."},
+    {q:"Vrai ou Faux : Les stereocils possedent une activite motrice propre.", a:"Faux (absence de microtubules)."},
+    {q:"Comment appelle-t-on les expansions cytoplasmiques fines et parfois anastomosees de l'epididyme ?", a:"Les stereocils."},
+    {q:"Quels sont les constituants de l'appareil ciliaire situes entre l'axoneme et la racine ciliaire ?", a:"Le corpuscule basal et la plaque basale."},
+  ],
+  "2-6": [
+    {q:"Quelle est la longueur totale du tube epididymaire chez l'homme ?", a:"3 a 6 metres."},
+    {q:"Quels sont les trois segments anatomiques de l'epididyme ?", a:"La tete (caput), le corps et la queue (cauda)."},
+    {q:"Quel type d'epithelium tapisse le canal epididymaire ?", a:"Un epithelium prismatique pseudo-stratifie."},
+    {q:"Quelles structures apicales caracterisent les cellules principales de l'epididyme ?", a:"Les stereocils."},
+    {q:"Quels organites des cellules principales epididymaires temoignent d'une forte activite de synthese proteique ?", a:"Le reticulum endoplasmique granulaire (REG) et l'appareil de Golgi."},
+    {q:"Quels processus cellulaires permettent aux cellules principales de l'epididyme d'assurer l'absorption ?", a:"La pinocytose et l'endocytose."},
+    {q:"Comment evolue l'epaisseur de la musculeuse le long de l'epididyme ?", a:"Elle s'epaissit progressivement de la tete vers la queue."},
+    {q:"Combien de couches musculaires trouve-t-on dans la partie terminale de l'epididyme ?", a:"3 couches."},
+    {q:"Quels sont les deux roles majeurs de l'epididyme vis-a-vis des spermatozoides ?", a:"Le transport et la maturation."},
+  ],
+  "2-7": [
+    {q:"Comment appelle-t-on le mouvement contractile de la musculeuse lisse participant au transit spermatique ?", a:"Le peristaltisme (contractions peristaltiques)."},
+    {q:"Quelle est la duree moyenne du transit epididymaire chez les mammiferes ?", a:"10 a 12 jours."},
+    {q:"Comment evolue la pression intraluminale le long de l'epididyme ?", a:"Elle decroit de la tete vers la queue."},
+  ],
+  "2-8": [
+    {q:"Dans quels segments de l'epididyme la maturation des spermatozoides a-t-elle lieu ?", a:"Dans la tete et le corps."},
+    {q:"Quelle capacite de mouvement le spermatozoide acquiert-il lors de la maturation epididymaire ?", a:"Une mobilite unidirectionnelle (progressive)."},
+    {q:"Sur quelle structure de l'ovocyte le spermatozoide mature doit-il pouvoir se fixer ?", a:"La zone pellucide."},
+    {q:"Quel type de mouvement observe-t-on chez les spermatozoides situes dans la tete de l'epididyme ?", a:"Un mouvement erratique sur place."},
+    {q:"Quel type de mouvement caracterise les spermatozoides dans la queue de l'epididyme ?", a:"Un mouvement progressif (flechant)."},
+    {q:"Les spermatozoides preleves dans la tete de l'epididyme peuvent-ils penetrer l'ovocyte ?", a:"Non, ils n'ont pas encore acquis cette capacite."},
+    {q:"La maturation epididymaire est le resultat d'une interaction entre les spermatozoides et _____.", a:"Les secretions epididymaires."},
+  ],
+  "2-9": [
+    {q:"Quel segment de l'epididyme sert de reservoir principal pour le stockage des spermatozoides ?", a:"La queue de l'epididyme."},
+    {q:"Quel pourcentage de la reserve epididymaire totale de spermatozoides est stocke dans la queue ?", a:"52 %."},
+    {q:"Quel segment epididymaire contient environ 26 % des spermatozoides ?", a:"La tete de l'epididyme."},
+  ],
+  "2-10": [
+    {q:"Quelle est la longueur moyenne du canal deferent ?", a:"Environ 40 cm."},
+    {q:"Dans quel cordon anatomique le canal deferent est-il contenu ?", a:"Le cordon spermatique."},
+    {q:"Le canal deferent transporte les spermatozoides de l'epididyme jusqu'a _____.", a:"L'uretre (via le canal ejaculateur)."},
+    {q:"Quelles sont les trois tuniques de la paroi du canal deferent ?", a:"La muqueuse, la musculeuse et l'adventice."},
+    {q:"Quel type d'epithelium compose la muqueuse du canal deferent ?", a:"Un epithelium prismatique pseudostratifie avec stereocils."},
+    {q:"Comment s'organisent les trois couches de fibres musculaires de la musculeuse du canal deferent ?", a:"Longitudinale interne, circulaire moyenne et longitudinale externe."},
+    {q:"De quoi est faite l'adventice du canal deferent ?", a:"De tissu conjonctif lache elastique, vascularise et innerve."},
+  ],
+
+  // ===== PDF 3: Male_Reproductive_Anatomy =====
+  "3-3": [
+    {q:"Quelle est la longueur approximative du canal ejaculateur ?", a:"2 cm."},
+    {q:"Selon le texte source, quel est le diametre du canal ejaculateur ?", a:"2 cm."},
+    {q:"Dans quel tissu le canal ejaculateur penetre-t-il immediatement apres sa formation ?", a:"Le tissu prostatique."},
+    {q:"Que devient la musculeuse du canal ejaculateur lors de sa penetration dans la prostate ?", a:"Elle disparait (le canal perd sa musculeuse)."},
+    {q:"Les canaux ejaculateurs rejoignent l'uretre prostatique de part et d'autre de quelle structure ?", a:"L'utricule prostatique."},
+    {q:"Quel type d'epithelium limite la lumiere du canal ejaculateur ?", a:"Un epithelium prismatique simple."},
+    {q:"Le canal ejaculateur fait suite a quelle structure avant de rejoindre l'uretre ?", a:"La vesicule seminale."},
+    {q:"Vrai ou Faux : Les canaux ejaculateurs possedent une musculeuse tres developpee.", a:"Faux (elle est peu developpee)."},
+    {q:"Le canal ejaculateur est decrit comme etant _____ (long ou court).", a:"Court."},
+  ],
+  "3-4": [
+    {q:"Ou l'uretre prend-il naissance ?", a:"A la partie inferieure de la vessie."},
+    {q:"Par quelle structure l'uretre s'ouvre-t-il a l'extremite du penis ?", a:"Le meat urogenital."},
+    {q:"Quelle est la longueur totale habituelle de l'uretre masculin ?", a:"Entre 20 et 25 cm."},
+    {q:"Citez les trois segments de l'uretre masculin.", a:"L'uretre prostatique, l'uretre membraneux et l'uretre spongieux."},
+    {q:"Quel est l'autre nom donne a l'uretre membraneux ?", a:"L'uretre perineal."},
+    {q:"Quel est l'autre nom donne a l'uretre spongieux ?", a:"L'uretre penien."},
+    {q:"Quelles sont les deux fonctions physiologiques de l'uretre ?", a:"L'evacuation de l'urine (miction) et le transport du sperme (ejaculation)."},
+    {q:"L'uretre prostatique est une voie urogenitale impaire et _____.", a:"Mediane."},
+    {q:"Quel segment de l'uretre traverse le corps spongieux du penis ?", a:"L'uretre spongieux (ou penien)."},
+    {q:"L'uretre spongieux est situe au sein de quelle structure erectile ?", a:"Le corps spongieux."},
+    {q:"L'uretre membraneux se situe entre l'uretre prostatique et l'uretre _____.", a:"Spongieux (ou penien)."},
+    {q:"Dans quelle partie de la prostate les canaux ejaculateurs rejoignent-ils l'uretre ?", a:"L'uretre prostatique."},
+    {q:"Quelle structure anatomique se trouve juste au-dessus de la prostate et recoit l'uretre ?", a:"La vessie."},
+  ],
+  "3-5": [
+    {q:"De quoi est compose le chorion de la muqueuse uretrale ?", a:"Un tissu conjonctivo-elastique tres vascularise contenant des glandes muqueuses."},
+    {q:"Quel est le role des glandes muqueuses situees dans la paroi de l'uretre ?", a:"Lubrifier l'uretre."},
+    {q:"Comment est organisee la musculeuse de l'uretre ?", a:"En deux couches : longitudinale interne et circulaire externe."},
+    {q:"Quel type de tissu constitue l'adventice de l'uretre ?", a:"Un tissu conjonctif."},
+    {q:"La musculeuse de l'uretre comporte une couche circulaire _____.", a:"Externe."},
+    {q:"La musculeuse de l'uretre comporte une couche longitudinale _____.", a:"Interne."},
+    {q:"La paroi de l'uretre spongieux contient des glandes _____ lubrifiantes.", a:"Muqueuses."},
+  ],
+  "3-6": [
+    {q:"Quelles sont les trois glandes genitales annexes du tractus genital masculin ?", a:"Les vesicules seminales, la prostate et les glandes bulbo-uretrales."},
+    {q:"Les glandes bulbo-uretrales sont egalement appelees glandes de _____.", a:"Cowper."},
+  ],
+  "3-7": [
+    {q:"Quelle est la forme caracteristique des vesicules seminales ?", a:"En forme de sac a paroi bosselee."},
+    {q:"Les vesicules seminales sont des organes _____ (pairs ou impairs).", a:"Pairs."},
+    {q:"Quelles sont les trois couches constituant la paroi du tube des vesicules seminales ?", a:"Une muqueuse, une musculeuse et une adventice."},
+    {q:"Les vesicules seminales sont constituees de tubes _____.", a:"Pelotonnees."},
+  ],
+  "3-8": [
+    {q:"Quelle est la particularite morphologique de la muqueuse des vesicules seminales ?", a:"Elle presente de nombreux replis delimitant des cavites de taille variable."},
+    {q:"Quel type d'epithelium tapisse les vesicules seminales ?", a:"Un epithelium prismatique ou cylindrique simple."},
+    {q:"Quels sont les deux types cellulaires presents dans l'epithelium des vesicules seminales ?", a:"Les cellules principales (glandulaires) et les cellules basales."},
+    {q:"Quelle est la caracteristique histologique des cellules principales des vesicules seminales ?", a:"Elles sont riches en grains de secretion."},
+    {q:"Quel est le but des nombreux replis de la muqueuse des vesicules seminales ?", a:"Augmenter la surface d'echange entre les cellules glandulaires et le milieu exterieur."},
+    {q:"Dans les vesicules seminales, l'epithelium est de type _____ ou cylindrique simple.", a:"Prismatique."},
+  ],
+  "3-9": [
+    {q:"Comment est organisee la musculeuse des vesicules seminales ?", a:"Une couche interne circulaire et une couche externe longitudinale."},
+    {q:"Quelle couche de la musculeuse des VS est interne ?", a:"La couche circulaire."},
+    {q:"Quelle couche de la musculeuse des VS est externe ?", a:"La couche longitudinale."},
+  ],
+  "3-10": [
+    {q:"Quelle structure elabore la majeure partie du plasma seminal ?", a:"Les vesicules seminales."},
+    {q:"Quel est le volume moyen de l'ejaculat produit par les vesicules seminales ?", a:"2,5 ml."},
+    {q:"Quel pourcentage du volume total de l'ejaculat est fourni par les vesicules seminales ?", a:"50 a 80 %."},
+    {q:"Quel est le pH du liquide produit par les vesicules seminales ?", a:"Alcalin."},
+    {q:"De quelle hormone depend l'activite secretoire des vesicules seminales ?", a:"La testosterone (activite androgenodependante)."},
+    {q:"Comment appelle-t-on le liquide dans lequel baignent les spermatozoides ?", a:"Le plasma seminal."},
+    {q:"Quelle est la nature du liquide elabore par les vesicules seminales par rapport a l'acidite ?", a:"Il est alcalin."},
+    {q:"Quels sont les composants non organiques majeurs du plasma seminal ?", a:"L'eau et les electrolytes."},
+  ],
+  "3-11": [
+    {q:"Quel sucre specifique est considere comme le marqueur des vesicules seminales ?", a:"Le fructose."},
+    {q:"Quels sont les deux roles du fructose pour les spermatozoides ?", a:"La nutrition et la mobilite."},
+    {q:"Citez deux proteines du plasma seminal ayant un pouvoir antibacterien.", a:"La lactoferrine et le lysozyme."},
+    {q:"Quel est le role du facteur immunosuppresseur dans le plasma seminal ?", a:"Provoquer une immunodepression localisee."},
+    {q:"Quelle est la fonction du facteur de de-capacitation produit par les VS ?", a:"Proteger contre une capacitation prematuree des spermatozoides."},
+    {q:"Quel est le role mecanique du facteur de coagulation chez les rongeurs ?", a:"La formation d'un bouchon vaginal."},
+    {q:"Quels sont les deux effets des prostaglandines contenues dans le sperme ?", a:"Les contractions uterines et la migration des spermatozoides."},
+    {q:"Quelle vitamine est mentionnee comme constituant du plasma seminal ?", a:"La vitamine C."},
+  ],
+
+  // ===== PDF 4: Prostatic_Blueprint =====
+  "4-2": [
+    {q:"Quelle est la nature tissulaire de la prostate ?", a:"C'est un organe musculo-glandulaire."},
+    {q:"A quel fruit la forme et la taille de la prostate sont-elles comparees ?", a:"A une petite chataigne."},
+    {q:"Ou se situe precisement la prostate par rapport a la vessie ?", a:"A la partie inferieure de la vessie."},
+    {q:"Pourquoi la prostate est-elle qualifiee de \"carrefour uro-genital\" ?", a:"Parce qu'elle est traversee par l'uretre et recoit les canaux ejaculateurs."},
+    {q:"Quel conduit traverse la prostate en son centre ?", a:"L'uretre prostatique."},
+    {q:"Par quoi la prostate est-elle cernee exterieurement ?", a:"Par une capsule fibro-elastique."},
+    {q:"Quelles structures partent de la capsule prostatique pour delimiter des lobules ?", a:"Des cloisons."},
+    {q:"Dans quelle partie de l'uretre prostatique s'abouchent les canaux ejaculateurs ?", a:"Dans sa partie moyenne."},
+    {q:"En combien de parties la glande prostatique est-elle divisee ?", a:"Deux parties : craniale et caudale."},
+    {q:"Combien de lobes composent chaque partie (craniale et caudale) de la prostate ?", a:"3 lobes chacune."},
+  ],
+  "4-3": [
+    {q:"De quel type de fibres est constitue le sphincter interne de la prostate ?", a:"De fibres musculaires lisses."},
+    {q:"Ou se situe le sphincter interne par rapport a l'uretre ?", a:"Il entoure la partie superieure de l'uretre."},
+    {q:"Quel est le role physiologique de la tonicite du sphincter interne ?", a:"Il empeche l'ecoulement spontane de l'urine provenant de la vessie."},
+    {q:"De quel type de fibres est constitue le sphincter externe de la prostate ?", a:"De fibres musculaires striees."},
+    {q:"Quelle structure le sphincter externe forme-t-il a la partie inferieure de l'uretre ?", a:"Un anneau."},
+    {q:"Sur quelles faces de la prostate le sphincter externe s'etend-il en forme de bouclier ?", a:"Les faces anterieure et antero-laterales."},
+    {q:"Quelle est la fonction principale du sphincter externe ?", a:"L'acte volontaire de la miction."},
+  ],
+  "4-4": [
+    {q:"Environ combien de glandes tubulo-alveolaires composent la prostate ?", a:"Une cinquantaine."},
+    {q:"Quels sont les composants du stroma conjonctif prostatique ?", a:"Fibres musculaires lisses, fibres elastiques, vaisseaux et nerfs."},
+    {q:"Comment sont reparties les trois groupes de glandes prostatiques ?", a:"En groupes concentriques."},
+    {q:"A quelle zone correspondent les glandes peri-uretrales internes ?", a:"La zone muqueuse."},
+    {q:"A quelle zone correspondent les glandes peri-uretrales externes ?", a:"La zone sous-muqueuse."},
+    {q:"Quel groupe de glandes assure l'essentiel de la secretion prostatique ?", a:"Les glandes principales."},
+    {q:"Quels types de cellules composent majoritairement l'epithelium glandulaire prostatique ?", a:"Des cellules secretrices (prismatiques, cubiques ou aplaties)."},
+    {q:"Quel est le role des petites cellules basales de l'epithelium prostatique ?", a:"Elles servent de cellules de remplacement."},
+  ],
+  "4-5": [
+    {q:"Definition : Excretion merocrine", a:"Exocytose des grains de secretion respectant l'integrite de la membrane cellulaire."},
+    {q:"Definition : Excretion apocrine", a:"Elimination du pole apical de la cellule avec les grains de secretion entoures de membrane."},
+    {q:"A quelle hormone les cellules glandulaires prostatiques sont-elles dependantes ?", a:"Aux androgenes (presence de recepteurs)."},
+  ],
+  "4-6": [
+    {q:"Que sont les sympexions (ou corps de Robin) ?", a:"Des corps spheriques formes de lamelles concentriques de glycoproteines dans la lumiere des acini."},
+    {q:"Quel changement les sympexions subissent-ils frequemment a partir de 40 ans ?", a:"Ils ont tendance a se calcifier."},
+    {q:"Comment appelle-t-on la calcification des corps de Robin ?", a:"La lithiase prostatique (ou calculs)."},
+  ],
+  "4-7": [
+    {q:"Quel est l'aspect physique de la secretion prostatique ?", a:"Un liquide epais et blanc."},
+    {q:"Quelle proportion approximative de l'ejaculat est fournie par la prostate ?", a:"Environ 1/6e."},
+    {q:"Quel est le pH de la secretion prostatique ?", a:"Legerement acide."},
+    {q:"Quelle enzyme proteolytique de la prostate sert de facteur de liquefaction du sperme ?", a:"La fibrinolysine."},
+    {q:"Citez deux polyamines contenues dans le liquide prostatique.", a:"La spermine et la spermidine."},
+    {q:"Quels sont les trois principaux ions presents dans les secretions prostatiques ?", a:"Zn, Mg et Ca."},
+    {q:"Quel acide organique est caracteristique de la secretion prostatique ?", a:"L'acide citrique."},
+    {q:"La secretion de la prostate est _____ en proteines mais riche en _____.", a:"Pauvre ; enzymes."},
+  ],
+  "4-8": [
+    {q:"Quelles sont les deux petites glandes de la taille d'un petit pois situees sous la prostate ?", a:"Les glandes bulbo-uretrales."},
+    {q:"Quel type de liquide les glandes bulbo-uretrales secretent-elles ?", a:"Un liquide mucoide."},
+    {q:"Dans quelle region de l'uretre les glandes bulbo-uretrales deversent-elles leur liquide ?", a:"Dans la region posterieure de l'uretre membraneux."},
+    {q:"Quelle est la fonction principale de la secretion des glandes bulbo-uretrales ?", a:"La lubrification de l'uretre."},
+    {q:"A quel moment de la reponse sexuelle le liquide bulbo-uretral est-il excrete ?", a:"Lors de l'ejaculation, il precede l'arrivee du sperme."},
+  ],
+  "4-9": [
+    {q:"Quels sont les deux composants majeurs de l'ejaculat ?", a:"Les cellules et le plasma seminal."},
+    {q:"Quels sont les deux types de cellules trouves dans le sperme ?", a:"Les spermatozoides et les cellules rondes."},
+    {q:"Quel est le volume minimal normal d'un ejaculat ?", a:">= 2 ml."},
+    {q:"Quel organe produit environ 65 % du volume du plasma seminal ?", a:"Les vesicules seminales."},
+    {q:"Quel pourcentage du volume du sperme est produit par la prostate ?", a:"Environ 30 %."},
+    {q:"Quelle part du volume ejacule provient des epididymes ?", a:"Environ 5 %."},
+  ],
+  "4-10": [
+    {q:"Quelle est la premiere etape de la sequence ejaculatoire ?", a:"Fermeture du sphincter lisse de l'uretre."},
+    {q:"Pendant la sequence ejaculatoire, ou s'accumulent initialement les secretions prostatiques ?", a:"Dans la lumiere de l'uretre prostatique qui s'ouvre pour former une cavite."},
+    {q:"D'ou proviennent les spermatozoides emis lors de l'ejaculation ?", a:"De la queue de l'epididyme."},
+    {q:"Quelle secretion rejoint le reste de l'ejaculat en dernier ?", a:"Le fluide vesiculaire (des vesicules seminales)."},
+  ],
+  "4-11": [
+    {q:"Quel constituant majeur du plasma seminal est fourni par les vesicules seminales ?", a:"L'essentiel des proteines (glycoproteines)."},
+    {q:"Citez deux substances reductrices produites par les vesicules seminales.", a:"Le fructose et l'acide ascorbique."},
+    {q:"Quel compose lipidique implique dans la motilite est secrete par les vesicules seminales ?", a:"Les prostaglandines."},
+    {q:"Citez un constituant specifique de la secretion epididymaire.", a:"La carnitine (ou glycerylphosphorylcholine, ou osidases)."},
+  ],
+
+  // ===== PDF 5: Male_Sexual_Function_Mechanics =====
+  "5-2": [
+    {q:"Dans le cadre de l'andrologie, quelle est la finalite principale de la sexualite dite \"reproductive\" ?", a:"La reproduction (erection, penetration, ejaculation intravaginale)."},
+    {q:"Quelle structure cerebrale exerce a la fois un role inhibiteur et un role liberateur (plaisir) sur la sexualite ?", a:"Le cortex cerebral."},
+    {q:"De quelle fonction systemique la fonction d'erection chez l'homme est-elle representative ?", a:"La fonction vasculaire."},
+    {q:"Vers quel type de pathologies une dysfonction erectile peut-elle orienter le medecin ?", a:"Les pathologies cardio-vasculaires (infarctus du myocarde, AVC)."},
+    {q:"Chez la femme, que peut cacher une dyspareunie profonde ?", a:"L'endometriose."},
+  ],
+  "5-3": [
+    {q:"Vrai ou Faux : Un homme peut avoir une bonne sexualite tout en etant infertile.", a:"Vrai."},
+    {q:"Quel est le volume minimal de sperme considere comme normal pour la fertilite ?", a:"1,5 mL."},
+    {q:"Comment appelle-t-on une secretion de sperme de volume inferieur a 1,5 mL ?", a:"L'hypospermie."},
+    {q:"Quel terme designe l'absence totale de sperme lors de l'ejaculation ?", a:"L'aspermie."},
+    {q:"Quel pourcentage du volume total du liquide seminal est occupe par les spermatozoides ?", a:"5%."},
+    {q:"Quelle est la concentration minimale normale de spermatozoides par mL de sperme ?", a:"15 millions."},
+    {q:"Comment qualifie-t-on un sperme dont la concentration en spermatozoides est inferieure a 15 millions/mL ?", a:"L'oligozoospermie."},
+    {q:"Quel terme definit l'absence totale de spermatozoides dans le sperme ?", a:"L'azoospermie."},
+    {q:"Vrai ou Faux : Les dysfonctions sexuelles sont la cause majeure d'infertilite chez la femme.", a:"Faux (les causes majeures sont le SOPK, l'endometriose ou l'infertilite tubaire)."},
+  ],
+  "5-4": [
+    {q:"Quelle phase de la reponse sexuelle masculine correspond au durcissement initial du sexe ?", a:"La tumescence."},
+    {q:"Dans le modele de la reponse sexuelle, quelle phase suit immediatement l'erection et precede l'orgasme ?", a:"La penetration (phase de plateau)."},
+    {q:"Quelle est la phase finale de la reponse sexuelle masculine caracterisee par le retour a l'etat de flaccidite ?", a:"La resolution (ou detumescence)."},
+  ],
+  "5-5": [
+    {q:"Quel type de medicaments peut provoquer des troubles du desir et de l'excitabilite ?", a:"Les neuroleptiques ou les psychotropes."},
+    {q:"Definition : Dysfonction erectile", a:"Impossibilite d'obtenir ou de maintenir une erection suffisante pour une activite sexuelle."},
+    {q:"Quelle anomalie de l'ejaculation est frequente chez les hommes jeunes tres excites ?", a:"L'ejaculation precoce (EP)."},
+    {q:"Comment appelle-t-on l'ejaculation qui survient vers la vessie plutot que vers l'exterieur ?", a:"L'ejaculation retrograde (ER)."},
+    {q:"Pourquoi le terme \"impuissance\" est-il a bannir en medecine moderne ?", a:"Il est juge irrespectueux et n'a pas de sens clinique precis (on prefere dysfonction erectile)."},
+  ],
+  "5-6": [
+    {q:"Quel type d'erection resulte uniquement d'une stimulation visuelle ou mentale ?", a:"L'erection psychogene."},
+    {q:"Quel type d'erection est provoque par une stimulation directe au toucher ?", a:"L'erection reflexe."},
+    {q:"L'erection coitale est une combinaison de quels deux types d'erections ?", a:"L'erection psychogene et l'erection reflexe."},
+    {q:"Pendant quelle phase du sommeil l'erection nocturne se produit-elle ?", a:"Le sommeil paradoxal."},
+    {q:"De quelle hormone l'erection nocturne est-elle dependante ?", a:"La testosterone."},
+    {q:"Quel phenomene mecanique cause l'erection du pendu lors d'une strangulation ?", a:"Le reflux de sang vers le bas du corps."},
+  ],
+  "5-7": [
+    {q:"Definition : Priapisme", a:"Erection involontaire, douloureuse, pathologique et prolongee ou le sang reste sequestre dans le penis."},
+    {q:"Pourquoi le priapisme est-il considere comme une urgence medico-chirurgicale ?", a:"Le sang sequestre risque de provoquer une necrose des tissus du penis."},
+    {q:"Quelle pathologie hematologique predispose au priapisme par cristallisation de l'hemoglobine ?", a:"La drepanocytose."},
+    {q:"Quels sont les deux principaux organes erectiles engages lors de l'erection ?", a:"Les deux corps caverneux."},
+    {q:"Quel organe erectile median entoure l'uretre penien ?", a:"Le corps spongieux."},
+    {q:"Quelles structures vasculaires se situent au centre de chaque corps caverneux ?", a:"Les arteres caverneuses."},
+    {q:"Quel mode d'echographie est utilise pour etudier les structures tissulaires et morphologiques du penis ?", a:"L'echographie en mode B."},
+    {q:"Quelle pathologie se manifeste par une fibrose (plaque blanchatre) au niveau du sexe lors d'une echographie ?", a:"La maladie de La Peyronie."},
+    {q:"Le corps spongieux presente deux renflements : le bulbe a l'arriere et le _____ a l'avant.", a:"Gland."},
+    {q:"L'albuginee qui entoure les corps erectiles est riche en cellules _____ _____.", a:"Musculaires lisses."},
+    {q:"La membrane fibreuse entourant les corps caverneux s'appelle l'_____.", a:"Albuginee."},
+  ],
+  "5-8": [
+    {q:"Quelles sont les quatre etapes physiologiques du deroule de l'erection ?", a:"1) Flaccidite, 2) Tumescence, 3) Rigidite, 4) Detumescence."},
+    {q:"Comment appelle-t-on les ramifications de l'artere caverneuse qui envoient le sang vers les lacs caverneux ?", a:"Les arteres helicines."},
+    {q:"Lors de l'erection, que doit-il advenir du retour veineux pour que le sang stagne dans le penis ?", a:"Le retour veineux doit etre bloque."},
+    {q:"Vrai ou Faux : Ligaturer les veines du penis est un traitement efficace de la dysfonction erectile.", a:"Faux (le probleme n'est jamais regle par cette methode seule)."},
+  ],
+  "5-9": [
+    {q:"Quel etat des cellules musculaires lisses (CML) caverneuses permet l'afflux massif de sang ?", a:"La relaxation."},
+    {q:"Quels sont les deux types cellulaires principaux protagonistes de l'erection ?", a:"Les cellules musculaires lisses et les cellules endotheliales."},
+    {q:"Quel systeme nerveux maintient l'etat de flaccidite par la contraction des CML ?", a:"Le systeme orthosympathique."},
+    {q:"Quel systeme nerveux provoque la relaxation des CML et la vasodilatation necessaire a l'erection ?", a:"Le systeme parasympathique."},
+    {q:"Quels muscles perineaux se contractent lors de l'erection pour ajouter de la pression sur la verge ?", a:"Les muscles ischiocaverneux et bulbocaverneux."},
+    {q:"Quel systeme nerveux declenche la detumescence en contractant les CML ?", a:"Le systeme orthosympathique."},
+  ],
+  "5-10": [
+    {q:"Pourquoi le sang preleve lors d'une intervention pour priapisme est-il noir ?", a:"Parce qu'il est sequestre depuis longtemps et s'est necrose par manque d'oxygenation."},
+  ],
+
+  // ===== PDF 6: Male_Reproductive_Clinical_Blueprint =====
+  "6-2": [
+    {q:"Quels sont les trois composants du mode Triplex utilise en echographie d'andrologie ?", a:"Le mode B (noir et blanc), le mode couleur et le mode Doppler pour les vitesses."},
+    {q:"Comment evoluent les vitesses systolique et diastolique lors d'une erection normale ?", a:"La vitesse systolique augmente et la vitesse diastolique diminue."},
+    {q:"Quel est le temoin echographique d'une bonne erection lors de l'examen des arteres caverneuses ?", a:"L'augmentation de la vitesse du sang."},
+    {q:"Selon l'IRM fonctionnelle, comment sont qualifiees les regions cerebrales activees par l'excitation sexuelle ?", a:"Elles sont qualifiees de regions androgenodependantes."},
+  ],
+  "6-3": [
+    {q:"Quel nerf, surnomme \"nerf du plaisir\", stimule le centre parasympathique pour l'erection ?", a:"Le nerf dorsal du penis."},
+    {q:"Quel nerf transmet le signal du centre parasympathique vers les corps caverneux ?", a:"Le nerf pelvien (ou caverneux)."},
+    {q:"Quels muscles perineaux se contractent lors du processus pro-erectile ?", a:"Les muscles bulbospongieux et ischiocaverneux."},
+    {q:"Quel systeme nerveux autonome gere le mecanisme pro-erectile ?", a:"Le systeme parasympathique."},
+  ],
+  "6-4": [
+    {q:"Definition : Maladie de la Peyronie", a:"Une fibrose du corps caverneux entrainant une courbure anormale lors de l'erection."},
+    {q:"Quelle cellule joue un role central dans le mecanisme moleculaire de l'erection ?", a:"La cellule endotheliale."},
+    {q:"Quelle molecule liberee par l'endothelium stimule la Guanylate cyclase ?", a:"Le monoxyde d'azote (NO)."},
+    {q:"Quel second messager est produit par la Guanylate cyclase pour induire l'erection ?", a:"Le GMPc (Guanosine monophosphate cyclique)."},
+    {q:"Quel est l'effet final des proteines kinases GMPc-dependantes sur la cellule musculaire lisse ?", a:"Elles provoquent sa relaxation."},
+    {q:"Pourquoi la relaxation de la cellule musculaire lisse est-elle indispensable a l'erection ?", a:"Elle permet a la cellule d'absorber le sang necessaire a la tumescence."},
+    {q:"Quelle est la voie de signalisation de secours si la voie du GMPc fonctionne mal ?", a:"La voie impliquant l'AMPc."},
+  ],
+  "6-5": [
+    {q:"Quelle enzyme est responsable de la degradation du GMPc et de l'arret de l'erection ?", a:"La phosphodiesterase de type 5 (PDE5)."},
+    {q:"Quel est le mecanisme d'action pharmacologique du Viagra ?", a:"Il inhibe la PDE5 pour maintenir la voie de signalisation du GMPc."},
+    {q:"Quelle est la difference fondamentale entre le Viagra et les prostaglandines concernant l'erection ?", a:"Le Viagra est un facilitateur (maintien), tandis que les prostaglandines sont des inducteurs (declenchement)."},
+  ],
+  "6-6": [
+    {q:"De quoi la dysfonction erectile est-elle souvent un indicateur precoce ?", a:"D'une dysfonction endotheliale et de potentielles pathologies cardiovasculaires futures."},
+    {q:"Citez trois facteurs de risque induisant un stress oxydatif et une alteration endotheliale.", a:"L'hypertension, le diabete, la dyslipidemie ou le tabac."},
+    {q:"Expliquez l'hypothese du diametre arteriel concernant la dysfonction erectile.", a:"Les arteres caverneuses etant petites (1-2 mm), une obstruction se manifeste plus tot que dans les arteres coronaires (3-4 mm)."},
+    {q:"Quel est le diametre moyen de l'artere du penis ?", a:"1-2 mm."},
+    {q:"Quel est le diametre moyen de l'artere coronaire ?", a:"3-4 mm."},
+    {q:"Quel est le diametre moyen de l'artere femorale ?", a:"6-8 mm."},
+  ],
+  "6-8": [
+    {q:"Quelle est la longueur approximative de l'uretre masculin comparee a celle de la femme ?", a:"Il mesure 20 cm chez l'homme contre 4 cm chez la femme."},
+    {q:"Pourquoi les femmes sont-elles plus predisposees aux cystites que les hommes ?", a:"En raison de la petite taille de l'uretre feminin (4 cm) qui facilite la remontee bacterienne."},
+    {q:"Quels sont les trois segments de l'uretre masculin ?", a:"L'uretre prostatique, l'uretre membraneux et l'uretre spongieux."},
+    {q:"Quel segment de l'uretre masculin traverse le perinee ?", a:"L'uretre membraneux."},
+    {q:"Ou se situe l'uretre spongieux ?", a:"Il est entoure par le penis."},
+  ],
+  "6-9": [
+    {q:"De quoi est compose le sphincter interne de la prostate ?", a:"De fibres musculaires lisses (sphincter lisse)."},
+    {q:"Quel est le role physiologique du sphincter interne (lisse) prostatique ?", a:"Empecher l'ecoulement spontane de l'urine provenant de la vessie."},
+    {q:"De quoi est compose le sphincter externe de la prostate ?", a:"De fibres musculaires striees (sphincter strie)."},
+    {q:"Quel acte physiologique depend de la contraction volontaire du sphincter strie ?", a:"L'acte volontaire de la miction."},
+    {q:"Quelle anomalie anatomique peut causer une hypospermie en bloquant les canaux ejaculateurs ?", a:"Des kystes de l'utricule prostatique."},
+    {q:"Vrai ou Faux : Le sperme est fabrique en permanence comme les spermatozoides.", a:"Faux, le sperme est fabrique au moment de l'ejaculation."},
+  ],
+  "6-10": [
+    {q:"Comment appelle-t-on la phase de l'ejaculation caracterisee par la secretion et la contraction du tractus seminal ?", a:"La phase d'emission."},
+    {q:"Comment appelle-t-on la phase de l'ejaculation caracterisee par la propulsion saccadee du sperme ?", a:"La phase d'expulsion."},
+    {q:"Quelle structure sert de \"chambre de pression\" lors de l'expulsion seminale ?", a:"L'uretre prostatique."},
+    {q:"Quel mecanisme assure une ejaculation anterograde ?", a:"La fermeture du sphincter lisse (col vesical) pour empecher le sperme de remonter vers la vessie."},
+    {q:"Quelles pathologies peuvent provoquer une ejaculation retrograde ?", a:"La chirurgie, les neuropathies ou le diabete."},
+    {q:"Quelle est la frequence des contractions rythmiques des muscles perineaux lors de l'expulsion ?", a:"0,8 Hz."},
+    {q:"Quelle glande sexuelle accessoire secrete la plus grande partie du volume du sperme (65%) ?", a:"Les vesicules seminales."},
+    {q:"Quelle est la proportion volumique du plasma seminal provenant de la prostate ?", a:"Environ 30%."},
+    {q:"Quelle est la proportion volumique du plasma seminal provenant de l'epididyme ?", a:"Environ 5%."},
+    {q:"Pourquoi le pH du sperme est-il alcalin ?", a:"Pour proteger les spermatozoides contre l'acidite vaginale."},
+    {q:"Quelle est la valeur limite inferieure du volume de sperme lors d'un ejaculat normal ?", a:">= 1,5 ml."},
+    {q:"Quel est le nombre total minimal de spermatozoides par ejaculat selon les normes de reference ?", a:"39 millions."},
+    {q:"Quel est le pourcentage minimal de formes typiques (morphologie normale) requis dans un spermogramme ?", a:"4%."},
+  ],
+  "6-12": [
+    {q:"Comment differencier une ejaculation retrograde d'une anejaculation lors d'une aspermie ?", a:"Par la presence ou l'absence de la sensation d'ejaculation et de plaisir."},
+    {q:"Comment confirme-t-on biologiquement une ejaculation retrograde ?", a:"En recherchant la presence de spermatozoides dans les urines apres une tentative d'ejaculation."},
+  ],
+};
+
+// Build flat slide list
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+
+let currentSlide = 0;
+const completed = new Set();
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      html += `<h3>${pdfs[curPdf-1].label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}">
+      <span class="check"></span>${s.pdf}.${s.slide} Diapo ${s.slide}
+    </div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+
+function buildSlide(s, idx) {
+  const pdf = pdfs[s.pdf-1];
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>${fcs.length} Flashcard${fcs.length>1?'s':''}</h3>
+      <button class="btn-reveal" onclick="revealAll(${idx})">Reveler toutes les reponses</button>
+      <div class="fc-grid">`;
+    fcs.forEach((fc, fi) => {
+      fcHtml += `<div class="flashcard" onclick="this.classList.toggle('flipped')" id="fc-${idx}-${fi}">
+        <div class="fc-inner">
+          <div class="fc-front">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.q}</span>
+            <span class="fc-hint">cliquer</span>
+          </div>
+          <div class="fc-back">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.a}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+    fcHtml += '</div></div>';
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcards pour cette diapo.</p>';
+  }
+
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">PDF ${s.pdf} — ${pdf.name} — Diapo ${s.slide}/${pdf.totalSlides}</span>
+    <div class="slide-img-wrap">
+      <img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy">
+    </div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>&#8592; Precedent</button>
+      <span style="color:#666;font-size:0.85rem">${idx+1} / ${totalSlides}</span>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant &#8594;</button>
+    </div>
+  </div>`;
+}
+
+function buildMain() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order" style="display:none">
+    <h2>Ordre des PDF pour la plateforme</h2>
+    <ol>${pdfs.map(p => `<li><strong>${p.name}.pdf</strong> — ${p.label}</li>`).join('')}</ol>
+  </div>`;
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  const cur = document.getElementById(`slide-${currentSlide}`);
+  if (cur) cur.classList.remove('active');
+  completed.add(currentSlide);
+  const sbOld = document.getElementById(`sb-${currentSlide}`);
+  if (sbOld) { sbOld.classList.add('completed'); sbOld.querySelector('.check').textContent = '\u2713 '; }
+  currentSlide = idx;
+  document.getElementById(`slide-${idx}`).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const sbNew = document.getElementById(`sb-${idx}`);
+  if (sbNew) { sbNew.classList.add('active'); sbNew.scrollIntoView({block:'nearest'}); }
+  document.getElementById('progressFill').style.width = `${((idx+1)/totalSlides)*100}%`;
+  document.getElementById('navCounter').textContent = `${idx+1} / ${totalSlides}`;
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function revealAll(slideIdx) {
+  const s = allSlides[slideIdx];
+  const fcs = flashcardMap[s.key] || [];
+  fcs.forEach((_, fi) => {
+    const el = document.getElementById(`fc-${slideIdx}-${fi}`);
+    if (el) el.classList.add('flipped');
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+
+buildSidebar();
+buildMain();
+goTo(0);
+</script>
+</body>
+</html>

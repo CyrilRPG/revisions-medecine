@@ -1,0 +1,8 @@
+# Source files (not needed for the site)
+*.pdf
+*.csv
+*.py
+__pycache__/
+_preview/
+GUIDE_GENERATION.md
+.DS_Store
