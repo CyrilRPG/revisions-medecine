@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilan de l'Eau - Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Bilan de l'Eau</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 50</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Human_Water_Balance", label: "L'Équilibre de l'Eau dans le Corps Humain", badge: "pdf-1", totalSlides: 8 },
+  { id: 4, name: "Renal_Water_Dynamics", label: "Dynamique Rénale de l'Eau : Entrées, Sorties et Néphron", badge: "pdf-2", totalSlides: 14 },
+  { id: 3, name: "Renal_Osmotic_Mechanics", label: "L'Usine Osmotique du Rein : Concentration et Dilution", badge: "pdf-3", totalSlides: 14 },
+  { id: 2, name: "Renal_Fluid_Control", label: "Régulation du Bilan de l'Eau : ADH et Diurétiques", badge: "pdf-4", totalSlides: 14 },
+];
+
+const flashcardMap = {
+  // ===== PDF 1: Human_Water_Balance =====
+  "1-2": [
+    {q:"Quel pourcentage du compartiment liquidien total l\'eau représente-t-elle chez l\'adulte ?", a:"L\'eau représente 60% du compartiment liquidien."},
+    {q:"Quelle proportion de l\'eau corporelle totale est située dans le compartiment extracellulaire ?", a:"L\'eau extracellulaire représente 1/3 de l\'eau totale."},
+    {q:"Quelle proportion de l\'eau corporelle totale est située dans le compartiment intracellulaire ?", a:"L\'eau intracellulaire représente 2/3 de l\'eau totale."},
+    {q:"Quels sont les deux sous-secteurs du liquide extracellulaire (60%) ?", a:"Le liquide interstitiel (15%) et le plasma (3 litres)."},
+    {q:"Pourquoi le plasma est-il utilisé pour les mesures biologiques d\'ionogramme ?", a:"Parce qu\'il est considéré comme un reflet du milieu extracellulaire."},
+    {q:"Par quel type de mécanisme l\'eau s\'échange-t-elle entre les compartiments ?", a:"L\'eau s\'échange de manière passive."},
+    {q:"Quelle quantité de liquide correspond aux 60% d\'eau totale chez un sujet de 70 kg ?", a:"42 litres."},
+    {q:"À combien de litres correspond le volume intracellulaire chez un sujet de 70 kg ?", a:"28 litres."},
+    {q:"À combien de litres correspond le volume extracellulaire total chez un sujet de 70 kg ?", a:"14 litres."},
+    {q:"Quel est le volume approximatif du liquide interstitiel chez un sujet de 70 kg ?", a:"11 litres."},
+    {q:"Dans quel secteur liquidien se trouvent le sodium, le chlore et les bicarbonates (HCO(3)^(-)) en majorité ?", a:"Le secteur extracellulaire (interstitium et plasma)."}
+  ],
+  "1-3": [
+    {q:"Formule : Osmolalité", a:"Osmolalité = nombres d\'osmoles/volume de solvant"},
+    {q:"Quelle variable biologique l\'organisme régule-t-il pour maintenir son contenu en eau ?", a:"L\'organisme régule l\'osmolalité."},
+    {q:"Quelles structures permettent à l\'organisme de mesurer l\'osmolalité ?", a:"Les osmorécepteurs."},
+    {q:"À l\'état stable, quelle est la relation entre l\'osmolalité extracellulaire et intracellulaire ?", a:"Les osmolalités des deux compartiments sont égales."},
+    {q:"Quelle est la valeur normale de l\'osmolalité des compartiments à l\'équilibre ?", a:"Environ 300 mosm/kg d\'H(2)O."},
+    {q:"Comment l\'organisme maintient-il l\'osmolalité constante face à des variations quotidiennes ?", a:"En ajustant les entrées d\'eau (soif) et les sorties d\'eau (rein)."},
+    {q:"Le principe selon lequel une variable régulée s\'écarte très peu de sa valeur consigne s\'appelle l\'_____.", a:"Homéostasie"},
+    {q:"Quelle est la particularité du nombre d\'osmoles dans le secteur intracellulaire au cours du temps ?", a:"Le nombre d\'osmoles intracellulaires est considéré comme constant."},
+    {q:"Quels mécanismes effecteurs l\'organisme utilise-t-il pour rétablir une osmolalité proche de 300 ?", a:"La soif (entrées) et l\'excrétion rénale (sorties)."}
+  ],
+  "1-4": [
+    {q:"Quelle substance majeure ne traverse pas la paroi des capillaires vers le milieu interstitiel ?", a:"Les protéines de type albumine."},
+    {q:"Grâce à quelles structures l\'eau traverse-t-elle les membranes cellulaires ?", a:"Les aquaporines."},
+    {q:"Dans quel sens le mouvement d\'eau passif se fait-il entre deux milieux de concentrations différentes ?", a:"De l\'osmolalité la plus faible vers l\'osmolalité la plus élevée."},
+    {q:"Pourquoi l\'équilibre osmotique entre les secteurs est-il atteint très rapidement ?", a:"Grâce au transfert passif d\'eau (perméabilité élevée)."},
+    {q:"Quelle est la conséquence d\'une perméabilité capillaire élevée aux petites molécules (Na^(+), Cl^(-)...) ?", a:"Les échanges entre le plasma et l\'interstitium sont permanents."}
+  ],
+  "1-5": [
+    {q:"Dans le compartiment intracellulaire, quelle est la seule variable qui se modifie ?", a:"Le volume d\'eau."},
+    {q:"Pourquoi le compartiment extracellulaire est-il qualifié d\'imprévisible ?", a:"Parce que le nombre d\'osmoles et le volume d\'eau peuvent tous deux varier."},
+    {q:"Si l\'osmolalité intracellulaire varie, qu\'est-ce que cela signifie obligatoirement ?", a:"Cela signifie que le volume d\'eau intracellulaire a varié."},
+    {q:"Dans quel compartiment toutes les perturbations initiales (ex: hémorragie) arrivent-elles ?", a:"Le compartiment extracellulaire."},
+    {q:"Dans le calcul de l\'osmolalité intracellulaire, quel terme de la fraction reste fixe ?", a:"Le numérateur (nombre d\'osmoles)."}
+  ],
+  "1-6": [
+    {q:"Quelle est la valeur normale précise de l\'osmolalité plasmatique mesurée en laboratoire ?", a:"295 ± 5 mosm/kg d\'H(2)O."},
+    {q:"Formule : Calcul de l\'osmolalité plasmatique à partir d\'une prise de sang", a:"2 × [Na^(+)] + [glucose] + [urée]"},
+    {q:"Quelle est la valeur physiologique moyenne de la glycémie et de l\'urémie chez un sujet normal ?", a:"Environ 5 mmol/L pour chaque substance."},
+    {q:"Comment appelle-t-on l\'osmolalité liée aux solutés qui ne traversent pas librement les membranes ?", a:"L\'osmolalité efficace ou tonicité."},
+    {q:"Formule : Calcul de la tonicité (osmolalité efficace)", a:"2 × [Na^(+)] ≈ 280 mosm/kg d\'H(2)O"},
+    {q:"Pourquoi le glucose et l\'urée ne participent-ils pas à la tonicité chez un sujet sain ?", a:"Parce qu\'ils traversent très bien les membranes biologiques."},
+    {q:"Quel instrument de laboratoire permet de mesurer directement l\'osmolalité plasmatique ?", a:"Un osmomètre."},
+    {q:"Concept : Tonicité", a:"Définition : Osmolalité efficace dépendant des solutés ne traversant pas les membranes. Exemple : 2 × [Na^(+)]."},
+    {q:"Qu\'est-ce qui représente la quasi-totalité des cations plasmatiques pour le calcul de l\'osmolalité ?", a:"L\'ion sodium (Na^(+))."},
+    {q:"Le glucose et l\'urée ne traversent plus correctement les membranes en cas de _____.", a:"Pathologie (type diabète)"}
+  ],
+  "1-7": [
+    {q:"L\'osmolalité extracellulaire est le reflet direct de l\'état d\'_____.", a:"Hydratation intracellulaire"},
+    {q:"Quel est l\'élément plasmatique majeur à surveiller pour évaluer le volume intracellulaire ?", a:"La natrémie (concentration plasmatique du sodium)."},
+    {q:"Vrai ou Faux : La natrémie renseigne sur l\'état du volume extracellulaire.", a:"Faux, elle est uniquement le reflet du volume intracellulaire."}
+  ],
+  "1-8": [
+    {q:"Quel est l\'effet d\'une baisse de l\'osmolalité (ex: 280 au lieu de 300) sur le volume cellulaire ?", a:"Le volume cellulaire augmente (hyperhydratation)."},
+    {q:"Quel est l\'effet d\'une hausse de l\'osmolalité (ex: 320 au lieu de 300) sur le volume cellulaire ?", a:"Le volume cellulaire diminue (déshydratation)."},
+    {q:"Une natrémie à 160 mmol/L indique une hyper-osmolalité et donc une _____.", a:"Déshydratation intracellulaire"},
+    {q:"Une natrémie à 120 mmol/L indique une hypo-osmolalité et donc une _____.", a:"Hyperhydratation intracellulaire"},
+    {q:"Quel est l\'impact d\'une hémorragie sur le bilan de l\'eau selon le cours ?", a:"Elle fait varier l\'osmolalité extracellulaire, forçant l\'organisme à adapter son contenu en eau."},
+    {q:"La natrémie normale est de l\'ordre de 140 mmol/L. Quel est l\'effet d\'une natrémie à 150 mmol/L sur les cellules ?", a:"Elle provoque une sortie d\'eau des cellules (déshydratation cellulaire)."},
+    {q:"La natrémie normale est de l\'ordre de 140 mmol/L. Quel est l\'effet d\'une natrémie à 130 mmol/L sur les cellules ?", a:"Elle provoque une entrée d\'eau dans les cellules (gonflement cellulaire)."}
+  ],
+  // ===== PDF 4: Renal_Water_Dynamics =====
+  "4-2": [
+    {q:"Qu\'est-ce que l\'apport d\'eau endogène ?", a:"L\'eau produite par le métabolisme et l\'oxydation des protides, glucides et lipides."},
+    {q:"Quel volume d\'eau les cellules produisent-elles de manière stable chaque jour ?", a:"Environ 500\\ mL par jour."},
+    {q:"Quelle est la fourchette habituelle des apports d\'eau exogènes par individu ?", a:"Entre 1 et 3\\ L par jour."},
+    {q:"Quelles sont les deux populations les plus vulnérables concernant l\'accès à l\'eau ?", a:"Les nouveau-nés et les personnes âgées."},
+    {q:"Pourquoi les personnes âgées présentent-elles un risque élevé de déshydratation ?", a:"Elles ne ressentent pas bien la sensation de soif."},
+    {q:"Quel mécanisme principal régule les apports d\'eau exogènes ?", a:"La sensation de soif."},
+    {q:"Concept : Apport exogène", a:"Définition : Apport d\'eau provenant de la boisson et de l\'alimentation, variant de 1 à 3\\ L par jour."},
+    {q:"Quel facteur social influençant l\'accès à l\'eau est mentionné dans le texte ?", a:"Les habitus."}
+  ],
+  "4-3": [
+    {q:"Citez les trois types de sorties d\'eau extra-rénales non régulées.", a:"Les sorties cutanées (sueur), respiratoires et les fèces."},
+    {q:"Quel est le volume moyen des sorties extra-rénales quotidiennes ?", a:"Entre 500 et 800\\ mL/j."},
+    {q:"Quel événement pathologique augmente significativement les sorties d\'eau par les fèces ?", a:"La diarrhée."},
+    {q:"Quel volume d\'eau est filtré quotidiennement au niveau des glomérules rénaux ?", a:"Environ 180\\ L par jour."},
+    {q:"Quel volume d\'urine est produit en moyenne chaque jour chez l\'homme ?", a:"Environ 1,8\\ L par jour."},
+    {q:"Le rein filtre environ _____ fois plus d\'eau qu\'il n\'en excrète via l\'urine.", a:"100."},
+    {q:"Quel volume d\'eau est filtré quotidiennement par les glomérules ?", a:"180\\ L."},
+    {q:"Les sorties respiratoires d\'eau sont considérées comme des sorties _____.", a:"extra-rénales (ou non régulées)."}
+  ],
+  "4-4": [
+    {q:"Quelle est la plage de variation de l\'osmolalité urinaire (U(osm)) chez l\'homme ?", a:"60 U(osm) 1200\\ mosm/kg\\ d\'H(2)O."},
+    {q:"Quelle quantité d\'osmoles (urée, sulfates, phosphates) doit être excrétée chaque jour ?", a:"600\\ mosm/j."},
+    {q:"Quel est le débit urinaire quotidien minimum chez l\'homme ?", a:"0,5\\ L."},
+    {q:"L\'excrétion quotidienne obligatoire d\'osmoles de 600\\ mosm/j comprend l\'urée, les phosphates et les _____.", a:"sulfates."}
+  ],
+  "4-5": [
+    {q:"Le rein adapte le volume d\'urine pour maintenir l\'_____ plasmatique constante.", a:"osmolalité."},
+    {q:"Comment évolue le nombre d\'osmoles excrétées lorsque les apports hydriques augmentent ?", a:"Il reste constant."},
+    {q:"Le _____ urinaire est dissocié de la sortie des osmoles.", a:"débit."},
+    {q:"Quelle valeur d\'osmolalité urinaire minimale l\'homme peut-il atteindre ?", a:"60\\ mosm/kg\\ H(2)O."},
+    {q:"L\'osmolalité urinaire maximale de 1200\\ mosm/kg est une valeur _____ chez l\'homme.", a:"fixe."}
+  ],
+  "4-7": [
+    {q:"Quel segment du néphron est extrêmement perméable à l\'eau grâce aux aquaporines 1 et à la voie paracellulaire ?", a:"Le tube contourné proximal (TCP)."},
+    {q:"De quoi dépend la perméabilité à l\'eau du canal collecteur ?", a:"De la présence de l\'hormone anti-diurétique (ADH)."},
+    {q:"Quelles aquaporines sont situées sur le côté basolatéral des cellules du canal collecteur ?", a:"Les aquaporines 3 et 4."},
+    {q:"Quelle aquaporine est insérée au pôle apical du canal collecteur sous l\'influence de l\'ADH ?", a:"L\'aquaporine 2 (AQP2)."},
+    {q:"Quel segment du néphron utilise l\'AQP1 pour la réabsorption transcellulaire d\'eau ?", a:"Le tube contourné proximal (et la branche descendante de l\'anse)."},
+    {q:"Vrai ou Faux : Les aquaporines 3 et 4 du canal collecteur sont dépendantes de l\'ADH.", a:"Faux (elles sont non dépendantes de l\'ADH)."}
+  ],
+  "4-8": [
+    {q:"Quelle proportion de l\'eau filtrée est réabsorbée dans le tube contourné proximal ?", a:"60-70%."},
+    {q:"La réabsorption d\'eau dans le tube contourné proximal est dite _____ car l\'osmolalité reste à 300\\ mosm/kg.", a:"iso-osmotique."},
+    {q:"Quelle est l\'osmolalité tubulaire au début du tube contourné proximal ?", a:"300\\ mosm/kg\\ H(2)O."},
+    {q:"Dans le TCP, la réabsorption d\'eau est proportionnelle à la réabsorption des _____.", a:"osmoles."},
+    {q:"Comment varie l\'osmolalité dans le tube contourné proximal ?", a:"Elle ne varie pas (elle reste à 300\\ mosm/kg)."}
+  ],
+  "4-9": [
+    {q:"Quelle est la particularité de la perméabilité de la branche descendante de l\'anse de Henlé ?", a:"Elle est perméable à l\'eau (AQP1) mais imperméable aux solutés."},
+    {q:"Quel pourcentage d\'eau est réabsorbé dans la branche descendante de l\'anse de Henlé ?", a:"15-20%."},
+    {q:"Pourquoi la branche ascendante de l\'anse de Henlé est-elle imperméable à l\'eau ?", a:"Les cellules n\'ont pas d\'aquaporines et les jonctions intercellulaires sont très serrées."},
+    {q:"Quelle substance est massivement réabsorbée dans la branche ascendante de l\'anse de Henlé ?", a:"Le chlorure de sodium (NaCl)."},
+    {q:"Quelle osmolalité maximale le flux tubulaire peut-il atteindre à la pointe de l\'anse de Henlé ?", a:"1200\\ mosm/kg."},
+    {q:"Pourquoi l\'osmolalité tubulaire diminue-t-elle dans la branche ascendante de l\'anse de Henlé ?", a:"Il y a réabsorption de solutés sans réabsorption d\'eau."},
+    {q:"Quelle branche de l\'anse de Henlé est le site d\'une réabsorption de solutés abaissant l\'osmolalité tubulaire ?", a:"La branche ascendante."},
+    {q:"Quel segment du néphron est responsable de la réabsorption de 15-20% de l\'eau filtrée ?", a:"La branche descendante de l\'anse de Henlé."}
+  ],
+  "4-10": [
+    {q:"Quelle est la caractéristique de perméabilité du tube contourné distal ?", a:"Imperméable à l\'eau mais perméable aux solutés."},
+    {q:"Quelle est l\'osmolalité approximative du liquide tubulaire au niveau du tube contourné distal ?", a:"Environ 150\\ mosm/kg\\ H(2)O."}
+  ],
+  "4-11": [
+    {q:"Quel pourcentage du volume filtré est réabsorbé au niveau du canal collecteur ?", a:"12-20%."},
+    {q:"À l\'entrée du canal collecteur, l\'osmolalité tubulaire est d\'environ _____ mosm/kg\\ H(2)O.", a:"100."},
+    {q:"Quelle partie du canal collecteur exprime les aquaporines 2 ?", a:"Le côté apical (ou membrane luminale)."}
+  ],
+  "4-12": [
+    {q:"Quel pourcentage du volume initialement filtré par le glomérule est finalement excrété dans les urines ?", a:"1%."}
+  ],
+  // ===== PDF 3: Renal_Osmotic_Mechanics =====
+  "3-2": [
+    {q:"Dans le processus de concentration de l\'urine, par quel mécanisme physique s\'effectue TOUJOURS la réabsorption d\'eau ?", a:"La réabsorption d\'eau est toujours un processus passif (osmose)."},
+    {q:"Pour qu\'il y ait réabsorption d\'eau dans le tube collecteur, comment doit être l\'osmolalité interstitielle par rapport au fluide tubulaire ?", a:"L\'osmolalité interstitielle doit être supérieure à celle du fluide tubulaire."},
+    {q:"Dans quel segment du néphron la concentration ou la dilution finale de l\'urine a-t-elle lieu ?", a:"Elle a lieu dans le canal collecteur (TC)."},
+    {q:"De quelle hormone dépend la perméabilité à l\'eau du canal collecteur ?", a:"Elle dépend de l\'hormone antidiurétique (ADH ou arginine vasopressine)."},
+    {q:"Quelles sont les deux conditions nécessaires pour que l\'eau soit réabsorbée au niveau du canal collecteur ?", a:"La présence d\'un gradient osmotique et la perméabilité du collecteur à l\'eau (via l\'ADH)."}
+  ],
+  "3-3": [
+    {q:"Quelle est la valeur de l\'osmolalité extracellulaire au niveau du cortex rénal ?", a:"Elle est de 300\\ mOsm/kg\\ H(2)O."},
+    {q:"Quelle est l\'osmolalité maximale que peut atteindre l\'interstitium rénal au niveau de la papille chez l\'humain ?", a:"Elle peut atteindre 1200\\ mOsm/kg\\ H(2)O."}
+  ],
+  "3-4": [
+    {q:"Quel transporteur ionique est responsable de l\'effet élémentaire créant le gradient osmotique dans la branche large ascendante ?", a:"Le co-transporteur Na^+/K^+/2Cl^-."},
+    {q:"Comment varie la perméabilité à l\'eau entre les branches descendante et ascendante de l\'anse de Henlé ?", a:"La branche descendante est perméable à l\'eau, tandis que la branche ascendante est imperméable."},
+    {q:"À l\'entrée de l\'anse de Henlé, quelle proportion du sodium filtré a déjà été réabsorbée ?", a:"Environ 95% (soit les 2/3) du sodium a été réabsorbé."},
+    {q:"Quel est le principe du système à contre-courant multiplicateur dans l\'anse de Henlé ?", a:"Le fluide circule dans deux branches parallèles mais en sens opposés (descendant et montant)."},
+    {q:"Quel gradient osmotique maximal le transport de NaCl peut-il générer entre la lumière tubulaire et l\'interstitium à un niveau donné ?", a:"Il peut engendrer un gradient de 200\\ mOsm/kg\\ H(2)O."},
+    {q:"Quelle caractéristique anatomique de l\'anse de Henlé détermine la capacité maximale de concentration de l\'urine ?", a:"La longueur de l\'anse de Henlé."},
+    {q:"À quel niveau de l\'anse de Henlé l\'osmolalité du fluide tubulaire est-elle la plus élevée ?", a:"Au fond de l\'anse (au niveau de l\'épingle à cheveux)."},
+    {q:"Quel pourcentage de l\'eau filtrée est réabsorbé avant l\'entrée dans l\'anse de Henlé ?", a:"Environ 80% (les 2/3) de l\'eau filtrée."}
+  ],
+  "3-5": [
+    {q:"Outre le NaCl, quelle autre molécule participe pour moitié à l\'hyperosmolalité de la médullaire interne ?", a:"L\'urée."},
+    {q:"Quel est l\'effet de l\'ADH sur la perméabilité à l\'urée dans la partie terminale du canal collecteur ?", a:"L\'ADH augmente la perméabilité à l\'urée en activant des transporteurs spécifiques."},
+    {q:"Pourquoi l\'urée s\'accumule-t-elle principalement autour de la papille rénale ?", a:"À cause de sa recirculation entre le canal collecteur terminal et la branche ascendante (cycle de l\'urée)."},
+    {q:"Quelle est la fonction principale du cycle de l\'urée dans la médullaire rénale ?", a:"Participer à la création et au maintien de l\'hyperosmolalité interstitielle."}
+  ],
+  "3-6": [
+    {q:"Quel système vasculaire est responsable du maintien du gradient osmotique cortico-papillaire ?", a:"Les vasa recta."},
+    {q:"Qu\'est-ce que les vasa recta par rapport aux néphrons ?", a:"Ce sont des capillaires droits qui longent les anses de Henlé des néphrons profonds."},
+    {q:"Pourquoi les néphrons superficiels ne participent-ils pas à la concentration des urines ?", a:"Ils ne possèdent pas de vasa recta."},
+    {q:"Lors de la descente des vasa recta dans la médullaire, quel mouvement l\'eau effectue-t-elle ?", a:"L\'eau sort du capillaire vers l\'interstitium hyperosmolaire."},
+    {q:"Lors de la remontée des vasa recta vers le cortex, quel mouvement les osmoles effectuent-elles ?", a:"Les osmoles sortent du capillaire vers l\'interstitium."},
+    {q:"Quel pourcentage du débit sanguin rénal total la médullaire reçoit-elle ?", a:"La médullaire reçoit seulement 10% du débit sanguin rénal."},
+    {q:"Quel est le risque d\'une augmentation importante du débit sanguin médullaire ?", a:"Le lavage du gradient osmotique médullaire et la perte de capacité à concentrer les urines."},
+    {q:"Pourquoi le débit sanguin médullaire doit-il être faible ?", a:"Pour éviter de \'laver\' le gradient osmotique qui est coûteux à produire."}
+  ],
+  "3-7": [
+    {q:"Où sont précisément synthétisés les neurones produisant l\'ADH ?", a:"Dans l\'hypothalamus (noyaux paraventriculaire et supra-optique)."},
+    {q:"Où l\'ADH est-elle stockée avant d\'être libérée dans la circulation ?", a:"Dans la post-hypophyse (neurohypophyse)."}
+  ],
+  "3-8": [
+    {q:"Sur quel type de récepteur membranaire l\'ADH se fixe-t-elle au niveau du tube collecteur ?", a:"Le récepteur V(2)."},
+    {q:"Quel second messager intracellulaire est augmenté suite à l\'activation du récepteur V(2) par l\'ADH ?", a:"L\'AMP cyclique (AMPc)."},
+    {q:"Quelle protéine kinase est activée par l\'augmentation de l\'AMPc dans la cellule principale du collecteur ?", a:"La protéine kinase A (PKA)."},
+    {q:"Quelle aquaporine est insérée dans la membrane apicale sous l\'effet de l\'ADH ?", a:"L\'aquaporine 2 (AQP(2))."},
+    {q:"Quelles aquaporines sont présentes de façon permanente sur la face basolatérale du tube collecteur ?", a:"Les aquaporines 3 (AQP(3)) et 4 (AQP(4))."},
+    {q:"Quel ion, en présence de la protéine phosphorylée par la PKA, permet l\'insertion des AQP(2) ?", a:"L\'ion calcium (Ca^(2+))."}
+  ],
+  "3-9": [
+    {q:"Comment apparaît la surface apicale des cellules du collecteur au microscope électronique en l\'absence d\'ADH ?", a:"La surface apicale apparaît lisse."}
+  ],
+  "3-10": [
+    {q:"Quel est le débit urinaire quotidien approximatif d\'un sujet totalement dépourvu d\'ADH ?", a:"Environ 15\\ L par jour."},
+    {q:"En présence d\'ADH, quelle peut être l\'osmolalité maximale de l\'urine définitive ?", a:"Elle peut atteindre 1200\\ mOsm/kg\\ H(2)O."},
+    {q:"Quelle est l\'osmolalité du fluide tubulaire à l\'entrée du tube collecteur chez un sujet sans ADH ?", a:"Environ 100\\ mOsm/l."},
+    {q:"Quelle est l\'osmolalité minimale que peuvent atteindre les urines en l\'absence totale d\'ADH ?", a:"Environ 60\\ mOsm/l."}
+  ],
+  "3-11": [
+    {q:"Comment l\'osmolalité urinaire évolue-t-elle par rapport à la concentration plasmatique d\'ADH ?", a:"Elle augmente linéairement avec l\'ADH jusqu\'à un plateau de 1200\\ mOsm/kg."}
+  ],
+  "3-12": [
+    {q:"Quel médicament diurétique est un inhibiteur spécifique du co-transport Na^+/K^+/2Cl^- ?", a:"Le Furosémide."},
+    {q:"Comment un régime sans protéines affecte-t-il le gradient osmotique cortico-papillaire ?", a:"Il le diminue car il y a moins de production d\'urée issue du catabolisme protidique."},
+    {q:"Quel est l\'effet de la diurèse osmotique sur le gradient cortico-papillaire ?", a:"Elle augmente le débit dans les vasa recta, ce qui diminue ou abolit le gradient."}
+  ],
+  "3-13": [
+    {q:"Qu\'est-ce que le diabète insipide neurogénique ?", a:"Une pathologie où l\'hypothalamus ne produit pas assez d\'ADH."},
+    {q:"Qu\'est-ce que le diabète insipide néphrogénique ?", a:"Une pathologie où le rein ne répond pas à l\'ADH présente (problème de récepteur ou autre)."},
+    {q:"Quel est le symptôme majeur commun aux deux types de diabète insipide ?", a:"Une polyurie importante (volume d\'urine excessif)."},
+    {q:"Que signifie littéralement le terme \'diabète insipide\' ?", a:"Cela signifie que les urines n\'ont pas de saveur."},
+    {q:"Pourquoi les urines du diabète sucré ont-elles un goût sucré ?", a:"Car la glycémie dépasse la capacité de réabsorption tubulaire, entraînant du glucose dans l\'urine."}
+  ],
+  "3-14": [
+    {q:"Quels sont les 3 facteurs dont dépend la capacité du rein à concentrer l\'urine ?", a:"Le gradient CP, la sécrétion d\'ADH et la réponse adéquate de l\'organe cible."}
+  ],
+  // ===== PDF 2: Renal_Fluid_Control =====
+  "2-2": [
+    {q:"Quelles sont les deux variables régulées servant de systèmes d\'alarme pour le bilan de l\'eau ?", a:"L\'osmolalité plasmatique et la volémie."},
+    {q:"Que reflète l\'osmolalité plasmatique concernant les secteurs de l\'organisme ?", a:"L\'hydratation du secteur intracellulaire."},
+    {q:"Que reflète la volémie concernant les secteurs de l\'organisme ?", a:"L\'hydratation du secteur extracellulaire."},
+    {q:"Dans la régulation du bilan hydrique, quel système régule spécifiquement les entrées d\'eau ?", a:"La soif."},
+    {q:"Quels sont les deux effecteurs principaux régulant les sorties d\'eau de l\'organisme ?", a:"Le rein et l\'hormone antidiurétique (ADH)."}
+  ],
+  "2-3": [
+    {q:"Où se situent précisément les osmorécepteurs chargés de monitorer l\'osmolalité plasmatique ?", a:"Dans l\'hypothalamus."},
+    {q:"Où se situent les volorécepteurs sensibles aux variations du volume sanguin ?", a:"Dans les oreillettes cardiaques."},
+    {q:"Quels récepteurs sont activés lorsque la volémie impacte directement la pression artérielle ?", a:"Les barorécepteurs."}
+  ],
+  "2-4": [
+    {q:"Quel est le stimulus physiologique principal déclenchant la sécrétion d\' ADH ?", a:"L\'osmolalité plasmatique."},
+    {q:"Comment évolue la libération d\' ADH par rapport à l\'augmentation de l\'osmolalité plasmatique ?", a:"Elle augmente de manière linéaire."},
+    {q:"Quel est le seuil normal d\'apparition de l\' ADH dans le plasma ?", a:"280\\ mOsm/L."}
+  ],
+  "2-5": [
+    {q:"À partir de quel pourcentage de diminution du volume sanguin circulant le stimulus volémique s\'active-t-il ?", a:"Une diminution de plus de 7%."},
+    {q:"Quel est l\'effet d\'une hypovolémie sévère sur le seuil d\'apparition de l\' ADH ?", a:"Le seuil diminue (l\' ADH est produite pour des osmolalités plus faibles)."},
+    {q:"Pourquoi l\' ADH est-elle sécrétée en cas d\'hémorragie brutale même si le patient est hypo-osmolaire ?", a:"Pour privilégier le maintien de la pression artérielle et de la volémie sur l\'osmolalité."}
+  ],
+  "2-6": [
+    {q:"À quel seuil d\'osmolalité plasmatique le signal de la soif est-il déclenché par l\'hypothalamus ?", a:"Au-delà de 290\\ mosm/kg d\'eau."},
+    {q:"Quel mécanisme empêche la surcorrection de l\'osmolalité immédiatement après avoir bu ?", a:"L\'inhibition des osmorécepteurs hypothalamiques par les osmorécepteurs du tractus digestif supérieur."},
+    {q:"À partir de quel pourcentage de baisse de la volémie considère-t-on qu\'il y a un risque vital ?", a:"Une baisse de plus de 13%."},
+    {q:"Quelle enzyme est produite par l\'appareil juxta-glomérulaire suite à l\'activation du système sympathique par les barorécepteurs intra-rénaux ?", a:"La rénine."},
+    {q:"Terme : Molécule dipsogène", a:"Définition : Substance qui provoque la sensation de soif (ex: Angiotensine II)."}
+  ],
+  "2-7": [
+    {q:"Pourquoi les sujets âgés sont-ils particulièrement à risque de déshydratation ?", a:"Parce que leur sensation de soif est altérée."}
+  ],
+  "2-8": [
+    {q:"En condition normale, quel est le débit urinaire quotidien moyen ?", a:"1,5\\ L/j."},
+    {q:"Quelle est l\'osmolalité urinaire habituelle en condition de diurèse normale ?", a:"600\\ mosm/L."},
+    {q:"Quelle quantité totale d\'osmoles doit être excrétée par jour en moyenne ?", a:"900\\ mosm/j."},
+    {q:"Quel pourcentage de l\'eau filtrée est réabsorbé le long du tubule rénal en temps normal ?", a:"99%."},
+    {q:"L\' ADH rend le canal collecteur perméable à l\'eau, permettant sa réabsorption passive par _____.", a:"Osmose"}
+  ],
+  "2-9": [
+    {q:"Quel est le débit urinaire minimal en situation d\'antidiurèse maximale ?", a:"750\\ ml/j (ou 0,75\\ L/j)."},
+    {q:"Quelle est l\'osmolalité maximale que l\'urine humaine peut atteindre en cas de déshydratation ?", a:"1200\\ mosm/L."},
+    {q:"En situation de privation d\'eau, quel est l\'état de la sécrétion d\' ADH ?", a:"Elle est à son maximum."}
+  ],
+  "2-10": [
+    {q:"La pathologie caractérisée par une absence totale d\' ADH ou de sa réponse rénale est appelée le _____.", a:"Diabète insipide"},
+    {q:"Quel est le débit urinaire typique rencontré dans un diabète insipide ?", a:"15\\ L/j."},
+    {q:"Quelle est l\'osmolalité urinaire en cas de diurèse aqueuse (diabète insipide) ?", a:"60\\ mosm/L."}
+  ],
+  "2-11": [
+    {q:"Définition : Diurèse osmotique", a:"Polyurie causée par la présence tubulaire d\'une substance osmotiquement active peu réabsorbée."},
+    {q:"Citez un exemple de substance exogène pouvant entraîner une diurèse osmotique thérapeutique.", a:"Le mannitol."},
+    {q:"Quelle substance endogène, outre le glucose, peut provoquer une diurèse osmotique lors d\'une levée d\'obstacle ?", a:"L\'urée."},
+    {q:"Quel est l\'impact d\'une perfusion de mannitol sur le volume des œdèmes cérébraux ?", a:"Elle le diminue en provoquant une sortie d\'eau par osmose vers le plasma."},
+    {q:"Quelle est l\'unité de mesure de l\'osmolalité utilisée pour définir le seuil de la soif ?", a:"mosm/kg d\'eau."}
+  ],
+  "2-12": [
+    {q:"À partir de quelle concentration plasmatique de glucose le transport maximum (T(max)) est-il atteint ?", a:"> 2\\ g/L (ou 10\\ mmol/L)."},
+    {q:"Pourquoi la présence de glucose dans le tubule proximal est-elle grave lors d\'un diabète déséquilibré ?", a:"Elle empêche la réabsorption normale des 2/3 du sodium et de l\'eau à cet endroit."},
+    {q:"Quel est l\'effet de la diurèse osmotique massive sur le gradient osmotique cortico-papillaire ?", a:"Il est aboli (l\'interstitium reste à 300\\ mosm/L partout)."},
+    {q:"En cas de diurèse osmotique, pourquoi l\'urine est-elle dite « iso-osmotique » ?", a:"Parce qu\'elle ne peut pas être concentrée au-delà de l\'osmolalité interstitielle de 300\\ mOsm/L."},
+    {q:"Historiquement, comment distinguait-on le diabète sucré du diabète insipide au 18^e siècle ?", a:"En goûtant les urines (sucrées dans le diabète sucré)."},
+    {q:"Pourquoi le débit urinaire est-il très élevé à la fin du proximal lors d\'une glycosurie ?", a:"À cause de la pression osmotique du glucose non réabsorbé qui retient l\'eau."},
+    {q:"Pourquoi une polyurie osmotique est-elle qualifiée de polyurie « iso-osmotique » ?", a:"L\'urine a la même osmolalité que le plasma (300\\ mOsm/L) par incapacité à concentrer."}
+  ],
+  "2-13": [
+    {q:"Sur quelle partie du néphron agissent les inhibiteurs de l\'anhydrase carbonique ?", a:"Le tubule proximal."},
+    {q:"Quel est le mécanisme d\'action des inhibiteurs de l\'anhydrase carbonique ?", a:"Blocage de la réabsorption du bicarbonate et du sodium associé."},
+    {q:"Quels sont les diurétiques les plus puissants agissant sur la branche large ascendante de l\'anse de Henle ?", a:"Les diurétiques de l\'anse (ex: Furosémide)."},
+    {q:"Quel est l\'effet majeur des diurétiques de l\'anse sur l\'osmolalité médullaire ?", a:"Ils diminuent l\'osmolalité interstitielle médullaire, empêchant la concentration des urines."},
+    {q:"Quel risque ionique est associé à l\'utilisation des diurétiques de l\'anse et des thiazidiques ?", a:"L\'hypokaliémie."},
+    {q:"Sur quel segment du tubule rénal les diurétiques thiazidiques agissent-ils ?", a:"Le tubule distal."},
+    {q:"Quelle classe de diurétiques est qualifiée d\'« épargneurs de potassium » ?", a:"Les antagonistes de l\'aldostérone (ex: Spironolactone)."},
+    {q:"Quel est le risque ionique majeur lié à l\'utilisation de la Spironolactone ?", a:"L\'hyperkaliémie."},
+    {q:"Quel transporteur est spécifiquement bloqué par l\'Amiloride ?", a:"Le canal épithélial à sodium (ENaC)."}
+  ],
+  "2-14": [
+    {q:"Comment l\' ADH adapte-t-elle les sorties rénales d\'eau ?", a:"En ajustant la perméabilité du canal collecteur pour maintenir une osmolalité plasmatique normale."},
+    {q:"Quel est le rôle des osmorécepteurs situés dans le tractus digestif supérieur ?", a:"Inhiber précocement la soif pour éviter une ingestion excessive d\'eau."},
+    {q:"Dans le schéma de régulation, quel organe est le principal effecteur des sorties d\'eau ?", a:"Le rein."},
+    {q:"Vrai ou Faux : En situation courante, c\'est la volémie qui régule principalement l\' ADH.", a:"Faux (c\'est l\'osmolalité plasmatique)."},
+    {q:"Quelle structure rénale produit la rénine en réponse à une stimulation sympathique ?", a:"L\'appareil juxta-glomérulaire."}
+  ],
+};
+
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+
+let currentSlide = 0;
+const completed = new Set();
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      const pdf = pdfs.find(p => p.id === curPdf);
+      html += `<h3>${pdf.label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}">
+      <span class="check"></span>Diapo ${s.slide}
+    </div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+
+function buildSlide(s, idx) {
+  const pdf = pdfs.find(p => p.id === s.pdf);
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>${fcs.length} Flashcard${fcs.length>1?'s':''}</h3>
+      <button class="btn-reveal" onclick="revealAll(${idx})">Révéler toutes les réponses</button>
+      <div class="fc-grid">`;
+    fcs.forEach((fc, fi) => {
+      fcHtml += `<div class="flashcard" onclick="this.classList.toggle(\'flipped\')" id="fc-${idx}-${fi}">
+        <div class="fc-inner">
+          <div class="fc-front">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.q}</span>
+            <span class="fc-hint">cliquer</span>
+          </div>
+          <div class="fc-back">
+            <span class="fc-num">${fi+1}</span>
+            <span class="fc-text">${fc.a}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+    fcHtml += '</div></div>';
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcards pour cette diapo.</p>';
+  }
+
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">PDF ${pdf.id} — ${pdf.name} — Diapo ${s.slide}/${pdf.totalSlides}</span>
+    <div class="slide-img-wrap">
+      <img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy">
+    </div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>&#8592; Précédent</button>
+      <span style="color:#666;font-size:0.85rem">${idx+1} / ${totalSlides}</span>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant &#8594;</button>
+    </div>
+  </div>`;
+}
+
+function buildMain() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order" style="display:none">
+    <h2>Ordre des PDF pour la plateforme</h2>
+    <ol>${pdfs.map(p => `<li><strong>${p.name}.pdf</strong> — ${p.label}</li>`).join('')}</ol>
+  </div>`;
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  const cur = document.getElementById(`slide-${currentSlide}`);
+  if (cur) cur.classList.remove('active');
+  completed.add(currentSlide);
+  const sbOld = document.getElementById(`sb-${currentSlide}`);
+  if (sbOld) { sbOld.classList.add('completed'); sbOld.querySelector('.check').textContent = '\u2713 '; }
+  currentSlide = idx;
+  document.getElementById(`slide-${idx}`).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const sbNew = document.getElementById(`sb-${idx}`);
+  if (sbNew) { sbNew.classList.add('active'); sbNew.scrollIntoView({block:'nearest'}); }
+  document.getElementById('progressFill').style.width = `${((idx+1)/totalSlides)*100}%`;
+  document.getElementById('navCounter').textContent = `${idx+1} / ${totalSlides}`;
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function revealAll(slideIdx) {
+  const s = allSlides[slideIdx];
+  const fcs = flashcardMap[s.key] || [];
+  fcs.forEach((_, fi) => {
+    const el = document.getElementById(`fc-${slideIdx}-${fi}`);
+    if (el) el.classList.add('flipped');
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+
+buildSidebar();
+buildMain();
+goTo(0);
+</script>
+</body>
+</html>
