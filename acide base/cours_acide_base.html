@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acide-Base & Potassium - Cours & Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; }
+  .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,15,26,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #2a2a4a; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress { flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden; }
+  .nav-progress-fill { height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d); border-radius: 3px; transition: width 0.3s; }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+  .sidebar { position: fixed; top: 50px; left: 0; bottom: 0; width: 280px; background: #12121f; border-right: 1px solid #2a2a4a; overflow-y: auto; z-index: 90; padding: 12px 0; }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 { padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px; }
+  .sidebar-item { padding: 8px 16px; cursor: pointer; font-size: 0.82rem; color: #999; transition: all 0.2s; border-left: 3px solid transparent; }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active { background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff; font-weight: 600; }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .pdf-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+  .pdf-5 { background: #3a1a2a; color: #ff6b9d; }
+  .pdf-6 { background: #1a3a3a; color: #22d3ee; }
+  .pdf-7 { background: #2a2a1a; color: #facc15; }
+  .pdf-8 { background: #3a1a1a; color: #f87171; }
+  .slide-img-wrap { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px; padding: 12px; margin-bottom: 24px; text-align: center; }
+  .slide-img-wrap img { max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .fc-section h3::before { content: ''; display: block; width: 20px; height: 2px; background: #7c8aff; }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard { perspective: 1000px; cursor: pointer; min-height: 70px; }
+  .fc-inner { position: relative; width: 100%; min-height: 70px; transition: transform 0.5s; transform-style: preserve-3d; }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back { backface-visibility: hidden; border-radius: 12px; padding: 16px 20px; width: 100%; }
+  .fc-front { background: linear-gradient(135deg, #1e1e36, #252545); border: 1px solid #3a3a5a; display: flex; align-items: center; gap: 12px; }
+  .fc-back { background: linear-gradient(135deg, #1a2e1a, #1e3a2e); border: 1px solid #2a5a3a; transform: rotateX(180deg); position: absolute; top: 0; left: 0; display: flex; align-items: center; gap: 12px; }
+  .fc-num { min-width: 28px; height: 28px; border-radius: 50%; background: #3a3a5a; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff; }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+  .bottom-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a; }
+  .btn { padding: 10px 24px; border-radius: 10px; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-reveal { display: inline-block; margin-bottom: 12px; padding: 8px 20px; background: #252545; color: #7c8aff; border: 1px solid #3a3a5a; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+  .btn-reveal:hover { background: #2a2a5a; }
+  .pdf-order { background: linear-gradient(135deg, #1a1a2e, #1e1e38); border: 1px solid #3a3a5a; border-radius: 16px; padding: 24px 28px; margin-bottom: 30px; }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li { padding: 6px 0; color: #bbb; font-size: 0.9rem; border-bottom: 1px solid #1a1a2a; }
+  .pdf-order li:last-child { border: none; }
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+  @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; padding: 20px 16px 100px; } }
+</style>
+</head>
+<body>
+<div class="top-nav">
+  <h1>Acide-Base & Potassium</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 104</span>
+</div>
+<div class="sidebar" id="sidebar"></div>
+<div class="main" id="main"></div>
+<script>
+const pdfs = [
+  { id: 7, name: "Renal_pH_Regulation", label: "L'Équilibre Vital : Rôle du Rein dans le pH", badge: "pdf-1", totalSlides: 14 },
+  { id: 5, name: "Renal_Acid_Base_Balance", label: "L'Usine Chimique du Rein : Conservation des Bicarbonates", badge: "pdf-2", totalSlides: 13 },
+  { id: 3, name: "L_Usine_Moleculaire_Renale", label: "L'Usine Moléculaire : Ammoniogenèse et Recyclage", badge: "pdf-3", totalSlides: 14 },
+  { id: 6, name: "Renal_pH_Refinery", label: "Le Canal Collecteur : Acidification Finale", badge: "pdf-4", totalSlides: 12 },
+  { id: 8, name: "The_Potassium_Ledger", label: "Le Bilan du Potassium : Registre Vital", badge: "pdf-5", totalSlides: 13 },
+  { id: 4, name: "Potassium_Regulation_Blueprint", label: "Régulation de la Kaliémie : Hormones et Néphron", badge: "pdf-6", totalSlides: 15 },
+  { id: 2, name: "Hypokalemia_Decoded", label: "L'Hypokaliémie : Urgence Silencieuse", badge: "pdf-7", totalSlides: 11 },
+  { id: 1, name: "Hyperkalemia_Blueprint", label: "L'Hyperkaliémie : Déséquilibre Silencieux", badge: "pdf-8", totalSlides: 12 },
+];
+const flashcardMap = {
+  // ===== PDF 7: Renal_pH_Regulation =====
+  "7-2": [
+    {q:"Quelle est la concentration physiologique d\'ions H^(+) dans le plasma artériel ?", a:"40 nmol/L"},
+    {q:"Quelle est la concentration physiologique d\'ions H^(+) dans le sang veineux ?", a:"45 nmol/L"},
+    {q:"Quelle formule permet de calculer le pH à partir de la concentration en ions H^(+) ?", a:"pH = - [H^(+)]"},
+    {q:"Quelle est la valeur normale du pH artériel ?", a:"7,40"},
+    {q:"À partir de quel seuil de pH parle-t-on d\'acidose plasmatique ?", a:"pH < 7,38"},
+    {q:"À partir de quel seuil de pH parle-t-on d\'alcalose plasmatique ?", a:"pH > 7,42"},
+    {q:"Quelle est la valeur normale du pH veineux ?", a:"7,35"}
+  ],
+  "7-3": [
+    {q:"Quels sont les deux organes assurant conjointement le maintien de la concentration plasmatique d\'H^(+) ?", a:"Le rein et les poumons"},
+    {q:"Quelle est la concentration approximative d\'ions H^(+) dans le milieu intracellulaire ?", a:"100 nmol/L"},
+    {q:"Quelle est la fourchette normale du pH intracellulaire ?", a:"6,8 à 7,2"}
+  ],
+  "7-4": [
+    {q:"Dans quelle artère effectue-t-on généralement le prélèvement pour l\'analyse des gaz du sang ?", a:"L\'artère radiale"},
+    {q:"Pourquoi le liquide interstitiel est-il légèrement plus acide que le plasma artériel ?", a:"Il contient peu ou pas de protéines pour tamponner les ions H^(+)."},
+    {q:"Quelle est la fourchette de pH normale du liquide gastrique ?", a:"0,7 à 3,8"},
+    {q:"Quel est le pH physiologique de la salive ?", a:"6,3"},
+    {q:"Quelle est l\'amplitude possible du pH urinaire ?", a:"4 à 8"},
+    {q:"Quel est l\'effet d\'une alimentation carnée sur le pH de l\'urine ?", a:"Le pH devient acide (inférieur à 7,4, souvent entre 5 et 6)."},
+    {q:"Quel est l\'effet d\'un régime végétarien sur le pH urinaire ?", a:"Le pH devient alcalin (supérieur à 7,4)."},
+    {q:"Pourquoi le liquide céphalo-rachidien (LCR) est-il plus acide que le plasma ?", a:"L\'absence de protéines due à la barrière hémato-encéphalique limite le pouvoir tampon."}
+  ],
+  "7-5": [
+    {q:"D\'où proviennent les \'acides volatiles\' ?", a:"Du métabolisme du CO(2)"},
+    {q:"Quelle quantité d\'acides volatiles les cellules produisent-elles quotidiennement ?", a:"13 000 à 20 000 mEq/jour"},
+    {q:"Par quel processus physiologique les acides volatiles sont-ils éliminés ?", a:"La ventilation pulmonaire"},
+    {q:"Quelle est la conséquence d\'une accumulation de CO(2) non éliminé par les poumons ?", a:"Une acidose d\'origine respiratoire"},
+    {q:"Quelle est la source quotidienne des \'acides fixes\' ?", a:"Le métabolisme intermédiaire et l\'alimentation"},
+    {q:"Quelle quantité d\'ions H^(+) provenant d\'acides fixes est produite toutes les 24h ?", a:"60 à 80 mmoles"},
+    {q:"Quel métabolisme conduit à l\'excrétion urinaire de sulfates ?", a:"Le métabolisme des acides aminés soufrés"},
+    {q:"L\'excrétion d\'acide urique provient principalement du métabolisme des _____.", a:"Nucléoprotéines"},
+    {q:"Quelle source métabolique génère des phosphates urinaires ?", a:"Les phosphoprotéines ou les phospholipides"}
+  ],
+  "7-6": [
+    {q:"Quelle est la réaction d\'hydratation du CO(2) ?", a:"CO(2) + H(2)O H(2)CO(3) H^(+) + HCO(3)^(-)"},
+    {q:"Quelle enzyme accélère la réaction entre le CO(2) et l\'H(2)O ?", a:"L\'anhydrase carbonique (AC)"}
+  ],
+  "7-7": [
+    {q:"Dans quelle condition le catabolisme des glucides produit-il une acidose lactique ?", a:"En cas d\'hypoxie (manque d\'oxygénation cellulaire)"},
+    {q:"Quel défaut hormonal provoque l\'acidocétose diabétique ?", a:"Un défaut d\'insuline (ou résistance à l\'insuline)"}
+  ],
+  "7-8": [
+    {q:"Quels sont les trois rôles spécifiques du rein dans l\'équilibre acido-basique ?", a:"Réabsorber les HCO(3)^(-), excréter la charge acide fixe et régénérer les HCO(3)^(-) consommés."},
+    {q:"Quel est le principal tampon du milieu extracellulaire ?", a:"Le bicarbonate (HCO(3)^(-))"},
+    {q:"Quelle est la concentration plasmatique normale de bicarbonates (HCO(3)^(-)) ?", a:"22 à 26 mmol/L"}
+  ],
+  "7-9": [
+    {q:"Quelle est la quantité totale de bicarbonates filtrés par le rein par jour ?", a:"4300 mmol/J"},
+    {q:"Quelle est la quantité de bicarbonates excrétée dans l\'urine en situation normale ?", a:"0 mmol/J"},
+    {q:"Quel pourcentage des bicarbonates est réabsorbé dans le tube contourné proximal (TCP) ?", a:"80 à 85 %"},
+    {q:"Quelle proportion de bicarbonates est réabsorbée dans le tube distal ?", a:"1 à 2 %"}
+  ],
+  "7-10": [
+    {q:"Dans la lumière tubulaire, quelle enzyme transforme H(2)CO(3) en H(2)O et CO(2) ?", a:"L\'anhydrase carbonique (AC)"},
+    {q:"Sous quelle forme le carbone issu du bicarbonate filtré traverse-t-il la membrane apicale ?", a:"Sous forme de CO(2)"}
+  ],
+  "7-12": [
+    {q:"La réabsorption des bicarbonates dans le tube proximal est liée à la réabsorption de quel ion ?", a:"L\'ion sodium (Na^(+))"},
+    {q:"Quel échangeur apical permet la sécrétion d\'H^(+) couplée à l\'entrée de Na^(+) ?", a:"L\'échangeur Na^(+)/H^(+)"},
+    {q:"Quels ions sortent par la membrane basolatérale lors de la réabsorption du bicarbonate ?", a:"Na^(+) et HCO(3)^(-)"}
+  ],
+  "7-13": [
+    {q:"Lors de la réabsorption des bicarbonates, l\'ion H^(+) est-il excrété ou seulement sécrété ?", a:"Sécrété (il est recyclé et non éliminé dans l\'urine finale)."}
+  ],
+  // ===== PDF 5: Renal_Acid_Base_Balance =====
+  "5-2": [
+    {q:"Quelles sont les trois formes d\'élimination des ions H^(+) par les reins ?", a:"Forme libre (négligeable), acidité titrable (1/3) et ion ammonium (2/3)."},
+    {q:"Équation de l\'excrétion nette d\'acide dans l\'urine :", a:"Excrétion nette = (acidité titrable) + (excrétion de NH(4)^(+)) - (excrétion de HCO(3)^(-))."}
+  ],
+  "5-3": [
+    {q:"Dans quel segment du néphron se déroule principalement la réabsorption du HCO(3)^(-) ?", a:"Le tube contourné proximal (TCP)."},
+    {q:"Quel ion est sécrété dans la lumière tubulaire en échange de la réabsorption du Na^(+) dans le TCP ?", a:"L\'ion H^(+)."},
+    {q:"Pourquoi l\'ion H^(+) sécrété dans le TCP n\'est-il pas considéré comme excrété à ce stade ?", a:"Parce qu\'il se combine au HCO(3)^(-) pour former du H(2)CO(3) au lieu de rester libre."},
+    {q:"Quelle enzyme, présente dans la bordure en brosse, accélère la dissociation du H(2)CO(3) dans la lumière tubulaire ?", a:"L\'anhydrase carbonique."},
+    {q:"En quelles molécules le H(2)CO(3) se dissocie-t-il dans la lumière tubulaire pour traverser la membrane cellulaire ?", a:"En H(2)O et CO(2)."},
+    {q:"Pourquoi le CO(2) peut-il traverser librement la membrane de la cellule tubulaire contrairement au H(2)CO(3) ?", a:"Car le CO(2) est lipophile."},
+    {q:"Une fois à l\'intérieur de la cellule, le CO(2) s\'hydrate pour reconstituer du H(2)CO(3) grâce à quelle enzyme ?", a:"L\'anhydrase carbonique intracellulaire."},
+    {q:"Citez le nom de l\'antiport responsable de la sécrétion de H^(+) couplée au Na^(+) dans le TCP.", a:"L\'antiport Na^(+)/H^(+) (ou NAH)."}
+  ],
+  "5-4": [
+    {q:"Quel est le nom du médicament inhibiteur de l\'anhydrase carbonique cité dans le cours ?", a:"L\'acétazolamide (Diamox)."},
+    {q:"Quel est l\'effet des inhibiteurs de l\'anhydrase carbonique sur l\'excrétion du Na^(+) ?", a:"Ils bloquent la réabsorption du Na^(+), agissant ainsi comme des diurétiques."},
+    {q:"Pourquoi le Diamox est-il utilisé pour prévenir le mal aigu des montagnes ?", a:"Il provoque une acidose qui stimule l\'hyperventilation et améliore les échanges gazeux."}
+  ],
+  "5-5": [
+    {q:"Quelle caractéristique du transport des bicarbonates dans le TCP limite sa capacité de réabsorption ?", a:"C\'est un transport saturable sujet à un transport maximal (Tm)."},
+    {q:"À quel seuil de concentration plasmatique en HCO(3)^(-) le rein commence-t-il généralement à excréter des bicarbonates dans les urines ?", a:"25 à 26 mmol/L."}
+  ],
+  "5-6": [
+    {q:"Comment le rein réagit-il au niveau cellulaire pour augmenter la réabsorption de bicarbonate au-delà du Tm habituel ?", a:"Il augmente la synthèse de nouveaux transporteurs (ex: NAH)."},
+    {q:"Quel est l\'effet d\'une diminution du volume extracellulaire (déshydratation) sur la réabsorption de HCO(3)^(-) ?", a:"Elle augmente la réabsorption."},
+    {q:"Pourquoi une augmentation de la PaCO(2) entraîne-t-elle une augmentation de la réabsorption des bicarbonates par le rein ?", a:"Pour compenser l\'acidose respiratoire en augmentant les bases dans le milieu extracellulaire."},
+    {q:"Quel trouble ionique plasmatique stimule l\'augmentation de la réabsorption de HCO(3)^(-) ?", a:"L\'hypokaliémie."},
+    {q:"Quel est l\'effet d\'une hyperventilation (diminution de la PaCO(2)) sur la réabsorption rénale de HCO(3)^(-) ?", a:"Elle diminue la réabsorption."}
+  ],
+  "5-7": [
+    {q:"Quelle est la voie majoritaire d\'excrétion des ions H^(+) par le rein ?", a:"L\'ion ammonium (NH(4)^(+)), représentant les 2/3 de l\'excrétion."}
+  ],
+  "5-8": [
+    {q:"Définition : Acidité titrable", a:"Quantité de base forte (ex: NaOH) nécessaire pour ramener le pH urinaire à la valeur du pH plasmatique (7,4)."},
+    {q:"À quoi correspond l\'acidité titrable au niveau chimique ?", a:"Aux ions H^(+) sécrétés qui réagissent avec des sels d\'acides faibles (autres que HCO(3)^(-))."},
+    {q:"Quel est le principal sel d\'acide faible impliqué dans l\'acidité titrable urinaire ?", a:"Les phosphates."},
+    {q:"Équation de tamponnement des H^(+) par le phosphate dans la lumière tubulaire :", a:"HPO(4)^(2-) + H^(+) H(2)PO(4)^(-)."},
+    {q:"Quelle est la valeur du pK du couple phosphate ?", a:"6,8."},
+    {q:"Concept : pK (constante d\'ionisation)", a:"Paramètre mesurant la force des acides et des bases, correspondant au pH où les formes acide et basique sont à égalité."}
+  ],
+  "5-9": [
+    {q:"Si le pH d\'un milieu est inférieur au pK, quelle forme chimique est majoritaire ?", a:"La forme acide."},
+    {q:"Quel est le rapport entre la forme basique (HPO(4)^(2-)) et la forme acide (H(2)PO(4)^(-)) du phosphate dans le plasma (pH ≈ 7,4) ?", a:"4 formes basiques pour 1 forme acide."},
+    {q:"Dans une urine à pH 5,8, quel est le rapport entre la forme basique et la forme acide du phosphate ?", a:"1 forme basique pour 10 formes acides."}
+  ],
+  "5-10": [
+    {q:"Pourquoi la production d\'acidité titrable liée aux phosphates commence-t-elle dès le TCP ?", a:"Car le pK du phosphate (6,8) est proche du pH du fluide tubulaire proximal."},
+    {q:"Pourquoi la production d\'acidité titrable pour la créatinine et l\'acide urique se fait-elle surtout dans les parties distales ?", a:"Leur pK est bas (4,9 et 5,7), nécessitant un pH tubulaire très acide pour former l\'acide faible."}
+  ],
+  "5-11": [
+    {q:"Quelle réaction chimique aboutit à la formation de l\'ion ammonium ?", a:"NH(3) + H^(+) NH(4)^(+)."},
+    {q:"Quelle est la valeur du pK du couple NH(4)^(+)/NH(3) ?", a:"9."},
+    {q:"Pourquoi l\'ammoniac se trouve-t-il à 95% sous forme de NH(4)^(+) dans les liquides biologiques ?", a:"Parce que le pH biologique est très inférieur au pK du couple (9)."},
+    {q:"Quelle molécule plasmatique est le précurseur de la production de NH(4)^(+) par le rein ?", a:"La glutamine."},
+    {q:"Quel segment du néphron produit la majorité (70%) des ions ammonium ?", a:"Le tube contourné proximal (TCP)."},
+    {q:"Nommez l\'enzyme, spécifique à certains tissus comme le rein, qui clive la glutamine en ammonium.", a:"La glutaminase."},
+    {q:"Quels sont les produits finaux du catabolisme d\'une molécule de glutamine par la glutaminase ?", a:"Deux molécules d\'alpha-cétoglutarate et deux ions NH(4)^(+)."}
+  ],
+  "5-12": [
+    {q:"Quelle est la limite de modulation de l\'excrétion des H^(+) sous forme d\'acidité titrable ?", a:"Elle ne peut augmenter que de 150% par rapport à l\'excrétion usuelle."},
+    {q:"Dans quelle situation pathologique l\'excrétion de NH(4)^(+) peut-elle être multipliée par trois ?", a:"En cas d\'acidose métabolique ou d\'accumulation d\'acide fixe."},
+    {q:"Vrai ou Faux : L\'excrétion d\'ions H^(+) sous forme de NH(4)^(+) est beaucoup plus modulable que celle sous forme d\'acidité titrable.", a:"Vrai."}
+  ],
+  // ===== PDF 3: L_Usine_Moleculaire_Renale =====
+  "3-2": [
+    {q:"Quel est le rôle principal des bicarbonates (HCO(3)^-) régénérés par le rein ?", a:"Tamponner et masquer les ions H^+."},
+    {q:"Pourquoi est-il vital pour le rein de régénérer le tampon HCO(3)^- ?", a:"Pour éviter l\'épuisement des stocks de tampons et la mort rapide."}
+  ],
+  "3-3": [
+    {q:"Pourquoi le NH(3) peut-il traverser facilement la membrane cellulaire vers la lumière tubulaire ?", a:"Parce qu\'il n\'est pas chargé et peut diffuser librement."},
+    {q:"Quels sont les deux produits de la dissociation de l\'ion ammonium (NH(4)^+) ?", a:"L\'ammoniac (NH(3)) et l\'ion hydrogène (H^+)."}
+  ],
+  "3-4": [
+    {q:"Dans quelles cellules rénales se déroule principalement l\'ammoniogénèse ?", a:"Les cellules tubulaires proximales."},
+    {q:"Quelle enzyme spécifique est nécessaire aux cellules proximales pour l\'ammoniogénèse ?", a:"La glutaminase."},
+    {q:"Quel est le substrat initial utilisé par la glutaminase pour produire de l\'ammonium ?", a:"La glutamine."},
+    {q:"Le clivage d\'une molécule de glutamine produit deux molécules de NH(4)^+ et deux molécules de _____.", a:"α-cétoglutarate (α KG^(2-))"},
+    {q:"Dans le schéma de l\'ammoniogénèse, en quoi peut se transformer l\'α KG^(2-) ?", a:"En glucose ou en CO(2)."}
+  ],
+  "3-5": [
+    {q:"Combien d\'ions H^+ sont consommés lors du clivage de la glutamine ?", a:"Deux ions H^+."},
+    {q:"D\'où proviennent les ions H^+ consommés pendant l\'ammoniogénèse ?", a:"De l\'hydratation de deux molécules de CO(2)."},
+    {q:"Complétez l\'équation d\'hydratation du dioxyde de carbone : 2 CO(2) + 2 H(2)O _____.", a:"2 H(2)CO(3)"},
+    {q:"Quelle est la réaction de dissociation de l\'acide carbonique (2 H(2)CO(3)) dans ce contexte ?", a:"2 H(2)CO(3) 2 HCO(3)^- + 2 H^+"},
+    {q:"Quel est le bilan stœchiométrique entre l\'excrétion de NH(4)^+ et la régénération de HCO(3)^- ?", a:"1 NH(4)^+ excrété = 1 HCO(3)^- régénéré."},
+    {q:"Quelle enzyme (abrégée AC dans le texte) catalyse l\'hydratation du CO(2) ?", a:"L\'Anhydrase Carbonique."}
+  ],
+  "3-6": [
+    {q:"Quel transporteur permet au NH(4)^+ de sortir de la cellule proximale vers la lumière tubulaire ?", a:"L\'antiport Na^+/H^+."},
+    {q:"Lors de la sortie du NH(4)^+ via l\'antiport proximal, quel ion entre dans la cellule ?", a:"L\'ion sodium (Na^+)."},
+    {q:"Avec quel anion d\'acide fort le NH(4)^+ s\'associe-t-il dans l\'urine pour faciliter son élimination ?", a:"L\'ion chlorure (Cl^-)."},
+    {q:"Quelle est la forme chimique finale de l\'ammonium éliminé en association avec le chlore ?", a:"Le chlorure d\'ammonium (NH(4)Cl)."},
+    {q:"Outre l\'antiport, par quel type de pompe le H^+ peut-il être sécrété après dissociation du NH(4)^+ ?", a:"La pompe H^+-ATPase."},
+    {q:"Quelle molécule est considérée comme un \'anion d\'acide fort\' dans le cours ?", a:"L\'ion chlorure (Cl^-)."}
+  ],
+  "3-7": [
+    {q:"Quel pourcentage du NH(4)^+ excrété dans l\'urine est réabsorbé au niveau de l\'anse de Henlé ?", a:"80 %."},
+    {q:"Dans quel segment précis de l\'anse de Henlé se produit la réabsorption du NH(4)^+ ?", a:"La branche ascendante large de l\'anse de Henlé (BAAH)."},
+    {q:"Quel transporteur membranaire assure la réabsorption du NH(4)^+ dans la BAAH ?", a:"Le cotransporteur NKCC (symport)."},
+    {q:"Dans le cotransporteur NKCC, quelle substance l\'ion NH(4)^+ remplace-t-il ?", a:"Le potassium (K^+)."},
+    {q:"Quel est le devenir des 20 % de NH(4)^+ non réabsorbés dans la BAAH ?", a:"Ils continuent leur trajet vers la partie distale du néphron."}
+  ],
+  "3-8": [
+    {q:"Une fois dans la cellule de la BAAH, en quoi le NH(4)^+ se dissocie-t-il ?", a:"En NH(3) et en H^+."},
+    {q:"Où se dirige le NH(3) après sa dissociation dans les cellules de la BAAH ?", a:"Dans l\'interstitium."},
+    {q:"Par quelle voie le H^+ quitte-t-il la cellule de la BAAH après dissociation ?", a:"La pompe H^+-ATPase (transport actif primaire)."}
+  ],
+  "3-9": [
+    {q:"Citez les trois éléments participant à la formation du gradient cortico-papillaire.", a:"L\'urée, le sel et l\'ammonium (NH(4)^+)."},
+    {q:"Comment l\'activité de la glutaminase évolue-t-il en cas d\'acidose métabolique ?", a:"Elle augmente."},
+    {q:"Quel stock de sécurité l\'organisme utilise-t-il au niveau rénal en cas d\'acidose ?", a:"Le stock d\'ammoniac au niveau médullaire."}
+  ],
+  "3-10": [
+    {q:"À quel niveau du néphron le NH(3) interstitiel regagne-t-il la lumière tubulaire ?", a:"Au niveau du canal collecteur."},
+    {q:"Pourquoi le NH(3) s\'associe-t-il au H^+ dans le canal collecteur ?", a:"À cause de la grande quantité de H^+ sécrétée à ce niveau."},
+    {q:"Concept : Piégeage ionique du NH(3)", a:"Le NH(3) diffuse dans le canal collecteur et se transforme en NH(4)^+ (chargé) en fixant un H^+, ce qui l\'empêche de rediffuser."}
+  ],
+  "3-11": [
+    {q:"Quel type d\'acidose permet d\'atteindre un mécanisme d\'adaptation maximal pour l\'excrétion de NH(4)^+ ?", a:"L\'acidose plasmatique chronique."},
+    {q:"Selon le graphique, comment varie l\'excrétion de NH(4)^+ par rapport au pH urinaire ?", a:"Elle augmente lorsque le pH urinaire diminue."},
+    {q:"Selon le graphique, l\'excrétion de NH(4)^+ est-elle plus élevée pour un même pH urinaire en cas d\'acidose chronique ou en conditions normales ?", a:"En cas d\'acidose chronique."}
+  ],
+  "3-12": [
+    {q:"Quel est l\'effet d\'une déplétion en potassium sur l\'excrétion de NH(4)^+ ?", a:"Elle augmente l\'excrétion."},
+    {q:"Comment la diminution du pH urinaire influence-t-elle l\'élimination de NH(4)^+ ?", a:"Elle favorise son élimination."},
+    {q:"Quelle hormone stimule la pompe H^+-ATPase des cellules intercalaires de type A ?", a:"L\'aldostérone."},
+    {q:"Comment l\'augmentation du débit urinaire affecte-t-elle l\'excrétion de NH(4)^+ ?", a:"Elle l\'augmente."},
+    {q:"Citez deux classes de diurétiques favorisant l\'excrétion de NH(4)^+.", a:"Les diurétiques de l\'anse et les thiazidiques."},
+    {q:"Vrai ou Faux : L\'acidose plasmatique aiguë diminue l\'excrétion de NH(4)^+.", a:"Faux (elle l\'augmente)."},
+    {q:"Quel est l\'impact de l\'aldostérone sur le pH urinaire ?", a:"Il le diminue en stimulant la sécrétion de H^+."}
+  ],
+  // ===== PDF 6: Renal_pH_Refinery =====
+  "6-2": [
+    {q:"Quel est le site principal de sécrétion des ions H^+ et d\'acidification de l\'urine dans le néphron ?", a:"Il s\'agit du canal collecteur."},
+    {q:"Quel est le pH urinaire minimal que le canal collecteur peut atteindre ?", a:"Le pH urinaire peut descendre jusqu\'à 4."},
+    {q:"Comment la concentration en H^+ de l\'urine au pH minimal se compare-t-elle à celle du plasma artériel ?", a:"Elle est 2000 fois supérieure à celle du plasma."},
+    {q:"Pourquoi l\'élimination des H^+ libres dans l\'urine est-elle considérée comme quantitativement négligeable ?", a:"Elle est très faible comparée à la production acide journalière du métabolisme (60 à 80 mmol/j)."},
+    {q:"Quel est le rôle qualitatif essentiel de l\'excrétion urinaire des H^+ libres ?", a:"Elle assure la régulation et la détermination du pH urinaire."},
+    {q:"Quelle est la quantité moyenne d\'acides fixes générés quotidiennement par l\'alimentation et le métabolisme ?", a:"Elle est de 60 à 80 mmol/j."}
+  ],
+  "6-3": [
+    {q:"Quelle est la valeur physiologique du pH dans le plasma artériel ?", a:"Le pH plasmatique est de 7,4."},
+    {q:"Quelle est la valeur du pH urinaire au niveau du filtrat glomérulaire ?", a:"Le pH est de 7,25."},
+    {q:"À quelle valeur le pH urinaire chute-t-il dans le tube contourné proximal (TCP) ?", a:"Le pH descend à 6,7."},
+    {q:"Quelle est l\'évolution du pH urinaire le long de l\'Anse de Henlé ?", a:"Il n\'y a pas de modification, le pH reste à 6,7."},
+    {q:"Quelle est la valeur du pH urinaire à la fin du tube contourné distal (TCD) ?", a:"Le pH atteint 6,6."},
+    {q:"Pourquoi le pH chute-t-il brusquement à 6,1 dans le canal collecteur ?", a:"Parce que c\'est le site majeur d\'acidification de l\'urine."},
+    {q:"Pourquoi le pH diminue-t-il entre le TCP (6,7) et le TCD (6,6) ?", a:"Parce qu\'il reste toujours du HCO(3)^- à réabsorber ou titrer avant le canal collecteur."}
+  ],
+  "6-4": [
+    {q:"Quels sont les deux types de cellules fonctionnelles présents dans le canal collecteur ?", a:"Ce sont les cellules principales et les cellules intercalaires."},
+    {q:"Quel canal ionique spécifique se situe au pôle apical de la cellule principale ?", a:"Il s\'agit du canal sodique ENac."},
+    {q:"Où se localise la pompe Na^+/K^+ ATPasique dans la cellule principale ?", a:"Elle se situe au niveau du pôle basolatéral."},
+    {q:"Quelle est la double fonction de transport ionique de la cellule principale ?", a:"Elle permet de réabsorber le Na^+ et d\'excréter le K^+."},
+    {q:"Quel est le rôle principal des cellules intercalaires de type A ?", a:"Elles sécrètent des ions H^+ dans la lumière tubulaire via une pompe ATPasique."},
+    {q:"Dans quelle situation physiologique les cellules intercalaires de type B sont-elles principalement actives ?", a:"Elles sont activées en cas d\'excès de bases (alcalose)."},
+    {q:"Pourquoi les cellules intercalaires de type B sont-elles généralement peu stimulées chez l\'humain ?", a:"En raison d\'une alimentation qui génère rarement un excès de bases, sauf chez les végétariens."},
+    {q:"Quel type de cellule intercalaire intervient spécifiquement en cas d\'acidose métabolique ?", a:"Il s\'agit de la cellule de type A."},
+    {q:"Quel type de cellule intercalaire intervient spécifiquement en cas d\'alcalose métabolique ?", a:"Il s\'agit de la cellule de type B."}
+  ],
+  "6-5": [
+    {q:"Quelle base est régénérée par la cellule intercalaire de type A lors de l\'excrétion des protons ?", a:"La cellule régénère du bicarbonate (HCO(3)^-)."},
+    {q:"Quelle enzyme (AC) permet la formation de H(2)CO(3) à partir de CO(2) dans les cellules intercalaires ?", a:"Il s\'agit de l\'anhydrase carbonique."},
+    {q:"Au pôle apical des cellules de type A, quelle pompe assure l\'excrétion des protons ?", a:"Il s\'agit de la pompe H^+-ATPase."},
+    {q:"Quel échangeur ionique se trouve au pôle basolatéral de la cellule intercalaire de type A ?", a:"Il s\'agit de l\'échangeur HCO(3)^- / Cl^-."}
+  ],
+  "6-6": [
+    {q:"Quel type de cellule intercalaire est mobilisé pour excréter le HCO(3)^- lors d\'une alcalose ?", a:"La cellule intercalaire de type B."},
+    {q:"Dans la cellule de type B, vers quel compartiment les protons (H^+) sont-ils envoyés ?", a:"Ils sont envoyés vers l\'interstitium (sang) via la pompe H^+-ATPase."},
+    {q:"Quel échangeur ionique est situé au pôle apical de la cellule intercalaire de type B ?", a:"Il s\'agit de l\'échangeur HCO(3)^- / Cl^-."}
+  ],
+  "6-7": [
+    {q:"Quelle substance stockée dans le parenchyme médullaire est mobilisée en cas d\'excès d\'acide ?", a:"Il s\'agit de l\'ammoniac (NH(3))."},
+    {q:"Quel est le trajet du NH(3) lors de sa mobilisation vers l\'urine ?", a:"Il passe de l\'interstitium vers la cellule tubulaire, puis vers la lumière tubulaire."},
+    {q:"Quelle molécule est formée par la combinaison du NH(3) avec les H^+ dans la lumière tubulaire ?", a:"La combinaison produit de l\'ion ammonium (NH(4)^+)."}
+  ],
+  "6-8": [
+    {q:"Quelles sont les deux formes principales sous lesquelles l\'acide est excrété dans l\'urine ?", a:"L\'acidité titrable et l\'ion ammonium (NH(4)^+)."},
+    {q:"Quelle proportion de l\'excrétion acide totale est représentée par l\'acidité titrable ?", a:"Elle représente environ 1/3 de l\'excrétion acide."},
+    {q:"Quelle proportion de l\'excrétion acide totale est représentée par l\'ion ammonium (NH(4)^+) ?", a:"Il représente environ 2/3 de l\'excrétion acide."},
+    {q:"Citez les trois principaux composés constituant l\'acidité titrable.", a:"Le phosphate acide, l\'acide urique et la créatinine."},
+    {q:"Quel est le pK du phosphate acide ?", a:"Son pK est de 6,8."},
+    {q:"Quel est le pK de l\'acide urique ?", a:"Son pK est de 5,7."},
+    {q:"Quel est le pK de la créatinine ?", a:"Son pK est de 4,9."},
+    {q:"Quelle est la plage normale de l\'excrétion journalière d\'ammonium (NH(4)^+) ?", a:"Elle se situe entre 30 et 60 mmoles/j."},
+    {q:"Quelle valeur maximale peut atteindre l\'excrétion d\'ammonium en cas de forte acidose ?", a:"Elle peut monter jusqu\'à 150 mmoles/j."},
+    {q:"Quel constituant de l\'acidité titrable peut atteindre une excrétion de 50 mmoles/j en cas de surcharge acide ?", a:"L\'acidité titrable globale (incluant phosphate, acide urique, créatinine)."}
+  ],
+  "6-9": [
+    {q:"Sous quelle forme exclusive les bases sont-elles excrétées par le rein ?", a:"Elles sont excrétées exclusivement sous forme de bicarbonates (HCO(3)^-)."},
+    {q:"À partir de quel seuil de pH urinaire observe-t-on une excrétion de bicarbonates ?", a:"L\'excrétion débute lorsque le pH urinaire est supérieur à 6,6."},
+    {q:"Vrai ou Faux : À la fin de l\'urine sortant du corps, il ne reste normalement plus de HCO(3)^-.", a:"Vrai (sauf en cas d\'atteinte du TM ou d\'alcalose)."}
+  ],
+  "6-10": [
+    {q:"Quel composé est administré en IV pour simuler une charge acide aiguë ?", a:"On utilise du chlorure d\'ammonium (NH(4)Cl)."},
+    {q:"Quel est l\'effet d\'une charge acide aiguë sur la concentration plasmatique en HCO(3)^- ?", a:"La concentration plasmatique en HCO(3)^- diminue."},
+    {q:"Quel seuil de pH urinaire est atteint lors d\'une réponse adaptée à une charge acide aiguë ?", a:"Le pH urinaire descend en dessous de 5,3."},
+    {q:"Comment évolue l\'ammoniogenèse lors d\'une charge acide aiguë ?", a:"Elle augmente pour accroître l\'excrétion de NH(4)^+."},
+    {q:"Lors d\'une charge acide, quelle action accompagne l\'excrétion de NH(4)^+ pour restaurer l\'équilibre ?", a:"La régénération des bicarbonates consommés."}
+  ],
+  "6-11": [
+    {q:"Quelle est la conséquence d\'une charge alcaline aiguë sur le pH plasmatique ?", a:"On observe une augmentation du pH plasmatique."},
+    {q:"Quel est l\'effet d\'une charge alcaline aiguë sur l\'acidité titrable urinaire ?", a:"On observe une disparition de l\'acidité titrable car le pH urinaire est trop élevé."},
+    {q:"Pourquoi le bicarbonate n\'est-il plus réabsorbé lors d\'une charge alcaline aiguë ?", a:"Parce que le Transport Maximum (TM) de réabsorption a été atteint."},
+    {q:"En combien de temps l\'organisme élimine-t-il totalement une surcharge alcaline ?", a:"L\'élimination complète se fait en 24 heures."},
+    {q:"Quelle modification subit l\'excrétion de NH(4)^+ lors d\'une injection de bicarbonates ?", a:"L\'excrétion d\'ammonium diminue."}
+  ],
+  // ===== PDF 8: The_Potassium_Ledger =====
+  "8-2": [
+    {q:"Comment l\'aldostérone affecte-t-elle la perméabilité apicale au sodium dans le canal collecteur ?", a:"Elle l\'augmente."},
+    {q:"Quel système hormonal stimulé par l\'hyperkaliémie agit sur les tissus cibles pour synthétiser des canaux Na^+/K^+ ?", a:"Le système de l\'aldostérone."},
+    {q:"Quelle est la principale cible rénale de l\'aldostérone pour la régulation du potassium ?", a:"Le tube collecteur (canal collecteur)."}
+  ],
+  "8-4": [
+    {q:"Quelle variation de la kaliémie attend-on pour une modification de 0,1 point de pH ?", a:"Une variation inverse de 0,5 à 0,6 mmol/L de [K^+](e)."},
+    {q:"À partir de quelle concentration plasmatique le potassium stimule-t-il directement sa propre sécrétion ?", a:"Au-delà de 4,2 mmol/L."},
+    {q:"Condition : Kaliémie > 4,2 mmol/L. Quel est l\'effet direct sur le potentiel transépithélial (PTE) ?", a:"Il devient plus négatif (PTE < 0), ce qui attire le potassium vers la lumière."}
+  ],
+  "8-6": [
+    {q:"Outre l\'entrée cellulaire, quels sont les deux effets extra-rénaux de l\'aldostérone sur le potassium ?", a:"Elle augmente le contenu en K^+ dans les fèces, la sueur et la salive."},
+    {q:"Lors d\'une charge aiguë en potassium, quel pourcentage de la charge initiale est excrété dans les urines après 4 à 6 heures ?", a:"50 % de la charge initiale."},
+    {q:"Quelle est la valeur moyenne de la filtration glomérulaire quotidienne du potassium ?", a:"720 mmol/j."},
+    {q:"Quel pourcentage du potassium filtré est réabsorbé au niveau du tubule proximal (TCP) ?", a:"60 à 70 % du K^+ filtré."},
+    {q:"Quel pourcentage du potassium filtré est réabsorbé dans la branche ascendante large de l\'anse de Henle ?", a:"Environ 30 % du K^+ filtré."},
+    {q:"Dans le tubule contourné proximal, par quelle voie de passage majeure le potassium est-il réabsorbé ?", a:"Par voie passive et paracellulaire (jonctions intercellulaires)."},
+    {q:"Comment évolue la polarité électrique de la lumière tubulaire dans la deuxième partie du TCP pour favoriser la réabsorption du K^+ ?", a:"Elle devient relativement positive en raison de la réabsorption massive d\'ions Cl^-."},
+    {q:"Quel cotransporteur apical assure l\'entrée du potassium dans les cellules de la branche ascendante large de l\'anse de Henle ?", a:"Le cotransporteur Na^+/K^+/2Cl^- (NKCC)."},
+    {q:"Par quelle membrane le potassium ressort-il de la cellule dans l\'anse de Henle pour être réabsorbé ?", a:"La membrane basolatérale (via des canaux potassiques)."},
+    {q:"Où est réabsorbé l\'essentiel du potassium filtré avant d\'atteindre le tube distal ?", a:"Dans le tubule proximal (60 - 70 %) et l\'anse de Henle (30 %)."},
+    {q:"Quel terme désigne l\'élimination urinaire du potassium ?", a:"La kaliurèse."},
+    {q:"Quelle proportion du potassium filtré arrive au tube distal après réabsorption proximale ?", a:"Une quantité quasi nulle."},
+    {q:"Quel ion s\'accumule dans la lumière de la première partie du TCP, créant le gradient pour la réabsorption du K^+ ?", a:"L\'ion chlorure (Cl^-)."}
+  ],
+  "8-8": [
+    {q:"Lors d\'une charge aiguë en potassium, quel pourcentage est transféré quasi immédiatement vers le milieu intracellulaire ?", a:"40 % de la charge potassique."}
+  ],
+  "8-9": [
+    {q:"Quels sont les trois systèmes principaux qui interviennent immédiatement pour corriger une hyperkaliémie ?", a:"L\'augmentation de l\'insuline, l\'augmentation de l\'aldostérone et la stimulation sympathique β-adrénergique."},
+    {q:"Quel est le délai nécessaire pour que l\'aldostérone augmente l\'excrétion urinaire du potassium ?", a:"Plusieurs heures."},
+    {q:"Comment la sécrétion d\'insuline et d\'aldostérone réagit-elle face à une hypokaliémie ?", a:"Leur sécrétion diminue."},
+    {q:"De quel processus rénal dépend principalement l\'excrétion finale du potassium dans les urines ?", a:"De la sécrétion distale régulée."},
+    {q:"Quelles cellules sont responsables de la sécrétion du potassium dans le tube distal et le canal collecteur ?", a:"Les cellules principales."},
+    {q:"Comment la réabsorption du sodium par la cellule principale influence-t-elle la sécrétion du potassium ?", a:"Elle rend la lumière tubulaire plus négative, créant un gradient électrique favorable à la sortie du K^+."},
+    {q:"Quelles cellules interviennent spécifiquement au niveau distal en cas de déplétion potassique ?", a:"Les cellules intercalaires de type A."},
+    {q:"Quel transporteur apical permet aux cellules intercalaires de type A de réabsorber le potassium ?", a:"La pompe H^+/K^+-ATPase."},
+    {q:"Quelle est la conséquence sur le pH urinaire de l\'activité des cellules intercalaires de type A lors d\'un déficit en potassium ?", a:"Une acidification de l\'urine due à la sécrétion d\'ions H^+."},
+    {q:"Quels sont les quatre facteurs majeurs modulant la sécrétion distale de K^+ ?", a:"La kaliémie, l\'aldostérone, le débit de Na^+ et le débit urinaire."},
+    {q:"Quels sont les deux effets de l\'aldostérone favorisant la sécrétion de K^+ dans le canal collecteur ?", a:"La synthèse de Na^+/K^+-ATPase et l\'augmentation de la perméabilité apicale au K^+ et au Na^+."},
+    {q:"Pourquoi l\'utilisation de diurétiques de l\'anse ou thiazidiques augmente-t-elle l\'excrétion de K^+ ?", a:"Parce qu\'ils augmentent la quantité de sodium délivrée au canal collecteur, ce qui stimule la sécrétion de K^+."},
+    {q:"En cas d\'acidose chronique, quel segment du néphron voit sa réabsorption de sodium diminuer ?", a:"Le tubule proximal."},
+    {q:"Vrai ou Faux : L\'excrétion de potassium dépend principalement du potassium filtré initialement au glomérule.", a:"Faux, elle dépend principalement de la sécrétion distale régulée."}
+  ],
+  "8-10": [
+    {q:"Quel transporteur basolatéral des cellules principales permet l\'entrée de potassium dans la cellule contre un gradient ?", a:"La pompe Na^+/K^+-ATPase."},
+    {q:"Pourquoi le potassium quitte-t-il préférentiellement la cellule principale vers la lumière tubulaire plutôt que vers l\'interstitium ?", a:"Car la conductance (perméabilité) au K^+ est plus élevée sur la membrane apicale."},
+    {q:"Dans la cellule principale, quel est l\'effet de l\'entrée apicale de Na^+ sur la pompe Na^+/K^+-ATPase ?", a:"Elle stimule indirectement son activité."},
+    {q:"Quel paramètre électrique est noté PTE dans les schémas de sécrétion du potassium ?", a:"Le potentiel transépithélial."}
+  ],
+  "8-11": [
+    {q:"Quelle est la valeur seuil du pH(a) définissant une acidose aiguë ?", a:"Un pH(a) < 7,38."},
+    {q:"Quel est l\'effet d\'une acidose aiguë sur la kaliémie ?", a:"Elle provoque une augmentation de la kaliémie (hyperkaliémie)."},
+    {q:"Quel échange ionique cellulaire explique l\'hyperkaliémie lors d\'une acidose aiguë ?", a:"L\'entrée d\'ions H^+ dans les cellules en échange d\'une sortie d\'ions K^+."},
+    {q:"Quelle est la valeur seuil du pH(a) définissant une alcalose aiguë ?", a:"Un pH(a) > 7,42."},
+    {q:"Quel est l\'effet d\'une alcalose aiguë sur la kaliémie ?", a:"Elle provoque une diminution de la kaliémie (hypokaliémie)."},
+    {q:"Quel échange ionique cellulaire explique l\'hypokaliémie lors d\'une alcalose aiguë ?", a:"Le transfert d\'ions H^+ hors de la cellule en échange d\'une entrée d\'ions K^+."},
+    {q:"Quelle est la caractéristique électrique des échanges H^+/K^+ impliqués dans l\'équilibre acido-basique ?", a:"Ils sont électro-neutres."},
+    {q:"Comment l\'insuline influence-t-elle les mouvements du potassium ?", a:"Elle favorise l\'entrée du potassium dans les cellules."},
+    {q:"Quel est l\'effet d\'une alcalose sur l\'excrétion rénale de potassium ?", a:"Elle favorise l\'excrétion de K^+."},
+    {q:"Pourquoi la sécrétion de potassium diminue-t-elle lors d\'une acidose aiguë ?", a:"En raison d\'une baisse de la conductance potassique au pôle apical."},
+    {q:"Quel mécanisme d\'adaptation dans l\'acidose chronique finit par favoriser la sécrétion de potassium ?", a:"La diminution de la réabsorption proximale de sodium, augmentant son arrivée au tubule distal."},
+    {q:"Lors d\'un échange H^+/K^+ en acidose, vers quel compartiment se dirige le potassium ?", a:"Vers le compartiment extracellulaire (le sang)."}
+  ],
+  // ===== PDF 4: Potassium_Regulation_Blueprint =====
+  "4-2": [
+    {q:"Quelle est la quantité de potassium par kilogramme de poids corporel dans l\'organisme ?", a:"Elle est de 50\\ mmol/kg."},
+    {q:"Quelle est la quantité totale de potassium contenue dans l\'organisme ?", a:"Elle s\'élève à 3500\\ mmol."},
+    {q:"Quel pourcentage du potassium total est localisé à l\'intérieur des cellules ?", a:"Environ 90% du potassium total est intracellulaire."},
+    {q:"Quelle fraction du potassium total se trouve dans le tissu osseux ?", a:"Le tissu osseux contient 8% du potassium total."},
+    {q:"Pourquoi le potassium situé dans l\'os est-il qualifié de « non échangeable » ?", a:"Car il ne peut pas être mobilisé de façon rapide par l\'organisme."},
+    {q:"Quel pourcentage du potassium total est présent dans le compartiment extracellulaire ?", a:"Il représente seulement 2% du potassium total."},
+    {q:"Quelle est la quantité totale de potassium (en mmol) dans le liquide extracellulaire ?", a:"Elle est d\'environ 70\\ mmol."},
+    {q:"Quelle proportion du potassium total est spécifiquement contenue dans le plasma ?", a:"Le plasma contient 0,5% du potassium total."},
+    {q:"À combien de millimoles correspond la fraction de potassium présente dans le plasma ?", a:"Elle correspond à une quantité comprise entre 15 et 20\\ mmol."},
+    {q:"Quelle est la fourchette habituelle de concentration intracellulaire du potassium ?", a:"Elle se situe généralement entre 120 et 150\\ mmol/L."},
+    {q:"Quels sont les cations majoritairement présents à l\'intérieur d\'une cellule ?", a:"Ce sont les ions potassium K^+."},
+    {q:"Quelle est la concentration approximative de sodium à l\'intérieur de la cellule ?", a:"Elle est comprise entre 10 et 20\\ mmol/L."},
+    {q:"Quel type de cellules constitue le plus grand réservoir de potassium de l\'organisme ?", a:"Les cellules musculaires."},
+    {q:"Quelle quantité de potassium (en mmol) est stockée dans les cellules musculaires ?", a:"Environ 2700\\ mmol."},
+    {q:"Quelle quantité de potassium contiennent les globules rouges de l\'organisme ?", a:"Ils en contiennent 250\\ mmol."},
+    {q:"Combien de millimoles de potassium sont stockées dans le foie ?", a:"Le foie contient 250\\ mmol de potassium."},
+    {q:"Terme : Kaliémie", a:"Définition : Concentration plasmatique de potassium par litre de plasma."},
+    {q:"De quel terme latin provient le symbole chimique K du potassium ?", a:"Il provient du terme « kalium »."},
+    {q:"De quel terme latin provient le symbole chimique Na du sodium ?", a:"Il provient du terme « natrium »."},
+    {q:"Quelle est la quantité moyenne de potassium ingérée par jour via l\'alimentation ?", a:"L\'apport quotidien est de 50 à 100\\ mmol."},
+    {q:"Comment l\'apport quotidien en potassium se compare-t-il à celui du sodium ?", a:"L\'apport de potassium est environ deux fois moins élevé que celui du sodium."},
+    {q:"Citez deux exemples d\'aliments particulièrement riches en potassium.", a:"Les fruits (frais ou secs) et le cacao."},
+    {q:"Pourquoi la viande est-elle considérée comme une source importante de potassium ?", a:"Parce qu\'elle contient une grande quantité de cellules musculaires riches en potassium."},
+    {q:"Quel est le taux d\'efficacité de l\'absorption digestive du potassium ?", a:"L\'absorption digestive est complète (100%)."},
+    {q:"Comment qualifie-t-on la vitesse d\'adaptation de l\'excrétion urinaire de potassium après un apport ?", a:"L\'adaptation rénale est considérée comme lente."},
+    {q:"Combien de temps le rein met-il pour augmenter l\'excrétion de potassium en cas d\'hyperkaliémie ?", a:"Il met plusieurs heures à adapter son excrétion."},
+    {q:"Quel mécanisme compense la lenteur rénale pour maintenir la kaliémie après un repas ?", a:"Des mouvements immédiats de potassium entre les compartiments extracellulaire et intracellulaire."},
+    {q:"Pourquoi l\'arrivée de 100\\ mmol de potassium alimentaire est-elle critique pour le compartiment extracellulaire ?", a:"Car ce compartiment n\'en contient que 70\\ mmol, risquant une hyperkaliémie immédiate."},
+    {q:"Le potassium est un nutriment _____ dans l\'alimentation car son absorption digestive est complète.", a:"Non limitant"},
+    {q:"Quelle est la concentration extracellulaire moyenne de potassium ?", a:"Environ 4\\ mmol/L."}
+  ],
+  "4-3": [
+    {q:"Outre les hormones, quel équilibre métabolique influence l\'activité de la Na^+/K^+-ATPase ?", a:"L\'équilibre acide-base du corps."}
+  ],
+  "4-4": [
+    {q:"Quelle hormone pancréatique est le principal stimulant de la Na^+/K^+-ATPase après manger ?", a:"L\'insuline."},
+    {q:"Quel est l\'effet global de l\'insuline sur la kaliémie ?", a:"L\'insuline diminue la kaliémie en favorisant l\'entrée du potassium dans les cellules."},
+    {q:"Citez les trois tissus cibles de l\'insuline pour la régulation du potassium.", a:"Les muscles, le foie et le tissu adipeux."},
+    {q:"À quel moment l\'activité de l\'insuline sur le potassium atteint-elle son pic ?", a:"Dans les heures qui suivent le repas."},
+    {q:"Via quels seconds messagers les catécholamines stimulent-elles la pompe Na^+/K^+-ATPase ?", a:"Via l\'activation de l\'adénylate cyclase et l\'augmentation de l\'AMP cyclique."},
+    {q:"Quel type spécifique de récepteur adrénergique favorise l\'entrée cellulaire du potassium ?", a:"Le récepteur β(2)."},
+    {q:"Pourquoi les traitements β(2)-mimétiques (contre l\'asthme) peuvent-ils induire une hypokaliémie ?", a:"Ils stimulent excessivement l\'entrée du potassium dans les cellules, abaissant sa concentration plasmatique."},
+    {q:"Quel est l\'effet « non rénal » de l\'aldostérone sur le potassium ?", a:"Elle stimule la Na^+/K^+-ATPase et l\'entrée cellulaire du potassium."}
+  ],
+  "4-5": [
+    {q:"Quelle est la principale complication mortelle d\'une hyperkaliémie ou d\'une hypokaliémie ?", a:"La survenue de troubles du rythme cardiaque."}
+  ],
+  "4-6": [
+    {q:"Quel organe assure l\'élimination principale du potassium de l\'organisme ?", a:"Le rein."},
+    {q:"Quel risque majeur encourent les patients atteints d\'insuffisance rénale concernant le potassium ?", a:"Un risque d\'accumulation plasmatique de potassium (hyperkaliémie)."},
+    {q:"Quel traitement de suppléance rénale permet d\'épurer le sang du potassium excédentaire ?", a:"La dialyse (ou rein artificiel)."},
+    {q:"Quelle proportion du potassium ingéré est normalement éliminée dans les urines ?", a:"De 90% à 95% du potassium ingéré est éliminé par les urines."},
+    {q:"Quelle quantité de potassium est éliminée quotidiennement par la sueur ?", a:"L\'élimination par la sueur est de 5 à 10\\ mmol/j."},
+    {q:"Combien de potassium est perdu chaque jour via les fèces ?", a:"La perte est de 5 à 10\\ mmol/j."}
+  ],
+  "4-10": [
+    {q:"Pourquoi le transfert du potassium vers l\'intérieur des cellules nécessite-t-il un transport actif ?", a:"Car il doit se faire contre un gradient de concentration important."},
+    {q:"Quelle enzyme ubiquitaire assure l\'entrée du potassium dans les cellules ?", a:"La pompe Na^+/K^+-ATPase."},
+    {q:"Quel est le mouvement ionique net généré par un cycle de la pompe Na^+/K^+-ATPase ?", a:"Sortie de 3 ions sodium et entrée de 2 ions potassium."},
+    {q:"Sous quelle forme la pompe Na^+/K^+-ATPase puise-t-elle son énergie ?", a:"Sous forme d\'ATP."}
+  ],
+  "4-13": [
+    {q:"Quel est l\'effet de l\'aldostérone sur la réabsorption du sodium par le rein ?", a:"L\'aldostérone favorise la réabsorption du sodium."},
+    {q:"Comment l\'aldostérone influence-t-elle l\'excrétion urinaire du potassium ?", a:"L\'aldostérone augmente l\'excrétion du potassium."},
+    {q:"Quelle est la plage de valeurs normales de la kaliémie ?", a:"Elle doit rester entre 3,5 et 4,5\\ mmol/L."}
+  ],
+  "4-14": [
+    {q:"Chez un individu sain, quel est le rapport habituel entre le sodium et le potassium excrétés ?", a:"Le rapport sodium/potassium excrété est supérieur à 1."}
+  ],
+  "4-15": [
+    {q:"Quel est l\'effet du glucagon sur le transfert intracellulaire du potassium ?", a:"Le glucagon stimule l\'entrée du potassium dans les cellules."}
+  ],
+  // ===== PDF 2: Hypokalemia_Decoded =====
+  "2-2": [
+    {q:"Quelle est la définition biologique de l\'hypokaliémie ?", a:"Une concentration plasmatique de K^+ inférieure à 3,5 mmol/L."},
+    {q:"Une diminution de la kaliémie de 1 mmol/L correspond à une baisse du stock intracellulaire de quelle quantité ?", a:"De 100 à 200 mmol."},
+    {q:"Lors d\'une hypokaliémie, le manque de potassium se manifeste-t-il uniquement dans le plasma ?", a:"Non, il y a souvent un manque de potassium même à l\'intérieur de la cellule."},
+    {q:"L\'hypokaliémie se définit par [K^+](pl) < _____ mmol/L.", a:"3,5"},
+    {q:"Comment l\'hypokaliémie affecte-t-elle le stock total de potassium de l\'organisme ?", a:"Elle diminue le stock global, incluant le stock intracellulaire."}
+  ],
+  "2-3": [
+    {q:"À partir de quel seuil de concentration plasmatique de K^+ considère-t-on l\'hypokaliémie comme sévère ?", a:"Inférieure à 3,0 mmol/L."},
+    {q:"Vrai ou Faux : L\'hypokaliémie est sans risque pour le pronostic vital.", a:"Faux (elle peut engager le pronostic vital, notamment par troubles du rythme)."}
+  ],
+  "2-4": [
+    {q:"Quel signe neuromusculaire est caractérisé par une réduction de la puissance motrice lors d\'une hypokaliémie ?", a:"La diminution de la force musculaire."},
+    {q:"Quel effet l\'hypokaliémie a-t-elle sur les réflexes ostéotendineux ?", a:"Elle peut entraîner une abolition des réflexes."},
+    {q:"Citez un signe digestif fréquent de l\'hypokaliémie.", a:"Le ralentissement du transit."},
+    {q:"Comment appelle-t-on les syndromes digestifs graves pouvant résulter d\'une hypokaliémie ?", a:"Les syndromes pseudo-occlusifs."},
+    {q:"Signes neuromusculaires : Paralysies avec _____ des réflexes ostéotendineux.", a:"Abolition"},
+    {q:"Le ralentissement du transit est un signe clinique _____ de l\'hypokaliémie.", a:"Digestif"}
+  ],
+  "2-5": [
+    {q:"Quelle anomalie du segment ST observe-t-on sur l\'ECG quand [K^+](pl) = 3,5 mmol/L ?", a:"Un sous-décalage du segment ST."},
+    {q:"Quelle onde supplémentaire commence à apparaître sur l\'ECG lors d\'une hypokaliémie modérée ?", a:"L\'onde U."},
+    {q:"Comment l\'espace PR est-il affecté lors d\'une hypokaliémie plus marquée ([K^+](pl) = 2,5 mmol/L) ?", a:"Il subit un allongement."},
+    {q:"L\'onde U est-elle plus ou moins visible lorsque la kaliémie chute à 2,5 mmol/L ?", a:"Elle est bien visible (plus marquée)."},
+    {q:"ECG à 3,5 mmol/L : _____ du segment ST.", a:"Sous-décalage"},
+    {q:"L\'allongement de l\'espace _____ est un signe d\'hypokaliémie marquée sur l\'ECG.", a:"PR"},
+    {q:"Quelle est la valeur normale de kaliémie représentée sur le premier ECG de l\'exemple ?", a:"4 mmol/L."}
+  ],
+  "2-6": [
+    {q:"Où prennent naissance les extrasystoles supraventriculaires ?", a:"Dans les oreillettes."},
+    {q:"Quel trouble du rythme cardiaque est considéré comme l\'un des plus graves liés à l\'hypokaliémie ?", a:"Les torsades de pointes."},
+    {q:"Pourquoi les torsades de pointes entraînent-elles une chute de la pression artérielle ?", a:"Le cœur se contracte de façon inefficace et n\'assure plus correctement la circulation du sang."},
+    {q:"Vers quelle issue fatale une torsade de pointes peut-elle évoluer ?", a:"Vers un arrêt cardiaque."},
+    {q:"Quelle est la conséquence directe d\'une contraction cardiaque inefficace lors d\'une torsade de pointes ?", a:"Une chute de la pression artérielle."},
+    {q:"Les tachycardies supraventriculaires font partie de quelle catégorie de troubles ?", a:"Les troubles du rythme les plus dangereux."},
+    {q:"Quel type de trouble du rythme prend naissance dans les oreillettes ?", a:"Les extrasystoles supraventriculaires."}
+  ],
+  "2-7": [
+    {q:"Quels sont les deux mécanismes généraux principaux de l\'hypokaliémie ?", a:"Apport de K^+ < pertes et transfert de K^+ vers les cellules."},
+    {q:"Pourquoi la carence d\'apport en potassium est-elle considérée comme une cause très rare ?", a:"Parce que la plupart des aliments contiennent du potassium."},
+    {q:"Quelles sont les deux origines possibles des pertes excessives de K^+ ?", a:"Rénales ou extrarénales."},
+    {q:"À quel type de pertes correspondent principalement les causes extrarénales ?", a:"Aux pertes digestives."},
+    {q:"Dans le schéma des mécanismes, quel symbole indique que la carence d\'apport est rare ?", a:"Une flèche en pointillée."},
+    {q:"L\'hypokaliémie d\'origine extra-rénale correspond principalement à des pertes _____.", a:"Digestives"}
+  ],
+  "2-8": [
+    {q:"Citez trois exemples de causes digestives d\'hypokaliémie.", a:"Diarrhée, fistules digestives et laxatifs."},
+    {q:"Quelle cause digestive est souvent omise spontanément par les patients ?", a:"La consommation de laxatifs."},
+    {q:"Comment appelle-t-on les maladies rénales, souvent génétiques, touchant le tubule ?", a:"Les tubulopathies."},
+    {q:"Citez deux formes d\'hypersécrétion surrénale causant une hypokaliémie.", a:"L\'hyperaldostéronisme et l\'hypercorticisme."},
+    {q:"Comment l\'hypercorticisme peut-il stimuler l\'excrétion de K^+ ?", a:"À forte concentration, les glucocorticoïdes stimulent les récepteurs minéralocorticoïdes destinés à l\'aldostérone."},
+    {q:"Quel est le synonyme de causes \"iatrogènes\" pour l\'hypokaliémie ?", a:"Causes médicamenteuses."},
+    {q:"Quel effet les corticoïdes ont-ils au niveau du rein concernant le sodium et le potassium ?", a:"Ils favorisent la réabsorption du sodium et l\'excrétion urinaire du potassium."},
+    {q:"L\'hyperaldostéronisme peut être de deux types, lesquels ?", a:"Primaire ou secondaire."},
+    {q:"Quel organe produit les hormones minéralocorticoïdes et glucocorticoïdes ?", a:"La corticosurrénale."},
+    {q:"Les causes rénales iatrogènes incluent les diurétiques de l\'anse, les thiazidiques et les _____.", a:"Corticoïdes"},
+    {q:"Les pertes digestives entraînent une augmentation des _____.", a:"Selles"},
+    {q:"Quel paramètre urinaire augmente suite à l\'action des corticoïdes ressemblant à l\'aldostérone ?", a:"L\'excrétion urinaire du potassium."},
+    {q:"Une tubulopathie est une anomalie de quelle partie du néphron ?", a:"Le tubule."},
+    {q:"Quel est l\'effet d\'une forte concentration de glucocorticoïdes sur les récepteurs de l\'aldostérone ?", a:"Ils peuvent stimuler ces récepteurs minéralocorticoïdes."},
+    {q:"Concept : Hypokaliémie d\'origine rénale", a:"Définition : Baisse du potassium sanguin due à une perte excessive par les reins (ex: diurétiques, hyperaldostéronisme)."}
+  ],
+  "2-9": [
+    {q:"Comment une alcalose aiguë affecte-t-elle la concentration plasmatique de K^+ ?", a:"Elle fait baisser la concentration en favorisant l\'entrée du K^+ dans les cellules."},
+    {q:"Quelle hormone stimule l\'entrée du potassium dans les cellules en activant la pompe Na^+/K^+-ATPase ?", a:"L\'insuline."},
+    {q:"La _____ stimule l\'entrée du K^+ dans les cellules via la pompe Na^+/K^+-ATPase.", a:"Insuline"},
+    {q:"Dans l\'alcalose aiguë, le _____ sanguin augmente, provoquant le transfert de K^+ vers les cellules.", a:"pH"},
+    {q:"L\'entrée du K^+ dans la cellule est favorisée par l\'augmentation de l\'activité de la pompe _____.", a:"Na^+/K^+-ATPase"},
+    {q:"Concept : Transfert intracellulaire de K^+", a:"Définition : Déplacement du potassium du compartiment plasmatique vers l\'intérieur des cellules (ex: alcalose, insuline)."}
+  ],
+  "2-10": [
+    {q:"Comment l\'augmentation du débit de Na^+ délivré au tubule distal affecte-t-elle la sécrétion de K^+ ?", a:"Elle augmente la sécrétion de K^+."},
+    {q:"Quel type de diurétique est cité comme exemple augmentant le débit de Na^+ distal ?", a:"Le diurétique de l\'anse."},
+    {q:"L\'augmentation de la réabsorption de sodium dans le collecteur stimule l\'activité de quelle pompe membranaire ?", a:"La pompe Na^+/K^+-ATPase."},
+    {q:"Dans quelle direction le potassium est-il sécrété après avoir été favorisé par l\'activité de la Na^+/K^+-ATPase ?", a:"Vers la lumière tubulaire."},
+    {q:"Pourquoi les diurétiques de l\'anse et les thiazidiques peuvent-ils entraîner une hypokaliémie ?", a:"Ils augmentent la réabsorption de Na^+ au niveau distal, ce qui favorise la sécrétion et l\'excrétion de K^+."},
+    {q:"Plus le sodium est réabsorbé au niveau distal, plus le potassium est _____ et _____.", a:"Sécrété et excrété."}
+  ],
+  // ===== PDF 1: Hyperkalemia_Blueprint =====
+  "1-2": [
+    {q:"À partir de quelle concentration plasmatique de potassium définit-on l\'hyperkaliémie ?", a:"Supérieure à 5,3 mmol/l."},
+    {q:"À quel seuil de kaliémie l\'hyperkaliémie devient-elle un danger vital ?", a:"Lorsqu\'elle est 7 mmol/l."}
+  ],
+  "1-3": [
+    {q:"Quel phénomène lié au prélèvement sanguin peut causer une fausse hyperkaliémie par rupture des globules rouges ?", a:"L\'hémolyse."},
+    {q:"Comment l\'hyperplaquettose peut-elle fausser le dosage du potassium plasmatique ?", a:"Par la libération de potassium par les plaquettes lors de la coagulation."}
+  ],
+  "1-4": [
+    {q:"Citez les deux principaux types de troubles neuro-musculaires liés à l\'hyperkaliémie.", a:"Les paresthésies (fourmillements) et les atteintes motrices (rares)."},
+    {q:"Concept : Paresthésie", a:"Définition : Sensation de fourmillement perçue au niveau de la peau, signe clinique possible de l\'hyperkaliémie."},
+    {q:"Les troubles myocardiques liés au potassium sont visibles grâce à quel examen ?", a:"L\'électrocardiogramme (ECG)."},
+    {q:"L\'hyperkaliémie est-elle un trouble de l\'activité électrique ou mécanique du cœur ?", a:"Des deux (altération majeure de l\'activité électrique et mécanique)."}
+  ],
+  "1-5": [
+    {q:"Quel est le signe ECG le plus caractéristique de l\'hyperkaliémie ?", a:"L\'augmentation de l\'amplitude des ondes T."},
+    {q:"L\'augmentation de l\'amplitude des ondes T est généralement _____ au degré d\'hyperkaliémie.", a:"proportionnelle"},
+    {q:"Quel changement observe-t-on au niveau de l\'intervalle PR lors d\'une hyperkaliémie ?", a:"Un allongement de l\'intervalle PR."},
+    {q:"Quelle est l\'évolution progressive de l\'onde P lors de l\'aggravation d\'une hyperkaliémie ?", a:"Un aplatissement, puis une disparition progressive."},
+    {q:"Que traduit l\'élargissement du complexe QRS sur l\'ECG d\'un patient hyperkaliémique ?", a:"Des troubles de la conduction intraventriculaire."},
+    {q:"Le potassium plasmatique est noté [K^+](pl). Quelle est sa valeur normale illustrée sur le premier ECG du document ?", a:"4 mmol/l."},
+    {q:"Quel est l\'effet d\'une hyperkaliémie à 8,5 mmol/l sur la morphologie de l\'onde P ?", a:"Elle disparaît progressivement."},
+    {q:"Un ECG avec une onde T pointue et symétrique évoque prioritairement une _____.", a:"hyperkaliémie"},
+    {q:"Quel signe ECG précède généralement la disparition des ondes P ?", a:"L\'allongement de l\'intervalle PR (et l\'aplatissement de l\'onde P)."}
+  ],
+  "1-6": [
+    {q:"Quelles sont les deux complications cardiaques graves observées dans les formes les plus sévères d\'hyperkaliémie ?", a:"La tachycardie ventriculaire et le collapsus cardiovasculaire."},
+    {q:"Vrai ou Faux : Un patient ayant une kaliémie à 7 mmol/l peut présenter un ECG normal.", a:"Faux (l\'ECG est une vérification immédiate car des anomalies sont attendues)."},
+    {q:"Quelles sont les deux premières étapes systématiques à réaliser face à une suspicion d\'hyperkaliémie ?", a:"Contrôler le dosage (éliminer l\'hémolyse) et réaliser un ECG."},
+    {q:"Quelle anomalie de conduction est responsable de l\'aspect de \'montagne\' du QRS à 8,5 mmol/l de potassium ?", a:"Une anomalie de conduction intraventriculaire."},
+    {q:"Quel est le risque vital immédiat d\'une kaliémie dépassant 7 mmol/l ?", a:"L\'arrêt cardiaque ou collapsus cardiovasculaire."}
+  ],
+  "1-7": [
+    {q:"Quelles sont les deux causes principales de l\'hyperkaliémie par apport ou défaut d\'élimination ?", a:"L\'apport exogène massif (sels diététiques) et la diminution de l\'excrétion rénale."},
+    {q:"Dans le schéma des mécanismes, l\'hyperkaliémie est classée selon deux axes : l\'apport supérieur aux possibilités d\'excrétion et le _____.", a:"transfert de K^+ du LIC vers le LEC"},
+    {q:"L\'hyperkaliémie par transfert concerne le passage du potassium du milieu _____ vers le milieu _____.", a:"intracellulaire (LIC) ; extracellulaire (LEC)"}
+  ],
+  "1-8": [
+    {q:"Comment l\'insuffisance rénale aiguë ou chronique provoque-t-elle une hyperkaliémie ?", a:"Par une réduction néphronique entraînant une diminution du DFG."},
+    {q:"Quel est l\'effet d\'un hypoaldostéronisme sur l\'excrétion du potassium et du sodium ?", a:"Il limite l\'excrétion de K^+ et augmente l\'excrétion de Na^+."},
+    {q:"Pourquoi l\'insuffisance surrénale peut-elle mener à une chute de la pression artérielle ?", a:"À cause de la déshydratation induite par l\'augmentation de l\'excrétion de sodium."},
+    {q:"Citez deux exemples de diurétiques épargneurs de potassium cités dans le cours.", a:"La spironolactone et le triamtérène."},
+    {q:"Quel est le mécanisme d\'action de la spironolactone sur la régulation potassique ?", a:"Elle bloque l\'action de l\'aldostérone."},
+    {q:"Quels sels diététiques, souvent utilisés comme substituts, sont très riches en potassium ?", a:"Les sels de régime (apport exogène massif)."},
+    {q:"L\'hypoaldostéronisme entraîne une _____ de la sécrétion distale de K^+.", a:"diminution"},
+    {q:"Quel paramètre rénal, s\'il diminue, est directement lié à une baisse de l\'excrétion du potassium ?", a:"Le Débit de Filtration Glomérulaire (DFG)."},
+    {q:"Outre l\'insuffisance rénale, quelle autre défaillance organique peut causer une baisse de sécrétion distale de K^+ ?", a:"L\'insuffisance surrénale."},
+    {q:"Dans le cadre de l\'insuffisance surrénale, l\'excrétion du sodium est _____.", a:"augmentée"},
+    {q:"Le triamtérène agit en bloquant _____.", a:"l\'aldostérone (au niveau rénal)"}
+  ],
+  "1-9": [
+    {q:"Expliquez le mécanisme du transfert de K^+ lors d\'une acidose aiguë.", a:"L\'entrée de H^+ dans la cellule s\'effectue en échange d\'une sortie de K^+ vers le plasma."},
+    {q:"Pourquoi le diabète insulinoprive favorise-t-il l\'hyperkaliémie ?", a:"Le manque d\'insuline réduit l\'activation de la pompe Na^+/K^+, limitant l\'entrée du potassium dans les cellules."},
+    {q:"Quel terme désigne la libération massive de potassium suite à un écrasement musculaire ?", a:"La rhabdomyolyse."},
+    {q:"Citez trois causes de destruction cellulaire massive entraînant une hyperkaliémie.", a:"Écrasement musculaire (rhabdomyolyse), brûlures et lyse tumorale."},
+    {q:"La rhabdomyolyse libère du potassium car les cellules _____ en sont très riches.", a:"musculaires"},
+    {q:"En cas d\'acidose, pour maintenir l\'électroneutralité, la sortie de K^+ compense l\'_____ de H^+.", a:"entrée"},
+    {q:"Le potassium sort de la cellule en cas de destruction tissulaire car sa concentration y est _____ à celle du plasma.", a:"supérieure (ou très riche)"},
+    {q:"Pourquoi faut-il être vigilant lors d\'une lyse tumorale massive ?", a:"Car la destruction rapide des cellules libère massivement du potassium dans le sang."}
+  ],
+  "1-11": [
+    {q:"Quel traitement est indiqué pour un patient présentant une hyperkaliémie avec insuffisance rénale sévère ?", a:"Le rein artificiel (dialyse)."},
+    {q:"Quel type de médicament utilise-t-on pour traiter une hyperkaliémie modérée ?", a:"Des médicaments bloquant l\'absorption digestive de potassium."},
+    {q:"Quelle hormone peut être administrée ponctuellement en cas d\'hyperkaliémie importante pour faire entrer le K^+ dans les cellules ?", a:"L\'insuline."},
+    {q:"Pourquoi la perfusion directe de potassium est-elle mentionnée comme délicate lors du traitement d\'une hypokaliémie ?", a:"Car elle est a priori très douloureuse."},
+    {q:"Quel est le but de l\'utilisation de l\'insuline dans le traitement de l\'hyperkaliémie sévère ?", a:"Activer la pompe Na^+/K^+ pour favoriser la réentrée du potassium dans les cellules."},
+    {q:"Le traitement par rein artificiel est particulièrement indiqué si l\'hyperkaliémie est associée à une diminution du _____.", a:"DFG (Débit de Filtration Glomérulaire)"}
+  ],
+};
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+let currentSlide = 0;
+const completed = new Set();
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      const pdf = pdfs.find(p => p.id === curPdf);
+      html += `<h3>${pdf.label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}"><span class="check"></span>Diapo ${s.slide}</div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+function buildSlide(s, idx) {
+  const pdf = pdfs.find(p => p.id === s.pdf);
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>${fcs.length} Flashcard${fcs.length>1?'s':''}</h3>
+      <button class="btn-reveal" onclick="revealAll(${idx})">Révéler toutes les réponses</button>
+      <div class="fc-grid">`;
+    fcs.forEach((fc, fi) => {
+      fcHtml += `<div class="flashcard" onclick="this.classList.toggle(\'flipped\')" id="fc-${idx}-${fi}">
+        <div class="fc-inner">
+          <div class="fc-front"><span class="fc-num">${fi+1}</span><span class="fc-text">${fc.q}</span><span class="fc-hint">cliquer</span></div>
+          <div class="fc-back"><span class="fc-num">${fi+1}</span><span class="fc-text">${fc.a}</span></div>
+        </div></div>`;
+    });
+    fcHtml += '</div></div>';
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcards pour cette diapo.</p>';
+  }
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">${pdf.name} — Diapo ${s.slide}/${pdf.totalSlides}</span>
+    <div class="slide-img-wrap"><img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy"></div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>&#8592; Précédent</button>
+      <span style="color:#666;font-size:0.85rem">${idx+1} / ${totalSlides}</span>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant &#8594;</button>
+    </div></div>`;
+}
+function buildMain() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order" style="display:none">
+    <h2>Ordre des cours</h2>
+    <ol>${pdfs.map(p => `<li><strong>${p.name}</strong> — ${p.label}</li>`).join('')}</ol>
+  </div>`;
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  const cur = document.getElementById(`slide-${currentSlide}`);
+  if (cur) cur.classList.remove('active');
+  completed.add(currentSlide);
+  const sbOld = document.getElementById(`sb-${currentSlide}`);
+  if (sbOld) { sbOld.classList.add('completed'); sbOld.querySelector('.check').textContent = '\u2713 '; }
+  currentSlide = idx;
+  document.getElementById(`slide-${idx}`).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const sbNew = document.getElementById(`sb-${idx}`);
+  if (sbNew) { sbNew.classList.add('active'); sbNew.scrollIntoView({block:'nearest'}); }
+  document.getElementById('progressFill').style.width = `${((idx+1)/totalSlides)*100}%`;
+  document.getElementById('navCounter').textContent = `${idx+1} / ${totalSlides}`;
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function revealAll(slideIdx) {
+  const s = allSlides[slideIdx];
+  const fcs = flashcardMap[s.key] || [];
+  fcs.forEach((_, fi) => {
+    const el = document.getElementById(`fc-${slideIdx}-${fi}`);
+    if (el) el.classList.add('flipped');
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+buildSidebar();
+buildMain();
+goTo(0);
+</script>
+</body>
+</html>
