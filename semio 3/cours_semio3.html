@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sémiologie 3 - IRA Fonctionnelle</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Sémiologie 3 — IRA Fonctionnelle</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 53</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Nephrology_Clinical_Blueprint", label: "Manuel Diagnostique : Indices Cliniques et Physiologie Rénale", badge: "pdf-1", totalSlides: 13 },
+  { id: 2, name: "Body_Fluid_Dashboard", label: "Tableau de Bord Corporel : Décoder la Déshydratation", badge: "pdf-2", totalSlides: 12 },
+  { id: 3, name: "The_Biological_Filtration_Factory", label: "L\'Usine de Filtration : Hémodynamique et SRAA", badge: "pdf-3", totalSlides: 15 },
+  { id: 4, name: "Functional_Renal_Failure_Mechanisms", label: "IRA Fonctionnelle : Mécanismes et Sémiologie", badge: "pdf-4", totalSlides: 13 },
+];
+
+const flashcardMap = {
+  // ===== PDF 1: Nephrology_Clinical_Blueprint =====
+  "1-2": [
+    {q:"Quelle est la valeur normale de la pression artérielle en période nocturne ?", a:"<120/70 mmHg"},
+    {q:"Quelle est la valeur normale de la pression artérielle lors d\'une auto-mesure au domicile ?", a:"<135/85 mmHg"},
+    {q:"Quelle est la valeur seuil de la pression artérielle normale devant un professionnel de santé ?", a:"<140/90 mmHg"},
+    {q:"Si la tension est >140/90 mmHg en cabinet mais normale au domicile, quel est le diagnostic ?", a:"Une HTA « blouse blanche »"},
+    {q:"Quels sont les deux examens permettant de confirmer une HTA blouse blanche ?", a:"L\'auto-mesure tensionnelle ou la MAPA"}
+  ],
+  "1-3": [
+    {q:"Quel est le risque principal lié à une hypotension orthostatique, particulièrement chez le sujet âgé ?", a:"Le risque de chute"},
+    {q:"Définition : Hypotension orthostatique", a:"Baisse de la tension artérielle lors du passage à la position debout."},
+    {q:"Quel est le critère de baisse de la pression systolique pour définir une hypotension orthostatique ?", a:"Une baisse >20 mmHg"},
+    {q:"Quel est le critère de baisse de la pression diastolique pour définir une hypotension orthostatique ?", a:"Une baisse >10 mmHg"}
+  ],
+  "1-4": [
+    {q:"Quelle est la cause probable d\'urines rouges avec une bandelette urinaire et un ECBU négatifs ?", a:"La présence d\'un colorant (alimentaire ou médicamenteux)"},
+    {q:"Quel diagnostic évoquer devant des urines rouges, une bandelette positive, mais moins de 10000 hématies/min à l\'ECBU après un effort intense ?", a:"Une rhabdomyolyse"},
+    {q:"Quel examen permet d\'affirmer l\'absence d\'hématies dans des urines rouges ?", a:"L\'ECBU (examen cytologique)"}
+  ],
+  "1-5": [
+    {q:"Quelle molécule est responsable de la couleur rouge des urines lors d\'une rhabdomyolyse ?", a:"La myoglobine"},
+    {q:"Pourquoi la myoglobine est-elle retrouvée dans les urines lors d\'une rhabdomyolyse ?", a:"C\'est une petite molécule filtrée par le glomérule."},
+    {q:"Quel diagnostic correspond à la présence d\'hémoglobine « libre » dans les urines ?", a:"L\'hémoglobinurie"},
+    {q:"Devant des urines rouges, une bandelette positive sans hématies, un ictère et une pâleur conjonctivale, quel processus est en cours ?", a:"Une hémolyse (destruction des globules rouges)"}
+  ],
+  "1-6": [
+    {q:"Quelle est la valeur normale du taux d\'hématies dans les urines (en /ml) ?", a:"< 10000 /ml"},
+    {q:"Quelle est la valeur normale du taux d\'hématies dans les urines (en /mm^(3)) ?", a:"< 10 /mm^(3)"},
+    {q:"Dans le test des trois pots, que signifie une hématurie présente uniquement dans le premier pot ?", a:"Une origine urétrale ou prostatique"},
+    {q:"Dans quelle partie de l\'appareil urinaire se situe l\'origine d\'une hématurie si le sang n\'apparaît qu\'à la fin de la miction ?", a:"La vessie"}
+  ],
+  "1-7": [
+    {q:"Si une protéinurie massive (4 g) est détectée sans aucune albumine dans les urines, le glomérule est-il le siège de la lésion ?", a:"Non, car l\'absence d\'albumine indique que la barrière glomérulaire est intacte."},
+    {q:"Quelle pathologie tubulaire peut expliquer une protéinurie sans albuminurie ?", a:"Une tubulopathie (défaut de réabsorption des petites molécules filtrées)"},
+    {q:"Outre la tubulopathie, quelle est la deuxième grande cause de protéinurie sans albuminurie ?", a:"Une production exagérée d\'une protéine de petite taille (ex: chaînes légères d\'Ig)"},
+    {q:"Pourquoi les chaînes lourdes des immunoglobulines ne sont-elles pas retrouvées dans les urines ?", a:"Elles sont trop lourdes (60000 Da) pour passer la barrière glomérulaire."},
+    {q:"Quel cancer du sang est caractérisé par une production excessive de chaînes légères d\'Ig ?", a:"Le myélome"},
+    {q:"Pourquoi une protéinurie de chaînes légères peut-elle apparaître dans les urines ?", a:"Car leur production excessive dépasse les capacités de réabsorption du tubule."}
+  ],
+  "1-8": [
+    {q:"Quel est le rôle de l\'osmolalité dans les mouvements d\'eau corporels ?", a:"Elle détermine le passage de l\'eau vers le milieu le plus riche en osmoles."},
+    {q:"Quel est l\'effet de l\'ajout d\'osmoles (comme le sel) sur la température de congélation de l\'eau ?", a:"Elle baisse la température de congélation."},
+    {q:"Si l\'osmolalité plasmatique augmente par rapport à l\'osmolalité intracellulaire, dans quel sens se déplace l\'eau ?", a:"De la cellule vers le plasma"},
+    {q:"L\'osmolalité correspond au nombre d\'(_)(_)( )par rapport à la quantité de (_)(_)(.)", a:"osmole ; solvant"},
+    {q:"Lors d\'une déshydratation intracellulaire, comment évolue l\'osmolalité plasmatique ?", a:"Elle augmente."}
+  ],
+  "1-9": [
+    {q:"Où se trouve 99 % du sodium de l\'organisme ?", a:"Dans le milieu extracellulaire"},
+    {q:"Quel mécanisme actif empêche le sodium de s\'accumuler à l\'intérieur de la cellule ?", a:"La pompe Na^(+)/K^(+) ATPase"},
+    {q:"La pompe Na^(+)/K^(+) ATPase fait (_)(_)( )le sodium de la cellule et fait (_)(_)( )le potassium.", a:"sortir ; rentrer"},
+    {q:"Vrai ou Faux : Le sel rentre librement dans la cellule par simple diffusion.", a:"Faux (il reste extracellulaire grâce à la pompe Na^(+)/K^(+) ATPase)."}
+  ],
+  "1-10": [
+    {q:"Quel état clinique est provoqué par un déplacement d\'eau de la cellule vers le secteur plasmatique ?", a:"Une déshydratation intracellulaire"},
+    {q:"Quelle situation entraîne une hyperhydratation intracellulaire ?", a:"Une baisse de l\'osmolalité plasmatique (trop d\'eau bue par rapport au sel)"},
+    {q:"Quelle hormone est responsable de la rétention d\'eau au niveau rénal ?", a:"L\'ADH (Hormone Antidiurétique)"},
+    {q:"Comment l\'organisme réagit-il au niveau de l\'ADH lorsque l\'osmolalité plasmatique diminue ?", a:"Il diminue la sécrétion d\'ADH pour éliminer l\'eau par les urines."}
+  ],
+  "1-11": [
+    {q:"Quel signe clinique physique traduit une augmentation majeure du volume extracellulaire ?", a:"L\'apparition d\'œdèmes interstitiels"},
+    {q:"Citez trois caractéristiques sémiologiques classiques des œdèmes de l\'hyperhydratation extracellulaire.", a:"Blancs, mous, et prenant le godet (ou froids/indolores/symétriques)."},
+    {q:"Comment appelle-t-on l\'épanchement de liquide dans la cavité péritonéale lors d\'une hyperhydratation ?", a:"L\'ascite"},
+    {q:"Comment appelle-t-on la présence de liquide dans la plèvre lors d\'une surcharge hydrosodée ?", a:"Un épanchement pleural"},
+    {q:"Quel est le siège anatomique principal des œdèmes lors d\'une hyperhydratation extracellulaire ?", a:"Les membres inférieurs"}
+  ],
+  "1-12": [
+    {q:"Quelle est la première cause d\'hyperhydratation extracellulaire en France ?", a:"L\'insuffisance cardiaque"},
+    {q:"Quelle pathologie hépatique est une cause majeure d\'hyperhydratation extracellulaire ?", a:"La cirrhose"},
+    {q:"Quelles sont les trois grandes catégories de causes de l\'hyperhydratation extracellulaire ?", a:"L\'insuffisance cardiaque, la cirrhose hépatique et les maladies rénales."}
+  ],
+  "1-13": [
+    {q:"Dans quel compartiment s\'accumule le sel en cas d\'excès dans l\'organisme ?", a:"Le compartiment extracellulaire"},
+    {q:"Définition : Insuffisance rénale aiguë fonctionnelle (pré-rénale)", a:"Diminution de la fonction rénale alors que les reins et les voies urinaires sont anatomiquement normaux."},
+    {q:"Quelle est la cause fondamentale d\'une insuffisance rénale aiguë fonctionnelle ?", a:"Une hypoperfusion rénale (absence de débit suffisant dans les artères rénales)."}
+  ],
+  // ===== PDF 2: Body_Fluid_Dashboard =====
+  "2-2": [
+    {q:"Quel type de déshydratation accompagne généralement les vomissements ?", a:"Une déshydratation extracellulaire."},
+    {q:"À quel niveau de potassium plasmatique définit-on une hypokaliémie ?", a:"< 3,5 mmol/L."},
+    {q:"Pourquoi l\'alcalose métabolique (pH > 7,42) provoque-t-elle une baisse du potassium plasmatique ?", a:"Elle entraîne un transfert intracellulaire de K^(()+)."},
+    {q:"Quel est l\'effet de l\'hyperaldostéronisme secondaire sur le sodium et le potassium ?", a:"Il provoque une réabsorption de sodium et une sécrétion de potassium."},
+    {q:"Comment le taux de bicarbonates plasmatiques évolue-t-il lors de vomissements répétés ?", a:"Il augmente (jusqu\'à 40-50 mmol/L) à cause de la perte d\'ions H^(()+) et de la rétention rénale."},
+    {q:"Lors d\'une alcalose, comment l\'organisme tente-t-il de compenser la hausse des bicarbonates au niveau cellulaire ?", a:"En faisant sortir des ions H^(()+) de la cellule en échange d\'un transfert de potassium vers l\'intérieur."}
+  ],
+  "2-3": [
+    {q:"Quel signe clinique de déshydratation est présent peu importe que la natrémie soit normale ou basse ?", a:"La soif."},
+    {q:"Quel organe faut-il examiner pour évaluer la sécheresse des muqueuses ?", a:"La langue."},
+    {q:"Quelle durée de persistance du pli cutané après pincement indique une pathologie ?", a:"Plus de 3 secondes."},
+    {q:"Citez trois profils de patients chez qui le signe du pli cutané est peu appréciable.", a:"Les personnes âgées, dénutries et/ou obèses."},
+    {q:"Comment décrit-on cliniquement l\'hypotonie des globes oculaires en cas de déshydratation ?", a:"L\'œil s\'enfonce au toucher comme dans une « motte de beurre »."},
+    {q:"Quels sont les deux signes cardiovasculaires majeurs de la déshydratation extracellulaire ?", a:"La baisse de la pression artérielle et la tachycardie."},
+    {q:"Quel aspect prennent les veines lors d\'une déshydratation extracellulaire ?", a:"Elles sont plates (non visibles)."},
+    {q:"Quelle est la définition biologique de l\'oligurie selon le support ?", a:"< 400 ml/jour."},
+    {q:"Quel signe de gravité cardiovasculaire doit-on particulièrement rechercher chez les personnes âgées déshydratées ?", a:"L\'hypotension orthostatique."},
+    {q:"Quelle est la principale plainte qui pousse les patients déshydratés à consulter ?", a:"Une énorme soif."}
+  ],
+  "2-4": [
+    {q:"Quels sont les deux signes neurologiques aspécifiques de la déshydratation intracellulaire ?", a:"La confusion et le coma."},
+    {q:"Quel est le seul argument biologique spécifique de la déshydratation intracellulaire ?", a:"L\'augmentation de l\'osmolalité plasmatique au-delà de 290 mosmol/L."},
+    {q:"Formule de l\'osmolalité plasmatique calculée :", a:"[Na]p × 2 + [glycémie]."},
+    {q:"Quel seuil de natrémie évoque une déshydratation intracellulaire ?", a:"> 142 mmol/L."},
+    {q:"Le diagnostic de la déshydratation est-il principalement clinique ou biologique ?", a:"Clinique."},
+    {q:"L\'insuffisance rénale liée à la déshydratation est qualifiée de (_)(_)(.)", a:"Fonctionnelle (ou pré-rénale)."}
+  ],
+  "2-5": [
+    {q:"Pourquoi l\'hématocrite augmente-t-il lors d\'une déshydratation ?", a:"Parce que les globules rouges sont concentrés dans un volume plasmatique moindre (hémoconcentration)."},
+    {q:"Quelle valeur d\'hématocrite peut-on observer lors d\'une déshydratation sévère ?", a:"55-60 %."},
+    {q:"Quel paramètre est indispensable de peser pour le suivi thérapeutique ?", a:"Le poids du patient."}
+  ],
+  "2-6": [
+    {q:"Définition biologique de l\'hyponatrémie :", a:"< 135 mmol/L."},
+    {q:"Citez deux causes de fausse hyponatrémie avec osmolalité normale ou haute.", a:"L\'hyperglycémie sévère ou l\'hyperprotidémie."}
+  ],
+  "2-7": [
+    {q:"Devant une hyponatrémie, quel est le premier paramètre clinique à évaluer selon l\'algorithme ?", a:"Le volume extracellulaire (Bas, Normal ou Haut)."},
+    {q:"En cas d\'hyponatrémie avec volume extracellulaire bas, quel taux de [Na] urinaire indique une perte extra-rénale ?", a:"< 20 mmol/L."},
+    {q:"En cas d\'hyponatrémie avec volume extracellulaire bas, quel taux de [Na] urinaire indique une perte rénale ?", a:"> 20 mmol/L."},
+    {q:"Quel rapport [urée]u/[urée]p indique une insuffisance rénale aiguë fonctionnelle (perte extra-rénale) ?", a:"> 10."},
+    {q:"Quel rapport [créatinine]u/[créatinine]p est attendu dans une perte rénale de sodium ?", a:"< 30."},
+    {q:"Une hyponatrémie avec volume extracellulaire normal et osmolalité urinaire > 150 mosmol/L évoque :", a:"Un SIADH (Syndrome de Sécrétion Inappropriée d\'Hormone Anti-Diurétique)."},
+    {q:"Quel diagnostic évoquer devant une hyponatrémie à VEC normal avec osmolalité urinaire  le 100 mosmol/L ?", a:"Un excès d\'apport d\'eau (Potomanie ou buveur de bière)."},
+    {q:"Citez deux pathologies causant une hyponatrémie avec volume extracellulaire haut (œdèmes).", a:"L\'insuffisance cardiaque ou la cirrhose décompensée."},
+    {q:"Quel est le traitement de principe pour une hyponatrémie avec volume extracellulaire haut ?", a:"Restriction en sodium et en eau + Diurétiques."},
+    {q:"Que signifie un rapport [Na]/[K] urinaire < 1 dans le cadre d\'une déshydratation extracellulaire ?", a:"Cela indique une réponse rénale adaptée avec rétention de sodium et élimination de potassium."}
+  ],
+  "2-8": [
+    {q:"Quel liquide utilise-t-on pour perfuser un patient en déshydratation extracellulaire ?", a:"Du NaCl (sérum physiologique à 0,9 %)."},
+    {q:"Comment calcule-t-on la quantité totale de NaCl à apporter lors du traitement ?", a:"Le volume en litres doit être égal à la perte de poids en kilogrammes."},
+    {q:"Quelle fraction du volume total de rehydration doit être administrée durant les 6 premières heures ?", a:"50 % du volume total."}
+  ],
+  "2-9": [
+    {q:"Pourquoi le sérum physiologique ne pénètre-t-il pas à l\'intérieur des cellules ?", a:"Parce que c\'est de l\'eau avec du sel, ce qui le maintient dans le secteur extracellulaire."},
+    {q:"Quelle est la répartition du NaCl perfusé dans le secteur extracellulaire ?", a:"1/3 dans le secteur plasmatique et 2/3 dans le secteur interstitiel."},
+    {q:"Quel est le risque d\'un apport trop important de NaCl une fois que le rein fonctionne normalement ?", a:"Il n\'y a pas de risque majeur car le rein urinera le surplus."}
+  ],
+  "2-10": [
+    {q:"Citez trois signes de gravité nécessitant une surveillance et une perfusion immédiate.", a:"Insuffisance rénale fonctionnelle, confusion et signes de mauvaise tolérance."},
+    {q:"En cas d\'épidémie et de manque de moyens de perfusion, quelle alternative peut être utilisée pour rehydrater ?", a:"Faire boire de l\'eau et du sel au patient."}
+  ],
+  "2-11": [
+    {q:"Comment la normalisation du volume extracellulaire (VEC) corrige-t-elle l\'alcalose métabolique ?", a:"Elle diminue la rétention de sodium et favorise l\'excrétion urinaire des bicarbonates."},
+    {q:"Quel est l\'effet du traitement par sérum physiologique sur l\'ADH en cas d\'hyponatrémie ?", a:"Il fait baisser l\'ADH, permettant l\'excrétion de l\'eau en excès par les urines."},
+    {q:"Pourquoi le rein retient-il le sodium au niveau proximal lors d\'une déshydratation ?", a:"Pour tenter de restaurer le volume plasmatique sous l\'effet de l\'aldostérone."},
+    {q:"L\'absence de quel réflexe normal explique l\'hyperosmolalité chez un patient ?", a:"L\'absence de soif ou l\'absence d\'accès à l\'eau."},
+    {q:"Concept : Traitement étiologique de la déshydratation", a:"Définition : Traiter la cause directe (ex: arrêter les vomissements) pour stopper la perte hydrique."}
+  ],
+  // ===== PDF 3: The_Biological_Filtration_Factory =====
+  "3-2": [
+    {q:"Quel pourcentage du débit cardiaque les reins reçoivent-ils normalement ?", a:"Entre 20 et 25 %."},
+    {q:"Quelle est la valeur moyenne du débit sanguin rénal (DSR) chez l\'adulte ?", a:"1 L/min."},
+    {q:"Quelle est la valeur moyenne du débit plasmatique rénal (DPR) ?", a:"600 mL/min."},
+    {q:"Selon le cours, quel organe est le mieux perfusé de tout l\'organisme ?", a:"Le rein."},
+    {q:"Quelle est la taille moyenne d\'un rein normal ?", a:"12 cm."}
+  ],
+  "3-3": [
+    {q:"Dans quel secteur de l\'organisme le sodium (Na^(()+)) est-il essentiellement présent ?", a:"Le secteur extracellulaire."},
+    {q:"Citez deux exemples de pertes sodées par la peau sans épiderme.", a:"Les brûlures et les dermatoses bulleuses diffuses."},
+    {q:"Quel mécanisme digestif lors d\'une occlusion entraîne une perte de sodium et d\'eau du compartiment plasmatique ?", a:"La sécrétion active par les anses grêles dilatées dans la lumière digestive."},
+    {q:"Citez trois solutés sécrétés dans la lumière intestinale lors d\'une occlusion digestive.", a:"L\'eau, le sel et le potassium."}
+  ],
+  "3-4": [
+    {q:"Combien de néphrons composent environ chaque glomérule à la naissance ?", a:"1 million."},
+    {q:"Formule : Débit de filtration glomérulaire (DFG)", a:"DFG = Kf × Puf"},
+    {q:"Quel est le pourcentage normal de la fraction de filtration (DFG / DPR) ?", a:"20 %."}
+  ],
+  "3-5": [
+    {q:"Dans la formule Puf = Pcg - Pt -  Pi cg, que représente le terme  Pi cg ?", a:"La pression oncotique intracapillaire plasmatique."},
+    {q:"Quelle pression favorise la filtration glomérulaire en poussant le liquide vers la chambre urinaire ?", a:"La pression hydrostatique."},
+    {q:"Quel est le volume d\'urines éliminé quotidiennement par une personne normale ?", a:"500 mL à 1 L."},
+    {q:"Quel pourcentage de la charge filtrée par le glomérule le tubule doit-il normalement réabsorber ?", a:"99 %."}
+  ],
+  "3-6": [
+    {q:"Quelle petite molécule fabriquée par le corps permet de mesurer l\'insuffisance rénale ?", a:"La créatinine."},
+    {q:"Quelle est l\'évolution du taux de créatinine plasmatique lorsque le rein filtre moins bien ?", a:"Le taux de créatine va être augmenté."}
+  ],
+  "3-7": [
+    {q:"Quelle pathologie cardiaque provoque une hypoperfusion rénale sans baisse du volume plasmatique ?", a:"L\'insuffisance cardiaque."},
+    {q:"Quelle pathologie hépatique est une cause fréquente d\'hypoperfusion rénale par baisse du débit cardiaque ?", a:"La cirrhose hépatique."},
+    {q:"Quelle anomalie structurelle réduit le débit sanguin rénal sans modifier le volume sanguin total ?", a:"La sténose de l\'artère rénale."},
+    {q:"Quel état pathologique entraîne une hypoperfusion rénale par une baisse intense des résistances artérielles systémiques ?", a:"Le sepsis sévère."},
+    {q:"Quelle est la cause principale de la baisse du volume sanguin total menant à une hypoperfusion rénale ?", a:"L\'hémorragie."},
+    {q:"La baisse du volume plasmatique correspond à une diminution du volume extracellulaire et du pool (_)(_)(.)", a:"Sodé"}
+  ],
+  "3-8": [
+    {q:"Où se situe précisément la cellule juxtaglomérulaire ?", a:"Entre le glomérule et le tubule distal."},
+    {q:"Quels sont les deux principaux stimuli de la synthèse de rénine ?", a:"L\'augmentation du Na^(()+) dans le tube distal et le nerf sympathique."},
+    {q:"Quel est l\'objectif principal de l\'autorégulation rénale ?", a:"Maintenir la filtration glomérulaire (DFG) constante."},
+    {q:"Comment appelle-t-on le mécanisme automatique de l\'artériole afférente impliqué dans l\'autorégulation ?", a:"Le tonus myogène."},
+    {q:"Le rétrocontrôle tubulo-glomérulaire provoque une (_)(_)( )de l\'artériole afférente si le sodium augmente dans le tube contourné distal.", a:"Vasoconstriction"},
+    {q:"Quelle est la valeur normale de la Pression Artérielle Moyenne (PAM) selon le support ?", a:"75 mmHg."}
+  ],
+  "3-9": [
+    {q:"Quel organe synthétise l\'angiotensinogène ?", a:"Le foie."},
+    {q:"Quelle hormone transforme l\'angiotensinogène en angiotensine I ?", a:"La rénine."},
+    {q:"Quelle hormone favorise la rétention de sel pour augmenter le volume et la pression artérielle ?", a:"L\'aldostérone."}
+  ],
+  "3-10": [
+    {q:"Citez deux effets centraux de l\'angiotensine II (AII) pour lutter contre l\'hypovolémie.", a:"La stimulation de la soif et la synthèse d\'ADH."},
+    {q:"Action de l\'Angiotensine II sur l\'artériole efférente en cas de baisse de perfusion ?", a:"Vasoconstriction (pour maintenir la pression de filtration)."},
+    {q:"Quelle substance inhibe la vasoconstriction de l\'artère afférente par l\'Angiotensine II ?", a:"Les prostaglandines (PGI2)."}
+  ],
+  "3-11": [
+    {q:"Pourquoi les AINS sont-ils dangereux chez un patient déshydraté ?", a:"Ils bloquent les prostaglandines protectrices, aggravant l\'hypoperfusion rénale."}
+  ],
+  "3-12": [
+    {q:"Quel est le mécanisme d\'action des inhibiteurs de l\'enzyme de conversion (IEC) ?", a:"Ils inhibent la production d\'Angiotensine II."}
+  ],
+  "3-13": [
+    {q:"Quel segment du rein réabsorbe la majorité (65 %) du sel filtré ?", a:"Le tubule proximal (TCP)."},
+    {q:"Pourquoi la réabsorption dans le tubule proximal est-elle dite \'isotonique\' ?", a:"Car le rein réabsorbe le Na^(()+) et l\'eau dans les mêmes proportions."},
+    {q:"Quel est le principal acteur apical de la réabsorption du sodium dans le tubule contourné proximal ?", a:"Les antiports Na^(()+)/H^(()+)."},
+    {q:"Quel transporteur basolatéral permet l\'expulsion du sodium hors de la cellule tubulaire vers le sang ?", a:"La Na^(()+)-K^(()+) ATPase."},
+    {q:"Quels canaux permettent la réabsorption d\'eau suite au déséquilibre osmotique dans le tubule contourné proximal ?", a:"Les aquaporines de type 1 (AQP1)."},
+    {q:"Quel est l\'effet direct de l\'Angiotensine II sur la Na^(()+)-K^(()+) ATPase en cas de déshydratation ?", a:"Elle augmente et stimule directement son activité."}
+  ],
+  "3-14": [
+    {q:"Comment l\'augmentation de la sécrétion de H^(()+) par les antiports Na^(()+)/H^(()+) affecte-t-elle les bicarbonates ?", a:"Elle permet une plus grande réabsorption des bicarbonates (HCO3^(()-))."},
+    {q:"Comment appelle-t-on l\'alcalose métabolique maintenue par la réabsorption accrue de bicarbonate lors d\'une déshydratation ?", a:"L\'alcalose métabolique de contraction."},
+    {q:"L\'Angiotensine II agit sur toute la partie proximale de l\'anse de Henlé et indirectement sur le tube collecteur via l\'(_)(_)(.)", a:"Aldostérone"}
+  ],
+  "3-15": [
+    {q:"Quel est le devenir du bicarbonate en excès lors de la réhydratation d\'un patient ?", a:"Il est évacué par les urines car l\'activité de l\'antiport Na^(()+)/H^(()+) diminue."},
+    {q:"Quel pourcentage de réabsorption du sodium s\'effectue dans la partie ascendante de l\'anse de Henlé ?", a:"25 %."},
+    {q:"Quelle proportion du sel est réabsorbée dans le tube collecteur ?", a:"Entre 1 et 3 %."}
+  ],
+  // ===== PDF 4: Functional_Renal_Failure_Mechanisms =====
+  "4-2": [
+    {q:"Comment les vomissements affectent-ils la fonction rénale ?", a:"La perte d\'eau digestive diminue le volume sanguin, entraînant une oligurie réactionnelle."},
+    {q:"Quelle est la définition clinique d\'une occlusion intestinale ?", a:"L\'arrêt complet ou partiel du transit intestinal."},
+    {q:"Quelle est la conséquence d\'une perte digestive basse (diarrhée) sur l\'osmolalité plasmatique ?", a:"Elle peut entraîner une déshydratation extracellulaire impactant la perfusion rénale."}
+  ],
+  "4-3": [
+    {q:"Pourquoi l\'angiotensine II favorise-t-elle un bilan hydrique positif ?", a:"Elle stimule simultanément la soif (apports) et l\'ADH (réabsorption)."},
+    {q:"L\'activation du récepteur AT(1) par l\'angiotensine II au niveau du rein entraîne une vasoconstriction de quelle artériole ?", a:"L\'artériole efférente."},
+    {q:"Comment l\'hypovolémie stimule-t-elle l\'ADH indépendamment de l\'angiotensine II ?", a:"Par l\'intermédiaire des barorécepteurs."},
+    {q:"Quelle enzyme permet la conversion de l\'angiotensine I en angiotensine II ?", a:"L\'enzyme de conversion de l\'angiotensine (ECA)."}
+  ],
+  "4-5": [
+    {q:"Sous l\'action de quelle hormone le transporteur NKCC2 est-il stimulé en cas de déshydratation ?", a:"L\'angiotensine II."},
+    {q:"Quelle est la perméabilité à l\'eau de la branche ascendante de l\'anse de Henlé ?", a:"Elle est imperméable à l\'eau."},
+    {q:"Quel type de réabsorption (tonie) caractérise le transport du sel dans la branche ascendante de l\'anse de Henlé ?", a:"Une réabsorption hypertonique (sel sans eau)."},
+    {q:"Quel est le devenir du potassium K^(+) réabsorbé dans la branche ascendante de l\'anse de Henlé ?", a:"Il est rejeté du côté basolatéral."},
+    {q:"Quelle fraction du sodium filtré est réabsorbée au niveau de l\'anse de Henlé ?", a:"25 %."},
+    {q:"Quel est l\'effet de la réabsorption de sel sans eau dans l\'anse ascendante sur l\'osmolalité des urines apicales ?", a:"Elle diminue l\'osmolalité des urines."},
+    {q:"Quel est l\'effet de la réabsorption de sel sans eau dans l\'anse ascendante sur l\'osmolalité interstitielle ?", a:"Elle augmente l\'osmolalité interstitielle."},
+    {q:"Quel médicament inhibe spécifiquement le transporteur NKCC2 ?", a:"Le furosémide."}
+  ],
+  "4-6": [
+    {q:"Quelle structure rénale permet le maintien du gradient osmotique cortico-papillaire ?", a:"Les vasa recta."},
+    {q:"Quelle est la caractéristique de perméabilité de la branche descendante de l\'anse de Henlé ?", a:"Elle est perméable à l\'eau mais dépourvue de transporteurs d\'électrolytes."},
+    {q:"Quelle valeur maximale l\'osmolalité peut-elle atteindre à la pointe de l\'anse de Henlé chez l\'Homme ?", a:"1200  mosm/kg."},
+    {q:"Dans l\'anse descendante, pourquoi l\'eau retourne-t-elle dans le cortex ?", a:"Pour être réabsorbée car l\'interstitium y est plus concentré que la lumière tubulaire."}
+  ],
+  "4-7": [
+    {q:"Dans le canal collecteur cortical, quelle hormone stimule l\'expression du canal ENaC ?", a:"L\'aldostérone."},
+    {q:"Terme : ENaC", a:"Definition : Canal sodique épithélial situé au pôle apical des cellules principales du canal collecteur cortical."},
+    {q:"Quel type de réabsorption du sodium a lieu dans le canal collecteur cortical sous l\'influence de l\'aldostérone ?", a:"Une réabsorption isotonique."},
+    {q:"Par quel transporteur le sodium sort-il du côté basolatéral dans le canal collecteur cortical ?", a:"La Na^(+)/K^(+) -ATPase."},
+    {q:"Quel canal permet l\'excrétion apicale du potassium K^(+) dans le canal collecteur cortical ?", a:"Le canal ROMK."},
+    {q:"Quel récepteur nucléaire lie l\'aldostérone dans les cellules du canal collecteur ?", a:"Le récepteur minéralocorticoïde (MR)."},
+    {q:"Vrai ou Faux : La réabsorption de sodium dans le canal collecteur cortical s\'accompagne d\'une réabsorption proportionnelle d\'eau (isotonique).", a:"Vrai."}
+  ],
+  "4-8": [
+    {q:"Quelle est la conséquence ionique plasmatique de l\'augmentation de l\'aldostérone ?", a:"Une hypokaliémie."},
+    {q:"Pourquoi l\'augmentation de l\'aldostérone favorise-t-elle l\'excrétion de protons H^(+) ?", a:"Le passage des charges positives de sodium dépolarise la partie luminale, stimulant la H^(+)/ ATPase."},
+    {q:"Quel trouble acido-basique est induit par une sécrétion excessive d\'aldostérone ?", a:"L\'alcalose métabolique."},
+    {q:"Quel médicament agit comme inhibiteur du canal ENaC ?", a:"L\'amiloride."},
+    {q:"Quelle est l\'origine métabolique des protons H^(+) excrétés sous l\'effet de l\'aldostérone ?", a:"La dissociation de l\'acide carbonique (H(2)CO(3))."}
+  ],
+  "4-9": [
+    {q:"Quels sont les deux principaux stimuli de la synthèse d\'ADH lors d\'une déshydratation ?", a:"L\'hypovolémie et l\'augmentation de l\'angiotensine II."},
+    {q:"Quelles protéines sont exprimées au pôle apical des cellules du canal collecteur médullaire sous l\'effet de l\'ADH ?", a:"Les aquaporines (AQP2)."},
+    {q:"Quelles aquaporines assurent la sortie de l\'eau au pôle basolatéral dans le canal collecteur médullaire ?", a:"AQP3 et AQP4."},
+    {q:"Quel est l\'impact de l\'ADH sur le volume et la concentration des urines ?", a:"Elle induit une oligurie (faible volume) et des urines hyper-concentrées."},
+    {q:"Au niveau de quel segment du néphron l\'ADH exerce-t-elle son action principale ?", a:"Le canal collecteur médullaire."}
+  ],
+  "4-10": [
+    {q:"Lors d\'une déshydratation extracellulaire, comment l\'adaptation physiologique peut-elle mener à une hyponatrémie ?", a:"Par l\'apport d\'eau pure (soif) et sa rétention (ADH) sans apport équivalent de sodium."},
+    {q:"L\'hyponatrémie par excès d\'eau libre entraîne une déshydratation extracellulaire associée à une (_)(_)( )intracellulaire.", a:"hyperhydratation"}
+  ],
+  "4-11": [
+    {q:"Quel est l\'effet d\'une hypoperfusion rénale sur les taux plasmatiques de créatinine et d\'urée ?", a:"Ils augmentent suite à la baisse du débit de filtration glomérulaire (DFG)."},
+    {q:"Quelles substances sont réabsorbées de manière accrue au niveau du TCP en cas d\'hypoperfusion rénale ?", a:"Le sodium (Na^(+)) et le bicarbonate (HCO(3)^(-))."},
+    {q:"Comment évolue la natrémie lors de la réabsorption au niveau du TCP ?", a:"Elle ne change pas car la réabsorption y est isotonique."},
+    {q:"Quelle est l\'osmolalité normale du filtrat à la sortie du tube contourné proximal (TCP) ?", a:"300  mosm/kg."}
+  ],
+  "4-12": [
+    {q:"Concept : Fraction excrétée de sodium (FE Na)", a:"Définition : Rapport entre la quantité de sodium perdue dans les urines et la quantité de sodium filtrée au glomérule."},
+    {q:"Quelle est la valeur de la FE Na dans une insuffisance rénale aiguë fonctionnelle ?", a:"< 1 %."},
+    {q:"Quelle est la valeur typique du sodium urinaire ([Na](u)) en cas d\'insuffisance rénale fonctionnelle ?", a:"< 20  mmol/L."},
+    {q:"Dans l\'insuffisance rénale fonctionnelle, le rapport urinaire [Na](u) / [K](u) est (_)(_)(.)", a:"inférieur à 1"},
+    {q:"Quel est le rapport Osmolalité(u) / Osmolalité(p) attendu dans une insuffisance rénale fonctionnelle ?", a:"> 2."},
+    {q:"Quel est le rapport Urée(u) / Urée(p) caractéristique d\'une insuffisance rénale fonctionnelle ?", a:"> 10."},
+    {q:"Quel est le rapport Créatinine(u) / Créatinine(p) dans une insuffisance rénale fonctionnelle ?", a:"> 30."},
+    {q:"Quelle est la valeur de la fraction excrétée de l\'urée (FE Urée) dans l\'insuffisance rénale fonctionnelle ?", a:"< 35 %."},
+    {q:"Quel terme sémiologique désigne une baisse de la diurèse ?", a:"Oligurie."},
+    {q:"Pourquoi le taux de bicarbonate plasmatique ([HCO(3)^(-)](p)) est-il souvent > 26  mmol/L dans l\'insuffisance rénale fonctionnelle ?", a:"À cause de la réabsorption accrue au TCP et de l\'excrétion de protons sous l\'effet de l\'aldostérone."}
+  ],
+};
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+let currentSlide = 0;
+const completed = new Set();
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      const pdf = pdfs.find(p => p.id === curPdf);
+      html += `<h3>${pdf.label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}"><span class="check"></span>Diapo ${s.slide}</div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+function buildSlide(s, idx) {
+  const pdf = pdfs.find(p => p.id === s.pdf);
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>Flashcards (${fcs.length})</h3>
+      <button class="btn-reveal" onclick="document.querySelectorAll('#slide-${idx} .flashcard').forEach(c=>c.classList.toggle(\'flipped\'))">Tout révéler / masquer</button>
+      <div class="fc-grid">
+        ${fcs.map((fc, j) => `
+          <div class="flashcard" onclick="this.classList.toggle(\'flipped\')">
+            <div class="fc-inner">
+              <div class="fc-front"><span class="fc-num">${j+1}</span><span class="fc-text">${fc.q}</span><span class="fc-hint">Cliquer</span></div>
+              <div class="fc-back"><span class="fc-num">✓</span><span class="fc-text">${fc.a}</span></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcard pour cette diapositive.</p>';
+  }
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">${pdf.name}</span>
+    <div class="slide-img-wrap"><img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy"></div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>← Précédent</button>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant →</button>
+    </div>
+  </div>`;
+}
+function render() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order">
+    <h2>Ordre des cours</h2><ol>`;
+  pdfs.forEach(p => {
+    html += `<li><strong>${p.name}</strong> — ${p.label}</li>`;
+  });
+  html += '</ol></div>';
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  document.querySelectorAll('.slide-section').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('slide-' + idx);
+  if (target) target.classList.add('active');
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  currentSlide = idx;
+  completed.add(idx);
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    const i = parseInt(el.dataset.idx);
+    el.classList.toggle('active', i === idx);
+    el.classList.toggle('completed', completed.has(i) && i !== idx);
+    el.querySelector('.check').textContent = completed.has(i) ? '✓ ' : '';
+  });
+  const pct = ((completed.size) / totalSlides * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('navCounter').textContent = `${idx + 1} / ${totalSlides}`;
+  const active = document.querySelector('.sidebar-item.active');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+  window.scrollTo(0, 0);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+buildSidebar();
+render();
+goTo(0);
+</script>
+</body>
+</html>
