@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sémiologie 1 - Cours & Flashcards</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Sémiologie 1</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 46</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Arterial_Pressure_Blueprint", label: "La Pression Artérielle : Comprendre, Mesurer et Agir", badge: "pdf-1", totalSlides: 12 },
+  { id: 2, name: "The_Mechanical_Blueprint", label: "Sémiologie Cardiovasculaire et Rénale", badge: "pdf-2", totalSlides: 12 },
+  { id: 3, name: "Urinalysis_Decoded", label: "L'Analyse d'Urine Décryptée : Protéinurie & Hématurie", badge: "pdf-3", totalSlides: 12 },
+  { id: 4, name: "Urinary_and_Fluid_Biology", label: "Système Urinaire et Hydrique : Des Symptômes à la Biologie", badge: "pdf-4", totalSlides: 10 },
+];
+
+const flashcardMap = {
+  // ===== PDF 1: Arterial_Pressure_Blueprint =====
+  "1-2": [
+    {q:"Quelle est la formule fondamentale de la pression artérielle (PA)?", a:"PA = DC × RVS"},
+    {q:"Comment se calcule le débit cardiaque (DC)?", a:"DC = Fc × VES"},
+    {q:"Dans le calcul du débit cardiaque, que signifie l\'abréviation Fc?", a:"Fréquence cardiaque (par minute)"},
+    {q:"Dans le calcul du débit cardiaque, que signifie l\'abréviation VES?", a:"Volume d\'Éjection Systolique"}
+  ],
+  "1-4": [
+    {q:"Quelle durée de repos minimale est nécessaire avant la mesure de la pression artérielle?", a:"5 minutes"},
+    {q:"Citez trois facteurs dont il faut être à distance avant de mesurer la PA.", a:"La prise de tabac, le café et l\'effort physique."},
+    {q:"Quelle doit être la position du bras du patient lors de la mesure de la pression artérielle?", a:"Le bras doit être à la hauteur du cœur."},
+    {q:"Dans quelles conditions doit être mesurée la PA lors de la première consultation pour HTA?", a:"Aux deux bras, en décubitus (allongé) et en orthostatisme (debout)."},
+    {q:"Pour quels profils de patients la mesure de la PA en orthostatisme est-elle systématique lors du suivi?", a:"Les patients sous traitement vasodilatateur, les diabétiques et les personnes âgées."},
+    {q:"Quels sont les critères de baisse de pression définissant l\'hypotension orthostatique?", a:"Baisse de la PAS > 20 mm Hg et/ou baisse de la PAD > 10 mm Hg."},
+    {q:"Dans quel intervalle de temps après le lever doit-on constater la baisse de PA pour une hypotension orthostatique?", a:"Entre 1 et 3 minutes après le lever."},
+    {q:"Quel est l\'impact pronostique majeur de l\'hypotension orthostatique chez les seniors?", a:"Une augmentation de la morbi-mortalité cardiovasculaire et du risque de chutes."}
+  ],
+  "1-5": [
+    {q:"Quelle proportion de la longueur du bras le brassard de tensiomètre doit-il recouvrir?", a:"Les 2/3 de la longueur du bras."},
+    {q:"Quelle est la conséquence sur la mesure de la PA d\'un brassard de taille trop petite?", a:"Une surestimation de la pression artérielle."},
+    {q:"Quelle est la conséquence sur la mesure de la PA d\'un brassard de taille trop grande?", a:"Une sous-estimation de la pression artérielle."}
+  ],
+  "1-6": [
+    {q:"Où doit-on placer le stéthoscope lors d\'une mesure manuelle de la PA?", a:"Sous le brassard, au bord antéro-interne du pli du coude, en regard de l\'artère humérale."},
+    {q:"À quel niveau doit-on gonfler le brassard par rapport à la PA systolique supposée?", a:"Au moins 30 mm Hg au-dessus de la valeur supposée."},
+    {q:"À quoi correspond la perception du premier bruit sourd régulier lors du dégonflage du brassard?", a:"La pression artérielle systolique (PAS)."},
+    {q:"À quoi correspond la disparition totale des bruits lors de la mesure manuelle de la PA?", a:"La pression artérielle diastolique (PAD)."},
+    {q:"Quel est le risque d\'erreur principal lors de l\'utilisation d\'un tensiomètre électronique?", a:"La présence d\'un rythme cardiaque irrégulier."},
+    {q:"Dans quelle circonstance pathologique observe-t-on typiquement un pouls paradoxal?", a:"Lors d\'une pathologie pulmonaire, notamment une crise d\'asthme sévère."}
+  ],
+  "1-7": [
+    {q:"Quelles sont les valeurs de définition d\'une PA optimale en consultation?", a:"PAS < 120 mm Hg et PAD < 80 mm Hg."},
+    {q:"Quelles sont les valeurs définissant une PA « normale haute » en consultation?", a:"PAS entre 130 et 139 mm Hg et/ou PAD entre 85 et 89 mm Hg."},
+    {q:"Quelle est la valeur cible de la PA lors d\'une consultation médicale?", a:"PAS < 140 mm Hg et PAD < 90 mm Hg."},
+    {q:"De combien de mm Hg la douleur ou le stress peuvent-ils augmenter la PAS?", a:"Jusqu\'à +60 mm Hg."}
+  ],
+  "1-8": [
+    {q:"Décrivez la « règle des 3 » utilisée pour l\'automesure tensionnelle.", a:"3 mesures consécutives, 2 fois par jour (matin et soir), pendant 3 jours."},
+    {q:"À quels moments précis de la journée l\'automesure doit-elle être réalisée?", a:"Le matin avant le petit déjeuner et la prise de médicaments, et le soir."},
+    {q:"Quelle est la valeur seuil de la PA normale en automesure?", a:"PA < 135/85 mm Hg."}
+  ],
+  "1-9": [
+    {q:"Quelle est la valeur seuil de normalité pour la moyenne des 24 heures en MAPA?", a:"PAS < 130 mm Hg et PAD < 80 mm Hg."},
+    {q:"Quelle est la valeur seuil de normalité pour la mesure MAPA nocturne?", a:"PAS < 120 mm Hg et PAD < 70 mm Hg."}
+  ],
+  "1-10": [
+    {q:"Quelle étape est indispensable après le dépistage d\'une PA > 140/90 mm Hg en consultation?", a:"Confirmer par une mesure ambulatoire (automesure ou MAPA)."},
+    {q:"Sous quelle condition de pression initiale peut-on se dispenser de confirmation ambulatoire de l\'HTA?", a:"Si la PA initiale est  ge 180/110 mm Hg ou en présence de complications organiques."},
+    {q:"Définition : Hypertension « blouse blanche »", a:"PA élevée en consultation mais normale en dehors de la consultation (mesure ambulatoire)."}
+  ],
+  "1-11": [
+    {q:"Citez trois complications majeures liées à l\'hypertension artérielle.", a:"L\'AVC, l\'insuffisance cardiaque et l\'insuffisance rénale chronique."}
+  ],
+  // ===== PDF 2: The_Mechanical_Blueprint =====
+  "2-7": [
+    {q:"Quelle est la limite supérieure de poids moléculaire pour la filtration des protéines par le rein?", a:"70 kD."},
+    {q:"Quelle est la valeur moyenne de la protéinurie physiologique par 24 heures?", a:"80 mg/24h (plage de 0,098 ± 0,025 g/jour)."},
+    {q:"Quel est le seuil maximal d\'une protéinurie dite « physiologique »?", a:"300 mg/jour."},
+    {q:"Quel est le seuil maximal d\'une albuminurie physiologique par 24 heures?", a:"30 mg/jour."},
+    {q:"Quelle protéine tubulaire constitue environ 40  % de la protéinurie physiologique?", a:"L\'uromoduline (ou protéine de Tamm-Horsfall)."}
+  ],
+  "2-8": [
+    {q:"Quelle est la caractéristique principale d\'une protéinurie d\'origine glomérulaire?", a:"Elle est composée majoritairement d\'albumine."},
+    {q:"Qu\'est-ce qu\'une protéinurie de « surcharge »?", a:"La filtration en excès d\'une protéine de faible poids moléculaire présente en trop grande quantité dans le plasma."},
+    {q:"Quelle proportion d\'albumine définit une protéinurie glomérulaire dite « sélective »?", a:"> 80-85  % d\'albumine à l\'électrophorèse."},
+    {q:"Quel type de protéinurie est recherché spécifiquement par l\'électrophorèse des protides urinaires?", a:"L\'étude de la composition des protéines (glomérulaire, tubulaire ou surcharge)."},
+    {q:"Quel terme désignait autrefois l\'identification d\'immunoglobulines urinaires par immuno-électrophorèse?", a:"Protéinurie de Bence Jones."}
+  ],
+  "2-9": [
+    {q:"Définition biologique du syndrome néphrotique.", a:"Protéinurie > 3 g/jour associée à une albuminémie < 30 g/L."},
+    {q:"Quel signe clinique oriente souvent vers la découverte d\'un syndrome néphrotique?", a:"Un syndrome œdémateux."},
+    {q:"Quelle est la caractéristique de débit d\'une protéinurie tubulaire?", a:"C\'est une protéinurie de faible débit, souvent inférieure à 2 g/jour."},
+    {q:"Citez trois circonstances physiologiques de protéinurie transitoire.", a:"La fièvre, l\'insuffisance cardiaque et l\'effort physique intense."},
+    {q:"Définition : Protéinurie orthostatique", a:"Protéinurie de faible débit présente uniquement debout et absente en position allongée (décubitus)."},
+    {q:"Quel est le profil type du patient présentant une protéinurie orthostatique?", a:"Un adolescent longiligne en croissance rapide."},
+    {q:"Quel est le pronostic à long terme de la protéinurie orthostatique?", a:"Elle est bénigne et disparaît généralement à l\'âge adulte."}
+  ],
+  "2-10": [
+    {q:"Quelle pathologie produit une protéinurie de surcharge par chaînes légères d\'immunoglobuline?", a:"Le myélome."},
+    {q:"Citez une cause de protéinurie de surcharge par myoglobine.", a:"La rhabdomyolyse (ex: traumatisme musculaire, toxicité médicamenteuse)."},
+    {q:"Quels marqueurs plasmatiques confirment une rhabdomyolyse?", a:"Un taux élevé de CPK, d\'ASAT et de LDH."},
+    {q:"Quelle est la cause d\'une protéinurie de surcharge par hémoglobine?", a:"Une hémolyse intravasculaire aiguë."},
+    {q:"Quel examen précise le type d\'immunoglobuline lors d\'une suspicion de myélome?", a:"L\'immuno-électrophorèse des protides urinaires (IEP.U)."}
+  ],
+  "2-11": [
+    {q:"Quel est le seuil de détection de l\'albuminurie par les bandelettes urinaires?", a:"Entre 50 et 100 mg/L."},
+    {q:"Citez deux causes de « faux positifs » à la bandelette urinaire pour la protéinurie.", a:"Des urines alcalines ou la présence d\'ammonium quaternaire."},
+    {q:"Pourquoi la bandelette urinaire peut-elle donner un « faux négatif » malgré une protéinurie réelle?", a:"Elle ne détecte pas les chaînes légères, la myoglobine ou l\'hémoglobine."},
+    {q:"À quelle valeur de protéinurie correspond une détection « +++ » à la bandelette?", a:"Environ 3 g/L."},
+    {q:"Quel réactif colorimétrique est utilisé pour le dosage de la protéinurie en laboratoire?", a:"Le rouge de Pyrogallol."},
+    {q:"Citez deux médicaments pouvant entraîner un faux positif lors du dosage au rouge de Pyrogallol.", a:"La pénicilline et les sulfamides."},
+    {q:"Comment valide-t-on la qualité d\'un recueil d\'urines des 24 heures?", a:"Par le dosage de la créatininurie qui doit être compris entre 8 et 12 mmol/24h."},
+    {q:"Quelle est la valeur normale d\'un ratio protéinurie/créatininurie sur échantillon?", a:"< 30 mg/mmol (ou < 300 mg/g)."},
+    {q:"Quelle est la définition biologique de la micro-albuminurie?", a:"Une albuminurie comprise entre 30 et 300 mg/24h."},
+    {q:"Quelle méthode de dosage permet de dépister la micro-albuminurie?", a:"La méthode immunologique (ELISA)."},
+    {q:"En dehors du diabète, à partir de quel ratio albuminurie/créatininurie parle-t-on de pathologie?", a:"> 300 mg/g."},
+    {q:"Quelle est la valeur de la créatininurie de 24 heures attendue pour valider un recueil?", a:"8 à 12 mmol/24h."},
+    {q:"Le ratio PCR > 300 mg/mmol correspond à une protéinurie de (_)(_)( )g/jour.", a:"> 3 g/jour"},
+    {q:"Vrai ou Faux : La présence d\'hématurie macroscopique peut fausser positivement le test de protéinurie par bandelette.", a:"Vrai"}
+  ],
+  // ===== PDF 3: Urinalysis_Decoded =====
+  "3-2": [
+    {q:"Quelle méthode est utilisée pour le dépistage rapide de l\'hématurie ?", a:"La bandelette urinaire (BU) réactive."}
+  ],
+  "3-8": [
+    {q:"Quelle est la définition biologique d\'une hématurie ?", a:"La présence d\'hématies en quantité anormale dans les urines."},
+    {q:"À partir de quelle concentration d\'hématies une hématurie est-elle qualifiée de macroscopique ?", a:"Plus de 1 million par ml (ou > 1 ,000 par mm^(3))."},
+    {q:"Une hématurie est dite microscopique si le taux d\'hématies se situe entre (_)(_)( )et (_)(_)( )par ml.", a:"10 ,000 ; 1 ,000 ,000"},
+    {q:"Quelle est la valeur normale (physiologique) du taux d\'hématies dans les urines ?", a:"Moins de 10 ,000 par ml (ou < 10 par mm^(3))."},
+    {q:"Quelle est la valeur normale du taux de leucocytes dans les urines ?", a:"Moins de 10 ,000 par ml (ou < 10 par mm^(3))."},
+    {q:"Quel examen de laboratoire permet de confirmer une hématurie ?", a:"L\'ECBU (Examen Cytologique et Bactériologique des Urines)."},
+    {q:"Pourquoi est-il recommandé de réaliser l\'ECBU de préférence sur la première miction du matin ?", a:"Parce que les urines y sont plus concentrées et acides."},
+    {q:"Quelle partie du jet urinaire doit être recueillie pour un ECBU ?", a:"Le milieu de jet."},
+    {q:"Quelle étape d\'hygiène est indispensable avant le recueil d\'un ECBU ?", a:"La toilette du méat avec un antiseptique suivie d\'un rinçage à l\'eau."},
+    {q:"Quels sont les paramètres de centrifugation des urines lors d\'un ECBU ?", a:"3 ,000 tours/min pendant 2 à 5 minutes."},
+    {q:"Quels sont les trois éléments quantifiés lors de l\'examen direct d\'un ECBU ?", a:"Les hématies, les leucocytes et la présence de germes (coloration de Gram)."},
+    {q:"Quel est le délai maximal de conservation d\'un prélèvement d\'urine à température ambiante avant analyse ?", a:"2 heures."},
+    {q:"Combien de temps un prélèvement d\'ECBU peut-il être conservé à 4°C ?", a:"24 heures."},
+    {q:"Lors de l\'examen direct d\'un ECBU, que permet de mettre en évidence la coloration de Gram ?", a:"La présence ou l\'absence de germes (bactéries)."},
+    {q:"Quel examen permet de confirmer que des urines rouges contiennent effectivement des hématies ?", a:"L\'examen cytologique des urines (ECBU)."},
+    {q:"Une hématurie avec présence de cylindres hématiques nécessite souvent une analyse en microscopie à (_)(_)(.)", a:"contraste de phase"}
+  ],
+  "3-9": [
+    {q:"Quel médicament est classiquement connu pour colorer les urines en rouge sans présence de sang (BU négative) ?", a:"La rifampicine."},
+    {q:"Citez deux aliments pouvant donner une coloration rouge aux urines malgré une bandelette urinaire négative.", a:"La betterave et la rhubarbe."}
+  ],
+  "3-10": [
+    {q:"Citez deux substances pouvant provoquer un faux positif à l\'hématurie sur une bandelette urinaire.", a:"L\'hémoglobine (hémoglobinurie) et la myoglobine (myoglobinurie)."}
+  ],
+  "3-11": [
+    {q:"Que suggère la présence de « cylindres hématiques » lors de l\'analyse du culot urinaire ?", a:"Une hématurie d\'origine glomérulaire."},
+    {q:"Dans le cadre d\'une hématurie macroscopique, que suggère la présence de caillots ?", a:"Une lésion d\'origine urologique."},
+    {q:"Une hématurie dite « initiale » évoque classiquement une pathologie d\'origine (_)(_)(.)", a:"urétro-cervico-prostatique"},
+    {q:"Une hématurie dite « terminale » évoque une pathologie d\'origine (_)(_)(.)", a:"vésicale"},
+    {q:"Quelle est la valeur localisatrice d\'une hématurie « totale » ?", a:"Elle n\'a pas de valeur localisatrice certaine (peut être rénale ou une hématurie importante)."},
+    {q:"Comment appelle-t-on le test clinique consistant à recueillir l\'urine dans trois récipients successifs pour localiser l\'origine d\'une hématurie ?", a:"L\'épreuve des 3 verres de Guyon."},
+    {q:"Citez trois signes cliniques associés pouvant orienter vers une origine urologique d\'une hématurie.", a:"La dysurie, la douleur et le contact lombaire."},
+    {q:"Concept : Hématurie glomérulaire", a:"Définition : Présence d\'hématies dans les urines provenant du glomérule rénal, caractérisée par la présence de cylindres hématiques."}
+  ],
+  // ===== PDF 4: Urinary_and_Fluid_Biology =====
+  "4-5": [
+    {q:"Quelle est la valeur normale de l\'osmolalité plasmatique chez l\'Homme ?", a:"Environ 285 mosmol/kg d\'eau."},
+    {q:"Donnez la formule du calcul de l\'osmolalité plasmatique calculée.", a:"[Na](p) × 2 + [glucose](p)"},
+    {q:"Quelle molécule explique la différence entre l\'osmolalité plasmatique mesurée et calculée ?", a:"L\'urée."},
+    {q:"Quels sont les deux effecteurs principaux régulant les entrées et sorties d\'eau (H(2)O) ?", a:"La soif et l\'ADH (Hormone Anti-Diurétique)."},
+    {q:"Outre la peau et les poumons, quel organe est responsable de pertes d\'eau dites « insensibles » ?", a:"Le tube digestif (via les selles)."},
+    {q:"Vrai ou Faux : L\'osmolalité plasmatique est la même dans les compartiments intracellulaire et extracellulaire à l\'équilibre.", a:"Vrai (285 mosmol/L)."}
+  ],
+  "4-6": [
+    {q:"Où se situent les barorécepteurs à haute pression régulant la volémie ?", a:"Dans la crosse de l\'aorte et le sinus carotidien."},
+    {q:"Où se situent les barorécepteurs à basse pression (volorécepteurs) ?", a:"Dans l\'oreillette gauche (OG)."},
+    {q:"Quel noyau du tronc cérébral reçoit les afférences des barorécepteurs via le nerf vague (X) ?", a:"Le noyau du tractus solitaire (NTS)."}
+  ],
+  "4-7": [
+    {q:"Où est synthétisée l\'ADH ?", a:"Dans les noyaux supra-optiques et para-ventriculaires de l\'hypothalamus."},
+    {q:"Où est stockée et sécrétée l\'ADH ?", a:"Dans la post-hypophyse."},
+    {q:"Quels sont les deux stimuli principaux de la sécrétion d\'ADH ?", a:"L\'augmentation de l\'osmolalité plasmatique et la baisse de la volémie."},
+    {q:"Comparée à la volémie, la régulation de l\'ADH par l\'osmolalité plasmatique est très (_)(_)( )mais peu (_)(_)(.)", a:"sensible ; puissante"},
+    {q:"À partir de quel pourcentage de variation de la volémie les barorécepteurs stimulent-ils puissamment la sécrétion d\'ADH ?", a:"Plus de 10 , %."},
+    {q:"Pourquoi une hyponatrémie peut-elle apparaître lors d\'une déshydratation extracellulaire sévère ?", a:"Car la soif et l\'ADH sont stimulées par l\'hypovolémie, favorisant la rétention d\'eau libre."},
+    {q:"Que signifie le terme « oligurie » ?", a:"Une diminution de la quantité d\'urines émise par 24 heures."},
+    {q:"Quel est l\'effet de l\'ADH sur le rein ?", a:"Elle augmente la réabsorption d\'eau libre au niveau du tube collecteur."},
+    {q:"Dans le cadre d\'un bilan hydrique, l\'entrée d\'eau est régulée par le centre de la soif situé dans (_)(_)(.)", a:"l\'hypothalamus"},
+    {q:"Quel est le paramètre physico-chimique du plasma qui est « très sensible mais peu puissant » pour la régulation de l\'ADH ?", a:"L\'osmolalité plasmatique."}
+  ],
+  "4-8": [
+    {q:"Quel système hormonal régule principalement les sorties rénales de sodium (Na^(+)) ?", a:"Le système Rénine-Angiotensine-Aldostérone (SRAA)."},
+    {q:"L\'hyperhydratation extracellulaire (HEC) correspond à un bilan sodé (_)(_)(.)", a:"positif (augmentation du sodium total)"},
+    {q:"Quelle est la cause fondamentale d\'une hyperhydratation extracellulaire ?", a:"Un défaut d\'adaptation des sorties rénales de sodium."},
+    {q:"Quelles sont les trois principales étiologies de l\'hyperhydratation extracellulaire ?", a:"L\'insuffisance cardiaque, la cirrhose hépatique et le syndrome néphrotique."},
+    {q:"Pourquoi le système rénine-angiotensine-aldostérone est-il activé dans l\'insuffisance cardiaque malgré une HEC ?", a:"À cause de la baisse du débit sanguin rénal (hypoperfusion glomérulaire)."},
+    {q:"Dans le modèle de l\'insuffisance cardiaque, comment appelle-t-on l\'état du secteur artériel ?", a:"Une hypovolémie relative."},
+    {q:"Quels sont les trois axes du traitement symptomatique d\'une hyperhydratation extracellulaire ?", a:"La restriction sodée, les diurétiques et la restriction hydrique (si hyponatrémie)."},
+    {q:"Quel facteur des forces de Starling favorise le passage de liquide vers l\'interstitium en cas d\'insuffisance cardiaque ?", a:"L\'augmentation de la pression hydrostatique capillaire (P(c))."},
+    {q:"Pourquoi une dénutrition protidique majeure peut-elle causer des œdèmes ?", a:"Par baisse de la pression oncotique plasmatique ( pi(c))."},
+    {q:"Quelle hormone surrénalienne favorise la réabsorption tubulaire de sodium ?", a:"L\'aldostérone."},
+    {q:"Quelle est la principale cause d\'hyperhydratation extracellulaire en pratique médicale ?", a:"L\'insuffisance cardiaque."},
+    {q:"L\'apparition d\'un œdème aigu du poumon (OAP) est une complication de (_)(_)(.)", a:"l\'hyperhydratation extracellulaire (HEC)"},
+    {q:"Quel est l\'impact de l\'angiotensine II sur la sensation de soif ?", a:"Elle stimule la soif au niveau du système nerveux central."}
+  ],
+  "4-9": [
+    {q:"Comment se manifeste cliniquement l\'augmentation du volume interstitiel lors d\'une HEC ?", a:"Par des œdèmes."},
+    {q:"Quelles sont les quatre caractéristiques sémiologiques classiques des œdèmes de l\'HEC ?", a:"Déclives, blancs, mous et indolores."},
+    {q:"Citez deux localisations de séreuses où peut s\'accumuler du liquide lors d\'une HEC.", a:"Le péritoine (ascite) et la plèvre (épanchement pleural)."},
+    {q:"Quels sont les deux signes biologiques traduisant une hémodilution lors d\'une HEC ?", a:"La baisse de l\'hématocrite et l\'hypoprotidémie."},
+    {q:"Citez deux signes de gravité respiratoire liés à une hyperhydratation extracellulaire.", a:"L\'épanchement pleural massif et l\'œdème pulmonaire (OAP)."},
+    {q:"Le « signe du godet » permet de mettre en évidence (_)(_)(.)", a:"un œdème (hyperhydratation interstitielle)"},
+    {q:"Une hyperhydratation extracellulaire s\'accompagne d\'une (_)(_)( )du poids corporel.", a:"augmentation"},
+    {q:"Comment varie l\'hématocrite en cas d\'hyperhydratation extracellulaire ?", a:"Elle diminue (par hémodilution)."},
+    {q:"Quelle pathologie hépatique est une cause majeure d\'HEC avec ascite ?", a:"La cirrhose hépatique."}
+  ],
+  "4-10": [
+    {q:"La déshydratation extracellulaire (DEC) est la conséquence d\'un bilan sodé (_)(_)(.)", a:"négatif (déficit en sodium)"},
+    {q:"Quels sont les deux compartiments dont le volume diminue lors d\'une déshydratation extracellulaire ?", a:"Le compartiment plasmatique et le compartiment interstitiel."},
+    {q:"Citez trois signes cliniques de la diminution du volume plasmatique lors d\'une DEC.", a:"L\'hypotension (ou hypotension orthostatique), la tachycardie et l\'oligurie."},
+    {q:"Citez trois signes cliniques de la diminution du volume interstitiel lors d\'une DEC.", a:"La perte de poids, le pli cutané et la langue sèche."},
+    {q:"Quels sont les deux signes biologiques traduisant une hémoconcentration lors d\'une DEC ?", a:"L\'augmentation de l\'hématocrite et de la protidémie."},
+    {q:"Quelle est l\'origine des pertes sodées si la diurèse est conservée (inadaptée) lors d\'une DEC ?", a:"Une origine rénale."},
+    {q:"Citez deux causes digestives fréquentes de déshydratation extracellulaire.", a:"Les vomissements et la diarrhée."},
+    {q:"Quel est le signe clinique le plus simple et le plus fiable pour suivre l\'évolution d\'une HEC ou d\'une DEC ?", a:"Le poids."},
+    {q:"Un pli cutané persistant après pincement de la peau est un signe de déshydratation (_)(_)(.)", a:"extracellulaire (diminution du secteur interstitiel)"},
+    {q:"Dans quelle situation pathologique peut-on observer une déshydratation extracellulaire par perte cutanée ?", a:"En cas de brûlures étendues ou de dermatose bulleuse diffuse."},
+    {q:"Citez une cause de déshydratation extracellulaire par « troisième secteur ».", a:"Une occlusion digestive."}
+  ],
+};
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+let currentSlide = 0;
+const completed = new Set();
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      const pdf = pdfs.find(p => p.id === curPdf);
+      html += `<h3>${pdf.label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}"><span class="check"></span>Diapo ${s.slide}</div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+function buildSlide(s, idx) {
+  const pdf = pdfs.find(p => p.id === s.pdf);
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>Flashcards (${fcs.length})</h3>
+      <button class="btn-reveal" onclick="document.querySelectorAll('#slide-${idx} .flashcard').forEach(c=>c.classList.toggle(\'flipped\'))">Tout révéler / masquer</button>
+      <div class="fc-grid">
+        ${fcs.map((fc, j) => `
+          <div class="flashcard" onclick="this.classList.toggle(\'flipped\')">
+            <div class="fc-inner">
+              <div class="fc-front"><span class="fc-num">${j+1}</span><span class="fc-text">${fc.q}</span><span class="fc-hint">Cliquer</span></div>
+              <div class="fc-back"><span class="fc-num">✓</span><span class="fc-text">${fc.a}</span></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcard pour cette diapositive.</p>';
+  }
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">${pdf.name}</span>
+    <div class="slide-img-wrap"><img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy"></div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>← Précédent</button>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant →</button>
+    </div>
+  </div>`;
+}
+function render() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order">
+    <h2>Ordre des cours</h2><ol>`;
+  pdfs.forEach(p => {
+    html += `<li><strong>${p.name}</strong> — ${p.label}</li>`;
+  });
+  html += '</ol></div>';
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  document.querySelectorAll('.slide-section').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('slide-' + idx);
+  if (target) target.classList.add('active');
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  currentSlide = idx;
+  completed.add(idx);
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    const i = parseInt(el.dataset.idx);
+    el.classList.toggle('active', i === idx);
+    el.classList.toggle('completed', completed.has(i) && i !== idx);
+    el.querySelector('.check').textContent = completed.has(i) ? '✓ ' : '';
+  });
+  const pct = ((completed.size) / totalSlides * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('navCounter').textContent = `${idx + 1} / ${totalSlides}`;
+  const active = document.querySelector('.sidebar-item.active');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+  window.scrollTo(0, 0);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+buildSidebar();
+render();
+goTo(0);
+</script>
+</body>
+</html>
