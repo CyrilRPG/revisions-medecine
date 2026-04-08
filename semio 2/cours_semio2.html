@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sémiologie 2 - IRC</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Sémiologie 2 — IRC</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 31</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Mécanique_du_Filtre_Rénal", label: "Comprendre l\'IRC : De la Clinique à l\'Hémodynamique", badge: "pdf-1", totalSlides: 14 },
+  { id: 2, name: "Renal_Engineering_Blueprint", label: "IRC : Mécanique Cellulaire et Thérapeutiques", badge: "pdf-2", totalSlides: 17 },
+];
+
+const flashcardMap = {
+  // ===== PDF 1: Mécanique_du_Filtre_Rénal =====
+  "1-2": [
+    {q:"Comment définit-on l\'insuffisance rénale chronique (IRC) par rapport à l\'évolution de la fonction rénale ?", a:"C\'est une altération progressive et irréversible des fonctions rénales."},
+    {q:"Quel est le seuil de débit de filtration glomérulaire (eDFG) définissant une IRC en pratique clinique ?", a:"Un eDFG inférieur à 60  ml/min/1,73 m^(2)."},
+    {q:"Quelle est la durée minimale requise pour confirmer le caractère chronique d\'une insuffisance rénale ?", a:"Depuis plus de 3 mois."},
+    {q:"Pourquoi l\'IRC est-elle qualifiée d\'altération \'progressive\' ?", a:"Parce que la fonction rénale continue de décliner dans le temps une fois le processus initié."},
+    {q:"Pourquoi l\'IRC est-elle qualifiée d\'altération \'irréversible\' ?", a:"Parce qu\'il n\'est pas possible de restaurer les néphrons détruits ou de revenir à une fonction normale."},
+    {q:"Dans l\'IRC, l\'augmentation du taux de créatinine plasmatique est un signe de (_)(_)(.)", a:"Diminution de la filtration rénale."}
+  ],
+  "1-3": [
+    {q:"Pourquoi la créatinine plasmatique est-elle considérée comme un mauvais marqueur universel ?", a:"Son taux dépend de la masse musculaire du patient, faussant l\'estimation du DFG."},
+    {q:"Quelle est la source physiologique de la créatinine dans le corps humain ?", a:"Le renouvellement des muscles."},
+    {q:"Quel organe est principalement responsable de l\'élimination de la créatinine ?", a:"Le rein (via la filtration glomérulaire)."}
+  ],
+  "1-4": [
+    {q:"Quelles sont les deux méthodes de référence pour mesurer directement le DFG ?", a:"La clairance de l\'inuline et la mesure isotopique du DFG."},
+    {q:"Quelle est la valeur normale d\'un DFG mesuré ?", a:"120  ml/min/1,73 m^(2)."},
+    {q:"Quelle relation existe-t-il entre le taux de créatinine et le DFG ?", a:"Une relation inverse : si la créatinine est élevée, le DFG est bas."},
+    {q:"Quel paramètre sanguin augmente proportionnellement au débit de filtration glomérulaire ?", a:"Le débit sanguin glomérulaire (DSG)."},
+    {q:"Quel paramètre biologique reflète l\'atteinte de la barrière de filtration glomérulaire ?", a:"La protéinurie."},
+    {q:"Quelle mesure est considérée comme la référence absolue (\'gold standard\') de la fonction rénale ?", a:"Le DFG mesuré (clairance de l\'inuline)."}
+  ],
+  "1-5": [
+    {q:"Formule : Calcul de la clairance de la créatinine (standard)", a:"([créatinine](urinaire) × volume diurèse) / [créatinine](plasmatique)"},
+    {q:"Quelle est la formule de Cockroft et Gault pour estimer la clairance de la créatinine ?", a:"((140 - âge) × poids × Coeff) / [créatinine]"},
+    {q:"Quel coefficient est appliqué dans la formule de Cockroft et Gault pour une femme ?", a:"0,85"},
+    {q:"Quel coefficient est appliqué dans la formule de Cockroft et Gault pour un homme ?", a:"1,125"},
+    {q:"Quelles sont les quatre variables utilisées pour estimer le DFG (eDFG) selon les méthodes modernes ?", a:"Le sexe, l\'âge, l\'ethnie et la créatinine plasmatique."},
+    {q:"Quel test d\'estimation du DFG est recommandé par la HAS depuis 2012 ?", a:"Le test CKD-EPI."},
+    {q:"Quel était le défaut principal de l\'ancien test MDRD par rapport au CKD-EPI ?", a:"Il montrait un écart important entre DFG estimé et réel chez les patients sans troubles rénaux."},
+    {q:"Pourquoi le test CKD-EPI est-il privilégié par rapport au MDRD ?", a:"Il est fiable à la fois pour les patients sains et pour ceux souffrant d\'IRC."},
+    {q:"Comment l\'eDFG est-il utilisé en pratique clinique par rapport au DFG mesuré ?", a:"L\'eDFG sert d\'outil de routine plus simple et moins coûteux pour les futurs patients."},
+    {q:"Quelle est la principale limite de la clairance de la créatinine mesurée par recueil d\'urines ?", a:"Elle nécessite un recueil précis du volume de diurèse, souvent source d\'erreurs."},
+    {q:"Terme : eDFG", a:"Débit de Filtration Glomérulaire estimé."},
+    {q:"Pourquoi l\'ethnie est-elle incluse dans les variables du test CKD-EPI ?", a:"Pour corriger les variations de masse musculaire moyenne entre certaines populations."},
+    {q:"Dans la formule de Cockroft et Gault, l\'âge intervient dans le (_)(_)( )de la fraction.", a:"Numérateur (sous la forme 140 - âge)."},
+    {q:"Le test MDRD est jugé fiable spécifiquement pour quel type de patients ?", a:"Les patients souffrant d\'insuffisance rénale chronique avérée."},
+    {q:"Quelle est la variable \'ethnie\' dans le CKD-EPI ?", a:"Un facteur de correction utilisé pour ajuster l\'estimation du DFG selon l\'origine ethnique."},
+    {q:"Pourquoi dit-on que le DFG estimé est \'plus simple à découvrir\' en clinique ?", a:"Car il ne nécessite qu\'une prise de sang et un calcul, contrairement au recueil d\'urines de 24h."},
+    {q:"La clairance de la créatinine selon Cockroft et Gault dépend du poids du patient. (Vrai/Faux)", a:"Vrai."}
+  ],
+  "1-6": [
+    {q:"Quelle méthode chirurgicale est généralement utilisée pour induire artificiellement une IRC chez le rat ?", a:"La néphrectomie des 4/5 des néphrons."},
+    {q:"Comment crée-t-on une néphropathie interstitielle chronique expérimentale chez l\'animal ?", a:"En créant un obstacle chronique sur les voies urinaires."},
+    {q:"Quel modèle animal est utilisé pour étudier les maladies métaboliques avec conséquences rénales ?", a:"Le rat obèse Zucker."},
+    {q:"Citez un exemple d\'agent toxique utilisé pour induire une glomérulonéphrite expérimentale.", a:"La toxicité chronique du plomb."},
+    {q:"Quel modèle animal permet d\'étudier l\'IRC liée à une hypertension spontanée ?", a:"Le rat spontanément hypertendu."},
+    {q:"Dans le modèle d\'IRC par néphrectomie, quel pourcentage de néphrons est typiquement retiré ?", a:"Environ 80 % (néphrectomie des 4/5)."},
+    {q:"Comment l\'obstacle urinaire mène-t-il à l\'insuffisance rénale ?", a:"L\'obstacle crée une pression rétrograde qui épuise progressivement le parenchyme rénal."},
+    {q:"Quel est le but des modèles expérimentaux \'in vivo\' dans l\'étude de l\'IRC ?", a:"Comprendre les mécanismes physiopathologiques et tester l\'efficacité de nouveaux traitements."}
+  ],
+  "1-7": [
+    {q:"Quels paramètres biologiques hormonaux peut-on mesurer dans le sang d\'un rat IRC ?", a:"La vitamine D, l\'érythropoïétine (EPO) et la parathormone (PTH)."},
+    {q:"Quels paramètres biologiques urinaires sont suivis dans les modèles expérimentaux d\'IRC ?", a:"La protéinurie, l\'urée, la créatinine et l\'ionogramme."},
+    {q:"Par quelle technique peut-on mesurer les pressions capillaires glomérulaires in vivo chez le rat ?", a:"Par cathétérisme sous microscope (ponction de glomérule)."},
+    {q:"Quels paramètres cliniques simples sont mesurables in vivo chez le rat ?", a:"La pression artérielle (PA), le poids et la diurèse."},
+    {q:"Pourquoi le débit urinaire est-il mesuré dans les différents segments du tubule par micro-ponction ?", a:"Pour analyser précisément le fonctionnement local du néphron in vivo."},
+    {q:"Quel segment du néphron peut être ponctionné pour mesurer les pressions sous microscope ?", a:"Le glomérule, le tubule ou les capillaires."},
+    {q:"Quel est l\'intérêt de mesurer l\'ionogramme sanguin dans l\'IRC expérimentale ?", a:"Évaluer le maintien de l\'équilibre électrolytique par les reins résiduels."},
+    {q:"Pourquoi le poids du rat est-il suivi cliniquement ?", a:"C\'est un indicateur de l\'état général et de l\'équilibre hydrique (rétention d\'eau éventuelle)."},
+    {q:"L\'érythropoïétine (EPO) est un paramètre biologique mesuré dans quel liquide ?", a:"Le sang (plasma)."}
+  ],
+  "1-8": [
+    {q:"Dans l\'expérimentation in vivo, à quoi sert le groupe \'Rat témoin\' ?", a:"À comparer les résultats avec une fausse chirurgie pour isoler l\'effet de l\'intervention rénale."},
+    {q:"Quelles sont les quatre conséquences cliniques et biologiques majeures chez le rat opéré (IRC induite) ?", a:"Mortalité rapide, DFG bas, protéinurie élevée et pression artérielle (PA) élevée."},
+    {q:"Pourquoi pratique-t-on une \'fausse chirurgie\' sur les rats témoins ?", a:"Pour garantir que les conditions expérimentales (stress, ouverture, suture) sont identiques hors intervention rénale."},
+    {q:"Quelle est l\'évolution typique de la protéinurie chez un rat souffrant d\'IRC expérimentale ?", a:"Elle augmente de façon importante et précoce."},
+    {q:"Quel lien existe-t-il entre la pression artérielle et la progression de l\'IRC dans les modèles expérimentaux ?", a:"Une pression artérielle élevée accélère les dommages rénaux et la baisse du DFG."},
+    {q:"Quel est l\'effet d\'une néphrectomie partielle sur la pression artérielle systémique ?", a:"Elle provoque une hypertension artérielle (HTA)."},
+    {q:"Comment évolue le DFG chez un rat opéré sans traitement ?", a:"Il baisse rapidement."}
+  ],
+  "1-9": [
+    {q:"Comment définit-on le phénomène d\'hyperperfusion glomérulaire après une perte de néphrons ?", a:"Les néphrons restants filtrent un volume de sang plus important pour compenser la perte."},
+    {q:"Quelle est la conséquence physique de l\'hyperperfusion sur les capillaires glomérulaires ?", a:"Une augmentation de la pression hydrostatique glomérulaire."},
+    {q:"Pourquoi l\'augmentation de la pression dans les capillaires glomérulaires est-elle délétère ?", a:"Elle risque d\'endommager les filtres rénaux."},
+    {q:"Quel est l\'impact d\'une réduction néphronique sur le débit sanguin de chaque glomérule restant ?", a:"Le débit sanguin glomérulaire individuel augmente (hyperperfusion)."},
+    {q:"Quel est l\'impact de l\'hyperperfusion sur la pression hydrostatique glomérulaire ?", a:"Elle l\'augmente de façon très importante (++++)."},
+    {q:"Quels sont les trois principaux paramètres hémodynamiques qui augmentent suite à une réduction néphronique ?", a:"Le débit sanguin rénal, le débit sanguin glomérulaire et la pression hydrostatique glomérulaire."}
+  ],
+  "1-10": [
+    {q:"Quel est l\'effet de l\'application d\'un inhibiteur du système rénine-angiotensine chez le rat opéré ?", a:"Il retarde la mortalité et ralentit la baisse du DFG."},
+    {q:"Le traitement anti-HTA permet-il un retour à la normale de la fonction rénale chez le rat opéré ?", a:"Non, aucune valeur ne retrouve la normale et les reins restent altérés."},
+    {q:"Comment un traitement anti-angiotensine protège-t-il le rein au niveau hémodynamique ?", a:"En limitant l\'hyperperfusion et en abaissant les pressions capillaires glomérulaires."},
+    {q:"Quel type spécifique d\'anti-HTA est le plus efficace pour retarder la sclérose glomérulaire ?", a:"Les Inhibiteurs de l\'Enzyme de Conversion (IEC)."},
+    {q:"Selon l\'étude histologique, comment évolue la structure rénale sous traitement par IEC ?", a:"L\'apparition de la sclérose glomérulaire est retardée."},
+    {q:"Comment varie la mortalité dans le groupe de rats traités par anti-HTA ?", a:"La mortalité est plus tardive par rapport au groupe opéré sans traitement."},
+    {q:"Quel effet le traitement par IEC a-t-il sur la protéinurie ?", a:"Il entraîne une diminution de la protéinurie."}
+  ],
+  "1-11": [
+    {q:"Qu\'est-ce que le \'débit sanguin rénal\' dans le contexte des conséquences hémodynamiques de l\'IRC ?", a:"C\'est le volume total de sang circulant dans les reins, qui augmente par compensation lors d\'une IRC."}
+  ],
+  "1-12": [
+    {q:"À quel processus histologique la baisse du DFG et la protéinurie sont-elles corrélées ?", a:"À l\'apparition d\'une sclérose glomérulaire (glomérulosclérose)."},
+    {q:"Définition : Glomérulosclérose", a:"Durcissement ou cicatrisation des glomérules rénaux, corrélé à la perte de fonction rénale."},
+    {q:"Quelle est la conséquence histologique ultime de l\'hyperperfusion glomérulaire non traitée ?", a:"La destruction des filtres glomérulaires par sclérose."},
+    {q:"Qu\'observe-t-on au microscope électronique lors d\'une sclérose glomérulaire ?", a:"Une perte de la structure normale des boucles capillaires et un comblement par du tissu fibreux."},
+    {q:"Quelle est la conséquence d\'une HTA non contrôlée sur le glomérule ?", a:"Elle aggrave la glomérulosclérose."}
+  ],
+  // ===== PDF 2: Renal_Engineering_Blueprint =====
+  "2-2": [
+    {q:"Quels sont les principaux déchets azotés éliminés par le rein ?", a:"La créatinine et l\'urée."},
+    {q:"Le rein élimine l\'acide urique, qui est un déchet issu du métabolisme de quel type de molécule ?", a:"Les acides nucléiques."},
+    {q:"En fonction de quoi le rein adapte-t-il les sorties hydro-électrolytiques ?", a:"Apports alimentaires, sorties extra-rénales et besoins du métabolisme cellulaire."},
+    {q:"Dans quelle partie du néphron se produit principalement la réabsorption des HCO(3)^(()-) filtrés ?", a:"Le Tubule Contourné Proximal (TCP)."},
+    {q:"Quels acides non volatiles sont excrétés par le rein pour l\'équilibre acido-basique ?", a:"NH(4)^(()+) (ammonium) et les phosphates."},
+    {q:"Quels ions sont essentiels à l\'équilibre hydro-électrolytique géré par le rein ?", a:"Le Sodium (Na^(()+)) et le Potassium (K^(()+))."},
+    {q:"Quel processus rénal permet de compenser la consommation de bicarbonates (HCO(3)^(()-)) par l\'organisme ?", a:"La régénération des bicarbonates consommés."},
+    {q:"Quelles sont les sorties extra-rénales que le rein doit compenser pour l\'équilibre hydrique ?", a:"La sueur, la respiration et les selles."}
+  ],
+  "2-3": [
+    {q:"Quelle fonction endocrine rénale régule la pression artérielle ?", a:"Le système Rénine – Angiotensine – Aldostérone."},
+    {q:"Quelle étape métabolique de la Vitamine D se déroule dans le rein ?", a:"L\'hydroxylation (1 OH)."},
+    {q:"Quelle est la conséquence de l\'activation de la vitamine D par le rein sur le système digestif ?", a:"L\'augmentation de l\'absorption digestive du Calcium (Ca^(()2+))."},
+    {q:"Quelle action le rein exerce-t-il directement sur le calcium lors de la formation de l\'urine ?", a:"La réabsorption tubulaire du Calcium."},
+    {q:"Quelle hormone est synthétisée par le rein pour stimuler la production de globules rouges ?", a:"L\'érythropoïétine (EPO)."},
+    {q:"Quel est le stimulus principal déclenchant la synthèse d\'érythropoïétine par le rein ?", a:"L\'hypoxie."},
+    {q:"Quels sont les deux rôles du rein concernant la gestion des médicaments ?", a:"Le métabolisme et l\'élimination."},
+    {q:"Quelle fonction rénale est liée à la synthèse de l\'hémoglobine ?", a:"La synthèse de l\'érythropoïétine (EPO)."},
+    {q:"L\'hydroxylation de la vitamine D par le rein est une fonction (_)(_)(.)", a:"Endocrine (ou métabolique)."},
+    {q:"Quelle action osseuse est liée au métabolisme phosphocalcique régulé indirectement par le rein ?", a:"L\'activité ostéoclastique."}
+  ],
+  "2-4": [
+    {q:"Quels types de cellules sont utilisés pour les cultures cellulaires in vitro selon le document ?", a:"Les cellules mésangiales, tubulaires et endothéliales."},
+    {q:"Quelle technique expérimentale permet d\'isoler un tubule spécifique sous microscope ?", a:"La dissection de néphrons pour réaliser des perfusions tubulaires in vitro."},
+    {q:"Quels segments du tubule rénal peuvent être isolés pour étude in vitro ?", a:"Le TCP, l\'anse de Henlé, le TCD et le collecteur."},
+    {q:"Dans le modèle in vitro, que permet de mesurer le milieu placé en amont et en aval du tubule isolé ?", a:"La composition des liquides."},
+    {q:"Dans le modèle de culture in vitro, que signifie \'étude de l\'expression phénotypique\' ?", a:"L\'analyse de la morphologie et des caractéristiques observables des cellules."}
+  ],
+  "2-5": [
+    {q:"Quels aspects de l\'expression phénotypique sont analysés sur les cellules in vitro ?", a:"La morphologie des cellules."},
+    {q:"L\'étude de la localisation des transporteurs des cellules tubulaires est un exemple d\'étude de l\'expression de quelles molécules ?", a:"Les molécules membranaires."},
+    {q:"Quel domaine d\'étude analyse les ARN et les expressions génomiques des cellules rénales ?", a:"La biologie moléculaire."},
+    {q:"Quelle est la fonction des études quantitatives et fonctionnelles des protéines dans le modèle in vitro ?", a:"L\'étude des transports trans-tubulaires."},
+    {q:"Quel est le rôle métabolique des cellules mésangiales in vitro ?", a:"L\'étude de leur métabolisme cellulaire."}
+  ],
+  "2-7": [
+    {q:"Quels sont les deux principaux facteurs cliniques favorisant la progression de l\'IRC ?", a:"L\'HTA et la protéinurie (ou albuminurie)."},
+    {q:"Quelle est la conséquence d\'une hyperpression au niveau du capillaire glomérulaire sur la filtration ?", a:"Une augmentation de la filtration glomérulaire, entraînant une albuminurie."},
+    {q:"Pourquoi l\'insuffisance rénale chronique entraîne-t-elle une baisse du débit de filtration glomérulaire (DFG) ?", a:"À cause de la fibrose glomérulaire et interstitielle qui détruit les unités fonctionnelles (néphrons)."},
+    {q:"Quel est l\'effet de l\'angiotensine 2 sur la tension au sein du glomérule ?", a:"Elle provoque une hyperpression au niveau du capillaire glomérulaire."}
+  ],
+  "2-8": [
+    {q:"Quelle molécule permet la contraction des cellules mésangiales en plus de l\'angiotensine 2 ?", a:"L\'angiotensine 2 elle-même induit cette contraction."},
+    {q:"Quelle cytokine est sécrétée par les cellules mésangiales sous l\'effet de l\'angiotensine 2 ?", a:"Le TGF-β (ou TGF béta)."},
+    {q:"Le TGF-β sécrété par les cellules mésangiales a une action autocrine et (_)(_)(.)", a:"Paracrine."},
+    {q:"En présence d\'un excès d\'angiotensine 2, en quel type cellulaire les cellules mésangiales se transforment-elles ?", a:"En myofibroblastes."},
+    {q:"Quelle substance est synthétisée par les myofibroblastes mésangiaux, conduisant à la fibrose glomérulaire ?", a:"Le collagène."},
+    {q:"Définition : Fibrose glomérulaire", a:"Accumulation de collagène sécrété par les cellules mésangiales entraînant des altérations morphologiques et fonctionnelles."},
+    {q:"Quel type de myofibroblaste est capable de synthétiser du collagène dans le glomérule ?", a:"La cellule mésangiale transformée sous l\'effet de l\'angiotensine 2."},
+    {q:"L\'angiotensine 2 induit une sécrétion de (_)(_)( )par les glomérules.", a:"TFG béta (ou TGF-β)."}
+  ],
+  "2-9": [
+    {q:"Quelle partie du néphron est directement touchée par une forte concentration de protéines dans l\'urine ?", a:"Le tubule proximal."},
+    {q:"Sur quelle face des cellules tubulaires proximales l\'albumine filtrée se fixe-t-elle ?", a:"Le pôle apical."},
+    {q:"Quelle molécule signalétique est sécrétée par les cellules tubulaires suite à la fixation de l\'albumine ?", a:"Le TGF-β."},
+    {q:"Quel est le rôle du TGF-β dans le contexte de l\'interaction protéinurie / cellules tubulaires ?", a:"C\'est un messager qui induit la fibrose."},
+    {q:"Quelles cellules sont stimulées par le TGF-β tubulaire pour produire du collagène ?", a:"Les fibroblastes interstitiels."},
+    {q:"Où s\'accumule le collagène lors d\'une fibrose interstitielle ?", a:"Autour des néphrons."},
+    {q:"Quel système hormonal amplifie l\'effet du TGF-β et aggrave la fibrose ?", a:"Le système rénine-angiotensine (Angiotensine II)."},
+    {q:"Quels sont les deux facteurs induisant la sécrétion de TGF-β par les tubules ?", a:"L\'albuminurie et l\'angiotensine 2."},
+    {q:"Concept : Action autocrine du TGF-β", a:"Le TGF-β agit directement sur la cellule qui l\'a sécrété pour modifier son propre fonctionnement."},
+    {q:"Quelle molécule est spécifiquement mentionnée comme se fixant sur le pôle apical des cellules tubulaires ?", a:"L\'albumine."},
+    {q:"L\'accumulation de collagène autour des néphrons définit la (_)(_)(.)", a:"Fibrose interstitielle."}
+  ],
+  "2-10": [
+    {q:"Comment appelle-t-on la cicatrice dans le rein qui empêche son fonctionnement normal ?", a:"La fibrose interstitielle."},
+    {q:"Quel est le résultat de l\'activation du système rénine-angiotensine sur la progression de la fibrose ?", a:"Il amplifie l\'effet du TGF-β, aggravant ainsi la fibrose."}
+  ],
+  "2-11": [
+    {q:"Au niveau glomérulaire, quel est l\'effet d\'un pré-traitement par IEC sur le TGF-β ?", a:"Il limite sa sécrétion, réduisant ainsi la fibrose glomérulaire."},
+    {q:"Pourquoi le traitement par IEC est-il jugé plus efficace que les autres anti-HTA pour le rein ?", a:"Il évite l\'HTA tout en diminuant spécifiquement le débit d\'albuminurie."},
+    {q:"Quel est l\'impact global des IEC sur la progression de l\'insuffisance rénale ?", a:"Ils ralentissent la progression de la maladie."},
+    {q:"Quel médicament permet de réduire la charge sur le glomérule et limiter l\'hyperfiltration ?", a:"Les inhibiteurs du SGLT2."},
+    {q:"Quel est l\'impact d\'un pré-traitement par IEC sur le débit d\'albuminurie ?", a:"Il le diminue."}
+  ],
+  "2-12": [
+    {q:"Dans l\'étude sur le diabète de type 2, quels sont les trois groupes de traitement comparés ?", a:"ARA2, inhibiteur calcique et placebo."},
+    {q:"Quels critères cliniques sont suivis pour évaluer la dégradation de la fonction rénale dans l\'étude Diabète ?", a:"Le doublement de la créatinine, l\'insuffisance rénale terminale ou le décès."},
+    {q:"Quelle classe thérapeutique s\'est révélée la plus efficace pour protéger les reins dans l\'étude Diabète ?", a:"Les ARA 2 (anti-angiotensine II)."},
+    {q:"Dans l\'étude Diabète, quel stade d\'insuffisance rénale chronique présentaient les patients ?", a:"Le stade 3."},
+    {q:"Quelle était la durée médiane de suivi dans l\'étude comparant le sartan à l\'inhibiteur calcique ?", a:"2,5 ans."},
+    {q:"Dans l\'étude Diabète, que signifie le critère \'créatinine x2\' ?", a:"Le doublement de la concentration de créatinine plasmatique, signe d\'une chute de la fonction rénale."}
+  ],
+  "2-13": [
+    {q:"Vrai ou Faux : Le bénéfice des sartans sur les \'critères durs\' (dialyse, transplantation) a été formellement démontré dans l\'étude citée.", a:"Faux, le bénéfice sur les critères durs n’est pas démontré."},
+    {q:"Quel terme qualifie l\'effet protecteur des sartans sur le rein ?", a:"Néphroprotecteur."},
+    {q:"Vrai ou Faux : Les inhibiteurs calciques sont plus efficaces que les ARA 2 pour la néphroprotection chez le diabétique.", a:"Faux, les ARA 2 sont les plus efficaces."}
+  ],
+  "2-14": [
+    {q:"D\'où provient l\'hormone aldostérone ?", a:"Du cortex surrénalien."},
+    {q:"Sur quelle partie du rein l\'aldostérone exerce-t-elle son action principale ?", a:"Les tubules distaux."},
+    {q:"Quel est l\'effet de l\'aldostérone sur la gestion du sodium et la tension artérielle ?", a:"Elle retient le sodium, ce qui augmente la tension artérielle."},
+    {q:"Comment l\'aldostérone influence-t-elle le volume sanguin ?", a:"En retenant l\'eau."},
+    {q:"Quel ion est excrété sous l\'influence de l\'aldostérone ?", a:"Le potassium (K^(()+))."},
+    {q:"Quelles sont les trois conséquences néfastes d\'un excès d\'aldostérone sur le rein ?", a:"Fibrose rénale, augmentation de la protéinurie et aggravation de l\'IRC."},
+    {q:"Quel est le bénéfice majeur du blocage de l\'aldostérone indépendant de l\'effet sur la tension ?", a:"La protection directe du rein (néphroprotection)."},
+    {q:"Citez un exemple d\'antagoniste de l\'aldostérone stéroïdien.", a:"La Spironolactone."},
+    {q:"L\'aldostérone favorise la fibrose rénale. Comment appelle-t-on ce tissu ?", a:"Le tissu cicatriciel."},
+    {q:"En plus de l\'effet sur la tension artérielle, que réduit le blocage de l\'aldostérone ?", a:"La protéinurie."},
+    {q:"Quels sont les deux types d\'antagonistes de l\'aldostérone mentionnés ?", a:"Stéroïdiens (ex: Spironolactone) et non stéroïdiens."}
+  ],
+  "2-15": [
+    {q:"Où se situe précisément le cotransporteur SGLT2 dans le rein ?", a:"Dans le tubule proximal."},
+    {q:"Quelles substances sont réabsorbées par le transporteur SGLT2 ?", a:"Le glucose et le sodium."},
+    {q:"Quel est l\'effet immédiat des inhibiteurs du SGLT2 sur la composition de l\'urine ?", a:"Une augmentation du passage du glucose et du sodium dans l\'urine."},
+    {q:"L\'effet des inhibiteurs SGLT2 est qualifié de (_)(_)( )car il diminue le taux de sucre dans le sang.", a:"Hypoglycémiant."}
+  ],
+  "2-16": [
+    {q:"Comment les inhibiteurs du SGLT2 protègent-ils le glomérule ?", a:"En réduisant la charge glomérulaire et en limitant l\'hyperfiltration."},
+    {q:"Outre la protection rénale, quel bénéfice cardiovasculaire apportent les SGLT2 ?", a:"Une baisse de l\'insuffisance cardiaque."},
+    {q:"Chez quels types de patients les traitements par SGLT2 sont-ils prometteurs selon le texte ?", a:"Les patients diabétiques et non diabétiques."}
+  ],
+};
+const allSlides = [];
+pdfs.forEach(pdf => {
+  for (let s = 1; s <= pdf.totalSlides; s++) {
+    allSlides.push({ pdf: pdf.id, slide: s, key: `${pdf.id}-${s}` });
+  }
+});
+const totalSlides = allSlides.length;
+let currentSlide = 0;
+const completed = new Set();
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  let curPdf = -1;
+  allSlides.forEach((s, i) => {
+    if (s.pdf !== curPdf) {
+      curPdf = s.pdf;
+      const pdf = pdfs.find(p => p.id === curPdf);
+      html += `<h3>${pdf.label}</h3>`;
+    }
+    html += `<div class="sidebar-item" data-idx="${i}" id="sb-${i}"><span class="check"></span>Diapo ${s.slide}</div>`;
+  });
+  sb.innerHTML = html;
+  sb.querySelectorAll('.sidebar-item').forEach(el => {
+    el.addEventListener('click', () => goTo(parseInt(el.dataset.idx)));
+  });
+}
+function buildSlide(s, idx) {
+  const pdf = pdfs.find(p => p.id === s.pdf);
+  const fcs = flashcardMap[s.key] || [];
+  const imgSrc = `slides/pdf${s.pdf}_slide${s.slide}.png`;
+  let fcHtml = '';
+  if (fcs.length > 0) {
+    fcHtml = `<div class="fc-section">
+      <h3>Flashcards (${fcs.length})</h3>
+      <button class="btn-reveal" onclick="document.querySelectorAll('#slide-${idx} .flashcard').forEach(c=>c.classList.toggle(\'flipped\'))">Tout révéler / masquer</button>
+      <div class="fc-grid">
+        ${fcs.map((fc, j) => `
+          <div class="flashcard" onclick="this.classList.toggle(\'flipped\')">
+            <div class="fc-inner">
+              <div class="fc-front"><span class="fc-num">${j+1}</span><span class="fc-text">${fc.q}</span><span class="fc-hint">Cliquer</span></div>
+              <div class="fc-back"><span class="fc-num">✓</span><span class="fc-text">${fc.a}</span></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  } else {
+    fcHtml = '<p class="no-fc">Pas de flashcard pour cette diapositive.</p>';
+  }
+  return `<div class="slide-section" id="slide-${idx}">
+    <span class="pdf-badge ${pdf.badge}">${pdf.name}</span>
+    <div class="slide-img-wrap"><img src="${imgSrc}" alt="Diapo ${s.slide}" loading="lazy"></div>
+    ${fcHtml}
+    <div class="bottom-nav">
+      <button class="btn btn-prev" onclick="goTo(${idx-1})" ${idx===0?'disabled':''}>← Précédent</button>
+      <button class="btn btn-next" onclick="goTo(${idx+1})" ${idx===totalSlides-1?'disabled':''}>Suivant →</button>
+    </div>
+  </div>`;
+}
+function render() {
+  const main = document.getElementById('main');
+  let html = `<div class="pdf-order" id="slide-order">
+    <h2>Ordre des cours</h2><ol>`;
+  pdfs.forEach(p => {
+    html += `<li><strong>${p.name}</strong> — ${p.label}</li>`;
+  });
+  html += '</ol></div>';
+  allSlides.forEach((s, i) => { html += buildSlide(s, i); });
+  main.innerHTML = html;
+}
+function goTo(idx) {
+  if (idx < 0 || idx >= totalSlides) return;
+  document.querySelectorAll('.slide-section').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('slide-' + idx);
+  if (target) target.classList.add('active');
+  document.getElementById('slide-order').style.display = idx === 0 ? 'block' : 'none';
+  currentSlide = idx;
+  completed.add(idx);
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    const i = parseInt(el.dataset.idx);
+    el.classList.toggle('active', i === idx);
+    el.classList.toggle('completed', completed.has(i) && i !== idx);
+    el.querySelector('.check').textContent = completed.has(i) ? '✓ ' : '';
+  });
+  const pct = ((completed.size) / totalSlides * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('navCounter').textContent = `${idx + 1} / ${totalSlides}`;
+  const active = document.querySelector('.sidebar-item.active');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+  window.scrollTo(0, 0);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentSlide + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentSlide - 1); }
+});
+buildSidebar();
+render();
+goTo(0);
+</script>
+</body>
+</html>
