@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miction - Physiologie</title>
+<style>
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  .top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,15,26,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-nav h1 { font-size: 1.1rem; color: #7c8aff; white-space: nowrap; }
+  .nav-progress {
+    flex: 1; height: 6px; background: #1a1a2e; border-radius: 3px; overflow: hidden;
+  }
+  .nav-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #7c8aff, #ff6b9d);
+    border-radius: 3px; transition: width 0.3s;
+  }
+  .nav-counter { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 50px; left: 0; bottom: 0; width: 280px;
+    background: #12121f; border-right: 1px solid #2a2a4a;
+    overflow-y: auto; z-index: 90; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
+  .sidebar h3 {
+    padding: 8px 16px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #7c8aff; margin-top: 8px;
+  }
+  .sidebar-item {
+    padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
+    color: #999; transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: #1a1a2e; color: #ccc; }
+  .sidebar-item.active {
+    background: #1a1a30; color: #7c8aff; border-left-color: #7c8aff;
+    font-weight: 600;
+  }
+  .sidebar-item.completed { color: #4ade80; }
+  .sidebar-item .check { margin-right: 6px; }
+
+  /* MAIN */
+  .main { margin-left: 280px; margin-top: 50px; padding: 30px 40px 100px; max-width: 1100px; }
+
+  /* SLIDE */
+  .slide-section { display: none; animation: fadeIn 0.3s; }
+  .slide-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pdf-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .pdf-1 { background: #1a2744; color: #5b9aff; }
+  .pdf-2 { background: #1a3a2a; color: #4ade80; }
+  .pdf-3 { background: #3a2a1a; color: #ffb347; }
+  .pdf-4 { background: #2a1a3a; color: #c084fc; }
+
+  .slide-img-wrap {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 16px;
+    padding: 12px; margin-bottom: 24px; text-align: center;
+  }
+  .slide-img-wrap img {
+    max-width: 100%; height: auto; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  /* FLASHCARDS */
+  .fc-section { margin-top: 20px; }
+  .fc-section h3 {
+    font-size: 0.85rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fc-section h3::before {
+    content: ''; display: block; width: 20px; height: 2px; background: #7c8aff;
+  }
+  .fc-grid { display: flex; flex-direction: column; gap: 10px; }
+  .flashcard {
+    perspective: 1000px; cursor: pointer; min-height: 70px;
+  }
+  .fc-inner {
+    position: relative; width: 100%; min-height: 70px;
+    transition: transform 0.5s; transform-style: preserve-3d;
+  }
+  .flashcard.flipped .fc-inner { transform: rotateX(180deg); }
+  .fc-front, .fc-back {
+    backface-visibility: hidden; border-radius: 12px;
+    padding: 16px 20px; width: 100%;
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #1e1e36, #252545);
+    border: 1px solid #3a3a5a;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-back {
+    background: linear-gradient(135deg, #1a2e1a, #1e3a2e);
+    border: 1px solid #2a5a3a;
+    transform: rotateX(180deg);
+    position: absolute; top: 0; left: 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .fc-num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: #3a3a5a; display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700; color: #7c8aff;
+  }
+  .fc-back .fc-num { background: #2a5a3a; color: #4ade80; }
+  .fc-text { font-size: 0.9rem; line-height: 1.5; flex: 1; }
+  .fc-hint { font-size: 0.7rem; color: #666; margin-left: auto; white-space: nowrap; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid #2a2a4a;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-prev { background: #1a1a2e; color: #7c8aff; border: 1px solid #3a3a5a; }
+  .btn-prev:hover { background: #252545; }
+  .btn-next { background: #7c8aff; color: #fff; }
+  .btn-next:hover { background: #6a78ee; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-reveal {
+    display: inline-block; margin-bottom: 12px; padding: 8px 20px;
+    background: #252545; color: #7c8aff; border: 1px solid #3a3a5a;
+    border-radius: 8px; font-size: 0.8rem; cursor: pointer;
+  }
+  .btn-reveal:hover { background: #2a2a5a; }
+
+  /* PDF ORDER BOX */
+  .pdf-order {
+    background: linear-gradient(135deg, #1a1a2e, #1e1e38);
+    border: 1px solid #3a3a5a; border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 30px;
+  }
+  .pdf-order h2 { color: #7c8aff; margin-bottom: 16px; font-size: 1.1rem; }
+  .pdf-order ol { padding-left: 24px; }
+  .pdf-order li {
+    padding: 6px 0; color: #bbb; font-size: 0.9rem;
+    border-bottom: 1px solid #1a1a2a;
+  }
+  .pdf-order li:last-child { border: none; }
+
+  .no-fc { color: #555; font-style: italic; margin-top: 12px; font-size: 0.85rem; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 100px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <h1>Miction — Physiologie</h1>
+  <div class="nav-progress"><div class="nav-progress-fill" id="progressFill"></div></div>
+  <span class="nav-counter" id="navCounter">1 / 27</span>
+</div>
+
+<div class="sidebar" id="sidebar"></div>
+<div class="main" id="main"></div>
+
+<script>
+const pdfs = [
+  { id: 1, name: "Bladder_Systems_Engineering", label: "L\'ingénierie de la miction et de la continence", badge: "pdf-1", totalSlides: 12 },
+  { id: 2, name: "Micturition_Mechanics", label: "La Mécanique de la Miction : Anatomie et Physiologie", badge: "pdf-2", totalSlides: 15 },
+];
+
+const flashcardMap = {
+  // ===== PDF 1: Bladder_Systems_Engineering =====
+  "1-2": [
+    {q:"Quel est le rôle principal de la vessie vis-à-vis des résidus de la filtration rénale ?", a:"Les évacuer périodiquement pour maintenir l\'homéostasie interne."},
+    {q:"Quel conduit achemine l\'urine des reins jusqu\'à la vessie ?", a:"L\'uretère."},
+    {q:"Quel conduit permet l\'évacuation des urines stockées dans la vessie vers l\'extérieur ?", a:"L\'urètre."}
+  ],
+  "1-3": [
+    {q:"Le fait de retenir ses urines s\'appelle la _____.", a:"continence"},
+    {q:"Comment s\'appelle la phase durant laquelle la vessie agit comme un réservoir ?", a:"La phase de remplissage."},
+    {q:"Quelle est la durée relative de la phase de remplissage par rapport à la vidange ?", a:"C\'est une phase longue."},
+    {q:"Lors de la phase de remplissage, dans quel état se trouvent les sphincters ?", a:"Ils sont contractés."},
+    {q:"Comment s\'appelle la phase de vidange de la vessie ?", a:"La miction."},
+    {q:"Quelle action des sphincters permet l\'ouverture de l\'urètre lors de la miction ?", a:"Leur décontraction (ou relaxation)."},
+    {q:"Quelle action le muscle vésical doit-il effectuer pour permettre l\'évacuation de l\'urine ?", a:"Une contraction."},
+    {q:"Vrai ou Faux : Une miction normale peut laisser un résidu d\'urine dans la vessie.", a:"Faux, toutes les urines doivent se vider sans laisser de résidus."}
+  ],
+  "1-4": [
+    {q:"Quel muscle lisse compose la paroi vésicale ?", a:"Le détrusor."},
+    {q:"Quel est le rôle fonctionnel des sphincters urinaires ?", a:"Retenir le passage de l\'urine en bloquant l\'urètre."}
+  ],
+  "1-5": [
+    {q:"De quel type de commande nerveuse dépend le muscle détrusor ?", a:"Une commande végétative (SNA)."},
+    {q:"De quel type de tissu musculaire est composé le sphincter interne ?", a:"De muscle lisse."},
+    {q:"Quel type de commande nerveuse contrôle le sphincter interne ?", a:"Une commande végétative (SNA)."},
+    {q:"De quel type de tissu musculaire est composé le sphincter externe ?", a:"De muscle strié squelettique."},
+    {q:"Quel type de commande nerveuse contrôle le sphincter externe ?", a:"Une commande somatique."},
+    {q:"Le sphincter _____ est le seul sous contrôle volontaire (somatique).", a:"externe"}
+  ],
+  "1-6": [
+    {q:"Comment qualifie-t-on une contraction musculaire initiée par le muscle lui-même sans intervention nerveuse ?", a:"Une contraction myogène."},
+    {q:"Quels sont les deux composants du Système Nerveux Central (SNC) impliqués dans la coordination de la miction ?", a:"L\'encéphale et la moelle épinière."},
+    {q:"Quelles zones de la moelle épinière sont particulièrement impliquées dans la miction ?", a:"Les zones sacrée et dorso-lombaire."},
+    {q:"Dans le schéma de l\'innervation, quels niveaux vertébraux correspondent au système sympathique (D10 à _____) ?", a:"L2"},
+    {q:"Dans le schéma de l\'innervation, quels niveaux vertébraux correspondent au système parasympathique (S2 à _____) ?", a:"S4"}
+  ],
+  "1-7": [
+    {q:"Le Système Nerveux Somatique (SNS) utilise combien de neurone(s) pour relier la moelle au muscle strié ?", a:"Un seul neurone (motoneurone périphérique)."},
+    {q:"Où se situent les centres nerveux du système parasympathique contrôlant les organes pelviens ?", a:"Au niveau de la moelle sacrée."},
+    {q:"Où se situent les centres nerveux du système sympathique impliqués dans la miction ?", a:"Au niveau de la moelle dorso-lombaire."},
+    {q:"Quel nerf transmet les informations motrices somatiques vers le sphincter externe ?", a:"Le nerf pudendal."},
+    {q:"De quel plexus nerveux est issu le nerf hypogastrique ?", a:"Du plexus hypogastrique."},
+    {q:"Quel nerf transmet les informations motrices sympathiques vers la vessie ?", a:"Le nerf hypogastrique."},
+    {q:"Quel nerf transmet les informations motrices parasympathiques vers la vessie ?", a:"Le nerf pelvien."},
+    {q:"Vrai ou Faux : Les nerfs pudendal, hypogastrique et pelvien ont uniquement une fonction motrice.", a:"Faux, ils transmettent également des informations sensitives vers le SNC."},
+    {q:"Le plexus _____ est le point d\'origine des fibres nerveuses sympathiques destinées à la vessie.", a:"hypogastrique"}
+  ],
+  "1-8": [
+    {q:"Quel type de neurotransmetteur est libéré par un neurone dit \'cholinergique\' ?", a:"L\'acétylcholine."},
+    {q:"Quels neurotransmetteurs sont libérés par un neurone dit \'adrénergique\' ?", a:"L\'adrénaline ou la noradrénaline."}
+  ],
+  "1-9": [
+    {q:"Quels sont les deux types de récepteurs post-synaptiques sur lesquels peut se fixer l\'acétylcholine ?", a:"Les récepteurs nicotiniques et muscariniques."},
+    {q:"Quels sont les deux grands types de récepteurs pour la noradrénaline ?", a:"Les récepteurs \α et \β."},
+    {q:"Sur quel type de récepteur se fixe l\'acétylcholine libérée par le motoneurone somatique au niveau du muscle strié ?", a:"Un récepteur nicotinique."},
+    {q:"Sur quel type de récepteur se fixe l\'acétylcholine libérée par le système parasympathique ?", a:"Un récepteur muscarinique."},
+    {q:"Sur quels types de récepteurs se fixe la noradrénaline libérée par le système sympathique ?", a:"Des récepteurs \α ou \β."},
+    {q:"Quel type de récepteur adrénergique est majoritairement impliqué dans la réponse du système sympathique ?", a:"Récepteur \α ou \β."},
+    {q:"Pourquoi la répartition des récepteurs est-elle importante pour l\'action des neuromédiateurs ?", a:"Car l\'action d\'un neuromédiateur change selon le type de récepteur sur lequel il se fixe."}
+  ],
+  "1-10": [
+    {q:"Quel est le but principal de l\'innervation sensitive de la vessie ?", a:"Faire remonter l\'information de remplissage (sensation de plénitude) vers le SNC."},
+    {q:"Quels récepteurs sensoriels physiologiques, situés dans la paroi vésicale, sont activés lors du remplissage ?", a:"Les mécanorécepteurs."},
+    {q:"À quels stimuli physiques les mécanorécepteurs vésicaux sont-ils sensibles ?", a:"À l\'étirement (distension) ou à l\'augmentation de la pression interne."},
+    {q:"Comment l\'information mécanique des mécanorécepteurs est-elle transmise au cerveau ?", a:"Elle est transformée en un message électrique remontant par les nerfs vers le SNC."}
+  ],
+  "1-11": [
+    {q:"La moelle sacrée regroupe les centres nerveux de quels systèmes (2 réponses attendues) ?", a:"Le système somatique et le système parasympathique."},
+    {q:"Lors de la phase de remplissage, le muscle détrusor est dans un état de _____.", a:"relaxation (ou relâchement)"},
+    {q:"Quel système nerveux prédomine lors de la phase de vidange pour contracter le détrusor ?", a:"Le système parasympathique."}
+  ],
+  // ===== PDF 2: Micturition_Mechanics =====
+  "2-3": [
+    {q:"Le sphincter externe de l\'urètre est un muscle de type _____.", a:"Strié"},
+    {q:"Le muscle détrusor est un muscle de type _____.", a:"Lisse"},
+    {q:"Le sphincter interne est un muscle de type _____.", a:"Lisse"},
+    {q:"La commande du sphincter externe est de type _____.", a:"Somatique (volontaire)"},
+    {q:"La commande du sphincter interne est de type _____.", a:"Végétative (sympathique)"}
+  ],
+  "2-4": [
+    {q:"Par quel type de fibres nerveuses l\'information de pression vésicale remonte-t-elle vers la moelle ?", a:"Des fibres sensitives de petit diamètre."},
+    {q:"Comment définit-on la sensation physiologique de plénitude vésicale ?", a:"Le sentiment d\'avoir la vessie pleine."},
+    {q:"Quel nerf transmet les informations de distension de la vessie vers les centres supérieurs ?", a:"Le nerf pelvien (voie afférente)."},
+    {q:"Quel nerf assure l\'innervation sensitive de la vessie ?", a:"Le nerf pelvien."}
+  ],
+  "2-5": [
+    {q:"Une fois acquises, quel type de commande les centres supra-médullaires permettent-ils pour la miction ?", a:"Une commande volontaire."},
+    {q:"Où se situe précisément le centre de la miction dans le tronc cérébral ?", a:"Dans la substance grise périaqueducale (autour de l\'aqueduc de Sylvius)."},
+    {q:"Quelle zone du cerveau est responsable de la prise de conscience du besoin d\'uriner ?", a:"Le cortex préfrontal."},
+    {q:"Quelle structure nerveuse coordonne l\'ensemble des mouvements nécessaires à la miction ?", a:"Le centre de la miction (dans le tronc cérébral)."}
+  ],
+  "2-6": [
+    {q:"À quelles étapes de la vie observe-t-on principalement des réflexes médullaires de miction ?", a:"Aux âges extrêmes (nourrissons et personnes âgées)."},
+    {q:"Quel stimulus initial déclenche généralement le réflexe de miction chez le bébé ?", a:"La distension mécanique de la vessie."},
+    {q:"Quel est l\'effet moteur final du réflexe médullaire de miction ?", a:"La vidange de la vessie."},
+    {q:"Pourquoi les très jeunes enfants ne peuvent-ils pas se retenir d\'uriner ?", a:"Leur système nerveux n\'est pas assez mature pour que le cortex inhibe le signal."},
+    {q:"Le réflexe médullaire de miction implique un message initial, une voie afférente et une _____.", a:"Réponse motrice"}
+  ],
+  "2-7": [
+    {q:"Quels sont les trois nerfs périphériques impliqués dans l\'innervation motrice de l\'appareil urinaire ?", a:"Les nerfs pelviens, hypogastriques et pudendaux."},
+    {q:"De quel niveau de la moelle épinière le système nerveux somatique (nerf pudendal) est-il issu ?", a:"La moelle sacrée (S2 à S4)."},
+    {q:"Quel muscle est innervé par le nerf pudendal ?", a:"Le sphincter externe de l\'urètre."},
+    {q:"Quel neurotransmetteur est libéré par le système nerveux somatique au niveau du sphincter externe ?", a:"L\'acétylcholine."},
+    {q:"De quel niveau de la moelle épinière le système nerveux sympathique (nerf hypogastrique) est-il issu ?", a:"La moelle dorso-lombaire (D10 à L2)."},
+    {q:"Quels sont les deux muscles ciblés par la commande sympathique via le nerf hypogastrique ?", a:"Le sphincter interne et le détrusor."},
+    {q:"Quel neurotransmetteur est principalement utilisé par le système nerveux sympathique ?", a:"La noradrénaline."},
+    {q:"Quel système nerveux est responsable de la contraction du détrusor via le nerf pelvien ?", a:"Le système nerveux parasympathique."},
+    {q:"Où se situent les centres nerveux du système parasympathique pour la miction ?", a:"Dans la moelle sacrée (S2 à S4)."},
+    {q:"Le nerf hypogastrique appartient au système nerveux _____.", a:"Sympathique"},
+    {q:"Le nerf pelvien appartient au système nerveux _____.", a:"Parasympathique"},
+    {q:"Quelle composante nerveuse entraîne la contraction du sphincter externe ?", a:"La composante somatique."},
+    {q:"Quel niveau médullaire correspond à l\'émergence du nerf hypogastrique ?", a:"D10 à L2."},
+    {q:"Quel niveau médullaire correspond à l\'émergence du nerf pudendal ?", a:"S2 à S4."}
+  ],
+  "2-8": [
+    {q:"Sur quel type de récepteur l\'acétylcholine se fixe-t-elle au niveau du sphincter externe ?", a:"Le récepteur nicotinique (N)."},
+    {q:"Quel est l\'effet de la fixation de l\'acétylcholine sur le sphincter externe ?", a:"La contraction du muscle."},
+    {q:"Sur quel récepteur la noradrénaline agit-elle pour contracter le sphincter interne ?", a:"Le récepteur alpha (\α)."},
+    {q:"Sur quel récepteur la noradrénaline agit-elle pour relaxer le muscle détrusor ?", a:"Le récepteur bêta (\β)."},
+    {q:"Quel type de récepteur à l\'acétylcholine trouve-t-on sur le muscle détrusor ?", a:"Le récepteur muscarinique (M)."},
+    {q:"La noradrénaline sur les récepteurs \β entraîne la _____ du détrusor.", a:"Relaxation"},
+    {q:"La noradrénaline sur les récepteurs \α entraîne la _____ du sphincter interne.", a:"Contraction"},
+    {q:"Quel récepteur est impliqué dans la contraction du détrusor par le système parasympathique ?", a:"Le récepteur muscarinique."}
+  ],
+  "2-9": [
+    {q:"Quelles sont les deux conditions motrices nécessaires pour assurer la continence ?", a:"La contraction des sphincters et la relaxation du détrusor."},
+    {q:"Quels systèmes nerveux doivent être activés pour maintenir la continence ?", a:"Les systèmes somatique et sympathique."},
+    {q:"Quel terme désigne la capacité de la vessie à se laisser remplir sans augmenter brusquement sa pression ?", a:"La compliance (réservoir compliant)."},
+    {q:"Quel système nerveux entraîne la relaxation du muscle détrusor ?", a:"Le système nerveux sympathique."},
+    {q:"Dans la continence, le système somatique contracte le sphincter _____.", a:"Externe"},
+    {q:"Dans la continence, le système sympathique contracte le sphincter _____.", a:"Interne"}
+  ],
+  "2-10": [
+    {q:"En temps normal, quelle action permanente le cortex préfrontal exerce-t-il sur le centre de la miction ?", a:"Une inhibition."},
+    {q:"La miction survient lorsque la pression intravésicale atteint le _____.", a:"Seuil de miction"},
+    {q:"Vrai ou Faux : Le centre de la miction est activé en permanence.", a:"Faux (il est inhibé en permanence par le cortex préfrontal)."}
+  ],
+  "2-11": [
+    {q:"Quelle est la première étape de l\'activation médullaire lors de la miction ?", a:"L\'inhibition des mécanismes de la continence (somatique et sympathique)."},
+    {q:"Que se passe-t-il au niveau des sphincters pour permettre la miction ?", a:"Ils doivent se relâcher (levée de la contraction)."}
+  ],
+  "2-12": [
+    {q:"Pourquoi la miction n\'est-elle pas un simple écoulement passif ?", a:"Elle nécessite une contraction active du détrusor par le parasympathique."},
+    {q:"Quel effet a l\'acétylcholine sur le muscle détrusor lors de la miction ?", a:"Elle provoque sa contraction."},
+    {q:"Quelle substance est libérée par la terminale parasympathique pour agir sur le détrusor ?", a:"L\'acétylcholine."}
+  ],
+  "2-13": [
+    {q:"Citez deux exemples de stimuli sensitifs pouvant favoriser la miction en dehors du besoin physiologique.", a:"L\'audition de l\'eau qui coule ou l\'immersion des mains dans l\'eau."},
+    {q:"En quoi consiste le \'syndrome clé-serrure\' ?", a:"L\'envie d\'uriner s\'intensifie brusquement à l\'approche de son domicile."},
+    {q:"Quels facteurs non physiologiques peuvent influencer le déclenchement de la miction chez l\'adulte ?", a:"Des facteurs sociaux, culturels ou émotionnels."}
+  ],
+  "2-14": [
+    {q:"Pourquoi pose-t-on souvent une sonde urinaire aux patients dans le coma ?", a:"Pour éviter la formation d\'un globe vésical dû à l\'abolition des centres médullaires."},
+    {q:"Comment appelle-t-on l\'écoulement d\'urine par simple débordement d\'une vessie trop pleine ?", a:"La miction par engorgement."}
+  ],
+};
+
+const totalSlides = 27;
+let curSlide = 1;
+let curPdf = 1;
+let completed = new Set();
+
+function slideId(pdfId, sNum) { return pdfId + "-" + sNum; }
+
+function globalIndex(pdfId, sNum) {
+  let idx = 0;
+  for (const p of pdfs) {
+    if (p.id === pdfId) return idx + sNum;
+    idx += p.totalSlides;
+  }
+  return idx + sNum;
+}
+
+function fromGlobal(g) {
+  let idx = 0;
+  for (const p of pdfs) {
+    if (g <= idx + p.totalSlides) return { pdfId: p.id, sNum: g - idx };
+    idx += p.totalSlides;
+  }
+  return { pdfId: pdfs[pdfs.length-1].id, sNum: pdfs[pdfs.length-1].totalSlides };
+}
+
+function buildSidebar() {
+  const sb = document.getElementById("sidebar");
+  let h = "";
+  for (const p of pdfs) {
+    h += `<h3>${p.label}</h3>`;
+    for (let s = 1; s <= p.totalSlides; s++) {
+      const g = globalIndex(p.id, s);
+      const active = g === curSlide ? "active" : "";
+      const done = completed.has(g) ? "completed" : "";
+      const check = completed.has(g) ? '<span class="check">✓</span>' : "";
+      h += `<div class="sidebar-item ${active} ${done}" onclick="goSlide(${g})">${check}Diapo ${s}</div>`;
+    }
+  }
+  sb.innerHTML = h;
+}
+
+function buildSlide() {
+  const { pdfId, sNum } = fromGlobal(curSlide);
+  curPdf = pdfId;
+  const p = pdfs.find(p => p.id === pdfId);
+  const sid = slideId(pdfId, sNum);
+  const cards = flashcardMap[sid] || [];
+  const g = curSlide;
+
+  let fcHtml = "";
+  if (cards.length > 0) {
+    fcHtml += `<div class="fc-section"><h3>Flashcards (${cards.length})</h3>`;
+    fcHtml += `<button class="btn-reveal" onclick="revealAll()">Révéler toutes les réponses</button>`;
+    fcHtml += `<div class="fc-grid">`;
+    cards.forEach((c, i) => {
+      fcHtml += `
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="fc-inner">
+            <div class="fc-front"><div class="fc-num">${i+1}</div><div class="fc-text">${c.q}</div><div class="fc-hint">cliquer</div></div>
+            <div class="fc-back"><div class="fc-num">✓</div><div class="fc-text">${c.a}</div></div>
+          </div>
+        </div>`;
+    });
+    fcHtml += `</div></div>`;
+  } else {
+    fcHtml = `<p class="no-fc">Pas de flashcards pour cette diapo.</p>`;
+  }
+
+  const prevDisabled = g <= 1 ? "disabled" : "";
+  const nextDisabled = g >= totalSlides ? "disabled" : "";
+
+  document.getElementById("main").innerHTML = `
+    <div class="slide-section active">
+      <span class="pdf-badge ${p.badge}">${p.name.replace(/_/g," ")}</span>
+      <div class="slide-img-wrap">
+        <img src="slides/pdf${pdfId}_slide${sNum}.png" alt="Diapo ${sNum}">
+      </div>
+      ${fcHtml}
+      <div class="bottom-nav">
+        <button class="btn btn-prev" ${prevDisabled} onclick="goSlide(${g-1})">← Précédent</button>
+        <button class="btn btn-next" ${nextDisabled} onclick="goSlide(${g+1})">Suivant →</button>
+      </div>
+    </div>`;
+
+  completed.add(g);
+  document.getElementById("progressFill").style.width = (g / totalSlides * 100) + "%";
+  document.getElementById("navCounter").textContent = g + " / " + totalSlides;
+  buildSidebar();
+  window.scrollTo(0, 0);
+}
+
+function goSlide(g) {
+  if (g < 1 || g > totalSlides) return;
+  curSlide = g;
+  buildSlide();
+}
+
+function revealAll() {
+  document.querySelectorAll(".flashcard").forEach(fc => fc.classList.add("flipped"));
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") goSlide(curSlide + 1);
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") goSlide(curSlide - 1);
+});
+
+buildSlide();
+</script>
+</body>
+</html>
